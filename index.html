@@ -235,6 +235,9 @@ header.top{position:relative}
 .lower-right .q-list{overflow-y:auto;min-height:0;flex:1 1 auto;grid-template-columns:1fr;padding-right:4px}
 .lower .mid{grid-template-columns:1fr}
 @media (max-width:900px){.lower{grid-template-columns:1fr}.lower-right{position:static}.lower-right .quests{max-height:none}.lower-right .q-list{overflow:visible}}
+.shamebar .tag{text-transform:uppercase}
+.shamebar .text{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sh-head{width:22px;height:22px;image-rendering:pixelated;box-shadow:0 0 0 2px var(--outline);flex:none}
 .agechip{display:inline-flex;align-items:center;gap:7px;font-weight:600;white-space:nowrap}
 .agechip::before{content:"";width:10px;height:10px;background:var(--c);box-shadow:0 0 0 2px var(--outline);flex:none}
 
@@ -391,9 +394,10 @@ button:disabled{opacity:.5;cursor:default}
     </aside>
   </div>
 
-  <section id="shameSec" hidden>
-    <div class="sect-head"><h2 class="mctitle">Hall of Shame</h2><span class="hint">Calculated from the death log</span></div>
-    <div class="shame" id="shame"></div>
+  <section class="panel tipbar shamebar" id="shameSec" hidden aria-label="Hall of Shame">
+    <span class="tag" id="shameTag">HALL OF SHAME</span>
+    <span class="text" id="shame"></span>
+    <button type="button" id="shameNext">Next award</button>
   </section>
 
   <section id="punSec" hidden>
@@ -996,6 +1000,21 @@ function startAliveTimer(iso){
 }
 
 // ---------- hall of shame ----------
+let shameCards = [], shameIdx = null;
+function showShame(){
+  const c = shameCards[shameIdx]; if (!c) return;
+  $("shameTag").textContent = c.label;
+  const big = c.big.includes("<small>") ? c.big.replace(/<small>(.*?)<\/small>/, " $1") : c.big;
+  $("shame").innerHTML = `${c.skin != null ? '<canvas class="sh-head" data-kind="head"></canvas>' : ""}<b>${esc(big)}</b> · ${esc(c.sub)}`;
+  const cv = $("shame").querySelector("canvas");
+  if (cv){ drawHead(cv, null); if (c.skin) loadImg(c.skin).then(im => { if (im) drawHead(cv, im); }); }
+}
+document.addEventListener("click", e => {
+  if (!e.target.closest("#shameNext") || shameCards.length < 2) return;
+  let n; do { n = Math.floor(Math.random() * shameCards.length); } while (n === shameIdx);
+  shameIdx = n; showShame();
+});
+
 function renderShame(){
   const sec = $("shameSec"), box = $("shame");
   if (!deaths.length){ sec.hidden = true; return; }
@@ -1059,8 +1078,9 @@ function renderShame(){
   const fewest = players.map(p => [p.id, counts[p.id] || 0]).sort((a,b) => a[1]-b[1]);
   if (fewest.length){ const n = fewest[0][1], ids = fewest.filter(x => x[1] === n).map(x => x[0]); card("Survivor", names(ids), n ? `Only ${n} death${n===1?"":"s"}. Suspicious.` : "Never died. Suspicious.", ids[0]); }
 
-  box.innerHTML = cards.map(c => `<div class="panel award"><span class="tag">${esc(c.label)}</span><div class="who-row">${c.headId ? `<canvas data-kind="head" data-skin="${esc(byId[c.headId]?.skin || "")}"></canvas>` : ""}<span class="big">${c.big.includes("<small>") ? c.big.replace(/^([^<]*)/, (m) => esc(m)) : esc(c.big)}</span></div><span class="sub">${esc(c.sub)}</span></div>`).join("");
-  box.querySelectorAll("canvas[data-kind]").forEach(cv => { drawHead(cv, null); const id = cv.dataset.skin; if (id) loadImg(id).then(im => { if (im) drawHead(cv, im); }); });
+  shameCards = cards.map(c => ({...c, skin: c.headId ? (byId[c.headId]?.skin || "") : null}));
+  if (shameIdx == null || shameIdx >= shameCards.length) shameIdx = Math.floor(Math.random() * shameCards.length);
+  showShame();
   sec.hidden = false;
 }
 
