@@ -389,9 +389,51 @@ button:disabled{opacity:.5;cursor:default}
   .spot .meter .on.next{animation:pulse 1s steps(2,end) infinite}
 }
 @keyframes pulse{50%{fill:var(--slot)}}
+
+/* ---------- news ticker ---------- */
+body.has-ticker{padding-top:36px}
+.ticker{position:fixed;top:0;left:0;right:0;height:36px;z-index:40;display:flex;background:#1E1E1E;color:#FFFFFF;font-size:14px;box-shadow:inset 0 -2px 0 #000000, 0 2px 0 rgba(0,0,0,.3)}
+.ticker[hidden]{display:none}
+.tk-lab{flex:none;display:flex;align-items:center;padding:0 12px;background:#B3261E;font-family:var(--f-label);font-weight:700;letter-spacing:.06em;font-size:12px;box-shadow:inset 2px 2px 0 #E0473D, inset -2px -2px 0 #6E1712;text-shadow:1px 1px 0 #3F0A07}
+.tk-lab .short{display:none}
+.tk-run{flex:1;min-width:0;overflow:hidden;position:relative;display:flex;align-items:center}
+.tk-track{display:flex;flex:none;white-space:nowrap;will-change:transform;animation:tkScroll var(--tk-dur,80s) linear infinite}
+.tk-run:hover .tk-track{animation-play-state:paused}
+.tk-seg{display:flex;flex:none;gap:34px;padding:0 34px 0 18px}
+.tk-it{display:inline-flex;gap:8px;align-items:center}
+.tk-k{color:#FFFF55}.tk-up{color:#55FF55}.tk-dn{color:#FF5555}.tk-dim{opacity:.6}
+.tk-sym{color:#55FFFF;font-weight:700}
+@keyframes tkScroll{to{transform:translateX(-50%)}}
+.tk-brk{position:absolute;inset:0;display:flex;align-items:center;gap:12px;background:#B3261E;color:#FFFFFF;font-weight:700;padding:0 12px;white-space:nowrap;overflow:hidden;animation:tkFlash 1.2s steps(2) infinite}
+.tk-brk[hidden]{display:none}
+.tk-brk .bt{flex:none;background:#FFFFFF;color:#B3261E;padding:3px 8px;font-size:12px;letter-spacing:.08em}
+.tk-brk .bx{overflow:hidden;text-overflow:ellipsis}
+@keyframes tkFlash{50%{background:#8E1C16}}
+@media (max-width:620px){.tk-lab .long{display:none}.tk-lab .short{display:inline}}
+@media (prefers-reduced-motion:reduce){.tk-run{overflow-x:auto;scrollbar-width:none}.tk-track{animation:none}.tk-seg + .tk-seg{display:none}.tk-brk{animation:none}}
+/* ---------- fortune cookie ---------- */
+.cookie{display:flex;align-items:center;gap:16px;padding:14px;cursor:pointer;min-height:84px}
+.cookie:focus-visible{outline:2px solid #FFFFFF;outline-offset:2px}
+.cookie .ck{flex:none;width:88px;height:56px;display:block}
+.cookie .ck svg{width:100%;height:100%;display:block}
+.cookie .ck-hint{font-size:15px;color:#FFFFFF;text-shadow:2px 2px 0 #3F3F3F}
+.cookie.wobble .ck{animation:ckWobble .5s steps(6) 1}
+@keyframes ckWobble{0%,100%{transform:rotate(0)}20%{transform:rotate(-8deg)}40%{transform:rotate(8deg)}60%{transform:rotate(-6deg)}80%{transform:rotate(5deg)}}
+.cookie.open{cursor:default}
+.cookie .slip{flex:1;min-width:0;background:#FFFDF0;color:#3F3F3F;padding:10px 14px;box-shadow:3px 3px 0 #555555;font-size:15px;line-height:1.4;transform:rotate(-1deg);animation:slipOut .45s ease-out 1}
+.cookie .slip b.hd{display:block;font-size:12px;color:#B3261E;margin-bottom:4px;letter-spacing:.05em}
+.cookie .slip .odds{display:block;margin-top:6px;color:#B3261E;font-weight:700}
+.cookie .slip .lucky{display:block;margin-top:2px;font-size:13px;opacity:.75}
+@keyframes slipOut{from{opacity:0;transform:translateX(-24px) rotate(-1deg) scaleX(.4)}to{opacity:1;transform:rotate(-1deg)}}
+@media (max-width:520px){.cookie{flex-direction:column;align-items:flex-start}}
+@media (prefers-reduced-motion:reduce){.cookie.wobble .ck,.cookie .slip{animation:none}}
 </style>
 </head>
 <body>
+<div class="ticker" id="ticker" hidden aria-label="Hearthigen news">
+  <span class="tk-lab"><span class="long">HEARTHIGEN NEWS</span><span class="short">NEWS</span></span>
+  <div class="tk-run"><div class="tk-track" id="tkTrack"></div><div class="tk-brk" id="tkBrk" hidden role="status"></div></div>
+</div>
 <canvas id="pano" aria-hidden="true"></canvas>
 <div class="pano-shade" aria-hidden="true"></div>
 
@@ -1480,7 +1522,7 @@ document.addEventListener("click", e => {
   const b = e.target.closest("#qTabs button[data-age]"); if (!b) return;
   viewAge = Number(b.dataset.age); renderQuests();
 });
-fetch("quests.json", {cache:"no-store"}).then(r => r.json()).then(q => { QUESTS = q; renderQuests(); }).catch(() => { $("qAge").textContent = "Couldn't load the quest list."; });
+fetch("quests.json", {cache:"no-store"}).then(r => r.json()).then(q => { QUESTS = q; renderQuests(); if (players.length) renderTicker(); }).catch(() => { $("qAge").textContent = "Couldn't load the quest list."; });
 
 
 function fmtWhen(iso){
@@ -1727,6 +1769,7 @@ function playerPageHtml(id){
       <div class="slot stat"><span class="label">Deaths</span><span class="v shadowed num">${myDeaths.length}</span></div>
       <div class="slot stat"><span class="label">Punish&shy;ments</span><span class="v red shadowed num">${pun}</span></div>
     </div>
+    ${cookieHtml(id)}
     <div class="pp-sec"><h3>Awards</h3>${awards.length ? `<ul class="pp-list">${awards.map(a => `<li class="slot"><span class="pp-award">${ICONS[a.label] ? `<span class="badge">${iconSvg(a.label)}</span>` : ""}<b>${esc(a.label)}</b></span><span class="when">${esc(a.sub)}</span></li>`).join("")}</ul>` : `<p class="pp-empty">No Hall of Shame awards. Yet.</p>`}</div>
     <div class="pp-sec"><h3>Punishments</h3>${myPun.length ? `<ul class="pp-list">${myPun.map(x => `<li class="slot"><span>${esc(x.text)}</span><span class="when">${x.time ? esc(fmtWhen(x.time).replace(/ @ .*/,"")) : ""}</span></li>`).join("")}</ul>` : `<p class="pp-empty">No punishments so far.</p>`}</div>
     <div class="pp-sec"><h3>Deaths</h3>${myDeaths.length ? `<ul class="pp-list">${myDeaths.map(d => `<li class="slot"><span>${esc(d.cause)}${d.reverted ? ' <span class="totem">REVERTED</span>' : ""}</span><span class="when">${d.time ? esc(fmtWhen(d.time)) : d.date ? esc(fmtDate(d.date)) : "Not tracked"}</span></li>`).join("")}</ul>` : `<p class="pp-empty">Hasn't died. Impressive.</p>`}</div>`;
@@ -2089,11 +2132,276 @@ let decorTimer = null;
 function scheduleDecor(){ clearTimeout(decorTimer); decorTimer = setTimeout(placeDecor, 120); }
 addEventListener("resize", scheduleDecor);
 try { new ResizeObserver(scheduleDecor).observe(document.body); } catch(e){}
+// ---------- news ticker, stocks, fortunes ----------
+const dateKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+function hashStr(str){ let h = 2166136261; for (let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } h ^= h >>> 15; h = Math.imul(h, 2246822507); h ^= h >>> 13; h = Math.imul(h, 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; }
+const STOCK_SYMBOL = {kanalumaddela:"KANA", silver3gaming:"SILV", mysticdragbax:"MYST", subkiwi:"KIWI", deim0s_v1:"DEIM", incendiaryblitz:"INCD", nagalooge:"DEVM", "monkey____":"SAGE", soulgiver039:"SOUL", feniul:"FENI", shrinppy:"PROP"};
+const symbolFor = p => STOCK_SYMBOL[p.id] || String(p.nick || p.name).replace(/[^a-z0-9]/gi, "").slice(0, 4).toUpperCase();
+const shortName = p => p ? (p.nick || p.name) : "Someone";
+const deathDay = d => d.time ? dateKey(new Date(d.time)) : (d.date || null);
+const deathMs = d => d.time ? Date.parse(d.time) : (d.date ? Date.parse(d.date + "T12:00:00") : 0);
+const realDeaths = () => sortedDeaths().filter(d => !d.reverted && !/^not tracked/i.test(d.cause || ""));
+// "Shot by Skeleton" -> "was shot by Skeleton", "Fell from a high place" -> "fell from a high place"
+const WAS_WORDS = /^(shot|slain|blown|killed|struck|squashed|impaled|pricked|frozen|fireballed|pummeled|squished|obliterated|poked|stung|skewered|doomed|stabbed|speared|eaten|crushed|stomped|sniped|bitten|roasted|smashed|burned to a crisp)\b/i;
+function causeText(c){
+  c = String(c || "died").trim();
+  const s = c.charAt(0).toLowerCase() + c.slice(1);
+  return WAS_WORDS.test(c) ? "was " + s : s;
+}
+function killerOf(cause){ const m = String(cause || "").match(/(?:\bby|fighting) (?:an? )?([A-Z][\w ]*?)$/); return m ? m[1] : null; }
+function agoText(ms){
+  const days = Math.floor((new Date(dateKey(new Date()) + "T00:00:00") - new Date(dateKey(new Date(ms)) + "T00:00:00")) / 86400000);
+  const mins = Math.floor((Date.now() - ms) / 60000);
+  if (mins < 60) return mins <= 1 ? "just now" : mins + " minutes ago";
+  if (days <= 0) return Math.floor(mins / 60) === 1 ? "1 hour ago" : Math.floor(mins / 60) + " hours ago";
+  if (days === 1) return "yesterday";
+  return days + " days ago";
+}
+// Stock price: starts at 100, climbs a little every day a player survives, crashes on every death. Same for everyone.
+function stockFor(id){
+  const all = realDeaths();
+  const mine = all.filter(d => d.player === id);
+  const perDay = {}; mine.forEach(d => { const k = deathDay(d); if (k) perDay[k] = (perDay[k] || 0) + 1; });
+  const first = all.map(deathDay).filter(Boolean).sort()[0] || dateKey(new Date());
+  let price = 100, prev = 100;
+  const today = new Date(); today.setHours(12, 0, 0, 0);
+  for (let d = new Date(first + "T12:00:00"); d <= today; d.setDate(d.getDate() + 1)){
+    const k = dateKey(d), n = perDay[k] || 0, noise = (hashStr("stock|" + id + "|" + k) - 0.5) * 0.06;
+    prev = price;
+    price = n ? price * Math.pow(0.82, n) * (1 + noise / 2) : price * (1.02 + noise);
+    price = Math.max(1, price);
+  }
+  return {price, change: prev ? (price - prev) / prev : 0};
+}
+// Chance of dying today: players who die more often get higher odds, plus a daily swing. Same for everyone.
+function deathOdds(id){
+  const all = realDeaths(), counts = {};
+  all.forEach(d => counts[d.player] = (counts[d.player] || 0) + 1);
+  const max = Math.max(1, ...Object.values(counts));
+  const lastMine = all.filter(d => d.player === id).map(deathMs).pop() || 0;
+  const recent = lastMine && Date.now() - lastMine < 3 * 86400000 ? 10 : 0;
+  const swing = (hashStr("odds|" + id + "|" + dateKey(new Date())) - 0.5) * 36;
+  return Math.max(3, Math.min(97, Math.round(18 + 52 * (counts[id] || 0) / max + recent + swing)));
+}
+const FORTUNES = {
+  funny: [
+    "Avoid water today. Just trust us.",
+    "You will find diamonds. You will also find lava.",
+    "Something green is standing right behind you.",
+    "Gravity is not your friend today. Stay off ladders.",
+    "Do not trust the villager with the good trade.",
+    "Today is a great day to stay in bed.",
+    "A creeper is thinking about you.",
+    "That cave sound was nothing. Probably.",
+    "Your shield will block everything except the thing that matters.",
+    "The chicken knows what you did.",
+    "You will dig straight down. Please don't.",
+    "Today's lucky number is 0. That's how many deaths you should have.",
+    "A skeleton has been practicing its aim. On you.",
+    "Your next boat ride will end on land.",
+    "Beware of anything that hisses, bounces or wears a pumpkin.",
+    "You will forget to eat at the worst possible moment.",
+    "A strange enderman will make eye contact. Look away.",
+    "The pressure plate was there for a reason.",
+    "Your horse has a plan. You are not in it.",
+    "Someone will say 'trust me' in voice chat today. Don't.",
+    "You will drop your sword in lava. Emotionally prepare.",
+    "Sleeping through the night is the bravest thing you'll do today.",
+    "The bridge you're building is one block too short.",
+    "A baby zombie on a chicken is coming. Run.",
+    "That 'quick trip' to the Nether will not be quick.",
+    "Do not punch the iron golem. We cannot stress this enough.",
+    "Phantoms are reading your sleep schedule.",
+    "You will hear a fuse sound and immediately regret everything.",
+    "Today you'll find a dungeon. It will find you first.",
+    "Every ravine is a trust fall. Nobody will catch you."
+  ],
+  savage: [
+    "The respawn screen misses you. Visit soon.",
+    "Your hearts are just a suggestion.",
+    "Today's punishment has your name written on it.",
+    "Even the zombies feel bad for you.",
+    "You are one bad jump away from a group apology.",
+    "Your armor is decorative.",
+    "The server has a pool going on when you'll die. It's today.",
+    "Somewhere, a skeleton is laughing at your last death.",
+    "Your survival skills are in the Wood Age.",
+    "Everyone's hearts drop when you log on.",
+    "Your coordinates are a crime scene.",
+    "Don't worry, the world was going to reset eventually anyway.",
+    "You will die doing something you said was 'totally safe.'",
+    "Your death message is already written. It's embarrassing.",
+    "Hardcore was a bold choice for you.",
+    "The lava pool is saving you a seat.",
+    "Statistically, this is your day to ruin it for everyone.",
+    "You fight like you have extra lives. You don't.",
+    "Your bed has seen you less than the death screen has.",
+    "Nobody blames you. Yet."
+  ],
+  wholesome: [
+    "Today is a good day to build something you're proud of.",
+    "A friend will save your life today. Say thanks.",
+    "Patience will find you better loot than speed.",
+    "You are the reason someone logs on today.",
+    "Small steps still climb mountains. Even block by block.",
+    "Your base looks better than you think it does.",
+    "Kindness in chat will come back to you.",
+    "Today, the sunrise is worth stopping for.",
+    "You will find exactly what you need, right when you need it.",
+    "Every death is a lesson. You're getting smarter.",
+    "Share your food today. Good things follow.",
+    "The team is stronger with you in it.",
+    "Your next adventure will be a story worth telling.",
+    "Take it slow today and enjoy the view.",
+    "Someone needs your help today. Be the one who shows up.",
+    "A quiet day of farming is still a good day.",
+    "You've survived every bad day so far. Keep going.",
+    "Good things grow when you tend to them. Like wheat.",
+    "Today you'll laugh at something dumb with your friends.",
+    "You're braver than the Nether thinks you are."
+  ],
+  killer: [
+    "{k} is looking for you again.",
+    "{k} remembers you. Fondly.",
+    "Your rematch with {k} is closer than you think.",
+    "Stay far away from anything that looks like {k} today."
+  ]
+};
+const LUCKY = ["Copper","Diamond","Emerald","Lapis","Redstone","Gold","Iron","Coal","Amethyst","Quartz","Netherite","Wheat","Bread","Torches","A water bucket","A golden apple","Your bed","Cobblestone","A shield","Totem vibes"];
+function fortuneFor(id){
+  const k = dateKey(new Date()), r = n => hashStr("fortune|" + n + "|" + id + "|" + k);
+  const killers = realDeaths().filter(d => d.player === id).map(d => killerOf(d.cause)).filter(Boolean);
+  const tones = ["funny", "funny", "savage", "wholesome"];
+  if (killers.length) tones.push("killer");
+  const tone = tones[Math.floor(r("tone") * tones.length)];
+  const list = FORTUNES[tone];
+  let text = list[Math.floor(r("pick") * list.length)];
+  if (tone === "killer"){
+    const counts = {}; killers.forEach(x => counts[x] = (counts[x] || 0) + 1);
+    const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+    text = text.replace("{k}", "The " + top);
+  }
+  return {text, lucky: LUCKY[Math.floor(r("lucky") * LUCKY.length)]};
+}
+const NUM2 = n => n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+function onThisDay(){
+  const today = new Date(), out = [];
+  const byDay = {}; realDeaths().forEach(d => { const k = deathDay(d); if (k) (byDay[k] = byDay[k] || []).push(d); });
+  const back = (label, d) => { const k = dateKey(d); (byDay[k] || []).forEach(x => out.push({label, d: x})); };
+  const w = new Date(today); w.setDate(w.getDate() - 7); back("1 week ago today", w);
+  for (let m = 1; m <= 12; m++){
+    const d = new Date(today.getFullYear(), today.getMonth() - m, today.getDate());
+    if (d.getDate() !== today.getDate()) continue;
+    back(m === 12 ? "1 year ago today" : m === 1 ? "1 month ago today" : m + " months ago today", d);
+  }
+  if (out.length) return out.slice(0, 3);
+  const past = realDeaths().filter(d => deathMs(d) < Date.now() - 2 * 86400000 && deathDay(d));
+  if (!past.length) return [];
+  const pick = past[Math.floor(hashStr("throwback|" + dateKey(today)) * past.length)];
+  const [y, mo, da] = deathDay(pick).split("-").map(Number);
+  return [{label: "Throwback to " + new Date(y, mo - 1, da).toLocaleDateString(undefined, {month: "short", day: "numeric"}), d: pick}];
+}
+let tickerKey = "";
+function renderTicker(){
+  if (!players.length){ $("ticker").hidden = true; document.body.classList.remove("has-ticker"); return; }
+  const t = totals();
+  const news = [];
+  const live = realDeaths(), last = live[live.length - 1];
+  if (last){
+    const p = players.find(x => x.id === last.player);
+    news.push(`<span class="tk-it"><span class="tk-k">LATEST</span>${esc(shortName(p))} ${esc(causeText(last.cause))}${deathMs(last) ? ` <span class="tk-dim">· ${esc(agoText(deathMs(last)))}</span>` : ""}</span>`);
+  }
+  const odds = players.map(p => ({p, o: deathOdds(p.id)})).sort((a, b) => b.o - a.o)[0];
+  if (odds) news.push(`<span class="tk-it"><span class="tk-k">FORECAST</span>Most likely to die today: ${esc(shortName(odds.p))} (${odds.o}%)</span>`);
+  onThisDay().forEach(x => { const p = players.find(y => y.id === x.d.player); news.push(`<span class="tk-it"><span class="tk-k">${esc(x.label.toUpperCase())}</span>${esc(shortName(p))} ${esc(causeText(x.d.cause))}</span>`); });
+  if (progress && progress.age){
+    const a = QUESTS && QUESTS.ages ? QUESTS.ages[progress.age - 1] : null;
+    news.push(`<span class="tk-it"><span class="tk-k">QUEST</span>Age ${progress.age}${a ? " · " + esc(a.name) : ""} · quest ${progress.quest}${a ? " of " + a.quests.length : ""}</span>`);
+  }
+  const cp = $("cpText").textContent;
+  if (cp && cp !== "None right now") news.push(`<span class="tk-it"><span class="tk-k">PUNISHMENT</span>Now serving: ${esc(cp)}</span>`);
+  news.push(`<span class="tk-it"><span class="tk-k">TOTALS</span>${esc($("sDeaths").textContent)} deaths · ${esc($("sPun").textContent)} punishments</span>`);
+  const stocks = [...players].sort((a, b) => (t[b.id] || 0) - (t[a.id] || 0) || a.name.localeCompare(b.name)).map(p => {
+    const s = stockFor(p.id), up = s.change >= 0;
+    return `<span class="tk-it" title="${esc(p.name)}"><span class="tk-sym">$${esc(symbolFor(p))}</span>${NUM2(s.price)} <span class="${up ? "tk-up" : "tk-dn"}">${up ? "▲" : "▼"} ${Math.abs(s.change * 100).toFixed(1)}%</span></span>`;
+  });
+  const seen = new Set(); for (let n = news.length - 1; n >= 0; n--){ if (seen.has(news[n])) news.splice(n, 1); else seen.add(news[n]); }
+  // Mix the stories in between the stock prices
+  const items = []; let si = 0;
+  news.forEach(n => { items.push(n); items.push(...stocks.slice(si, si + 3)); si += 3; });
+  items.push(...stocks.slice(si));
+  const seg = items.join("");
+  if (seg !== tickerKey){
+    tickerKey = seg;
+    const tr = $("tkTrack");
+    tr.innerHTML = `<div class="tk-seg">${seg}</div><div class="tk-seg" aria-hidden="true">${seg}</div>`;
+    $("ticker").hidden = false; document.body.classList.add("has-ticker");
+    requestAnimationFrame(() => { const w = tr.firstElementChild.offsetWidth; tr.style.setProperty("--tk-dur", Math.max(30, Math.round(w / 70)) + "s"); });
+  }
+  checkBreaking();
+}
+const BREAKING_MS = 15 * 60000;
+function checkBreaking(){
+  const el = $("tkBrk"), d = realDeaths().filter(x => x.time).pop();
+  const since = d ? Date.now() - Date.parse(d.time) : Infinity;
+  if (!d || since < -60000 || since > BREAKING_MS){ el.hidden = true; return; }
+  const p = players.find(x => x.id === d.player), pts = deathPts(d);
+  el.innerHTML = `<span class="bt">BREAKING NEWS</span><span class="bx">${esc(shortName(p))} ${esc(causeText(d.cause))}.${pts ? ` Points +${pts}.` : ""}</span>`;
+  el.hidden = false;
+}
+setInterval(() => { if (!document.hidden && players.length) renderTicker(); }, 30000);
+// Fortune cookie on player pages
+const PIX = (rows, pal) => { let r = ""; rows.forEach((row, y) => [...row].forEach((c, x) => { if (pal[c]) r += `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${pal[c]}"/>`; })); return r; };
+const CK_PAL = {a:"#7A4A12", b:"#D9A441", c:"#F2C76B", d:"#A8742A", p:"#FFFDF0", r:"#B3261E"};
+const COOKIE_CLOSED = `<svg viewBox="0 0 20 14" shape-rendering="crispEdges" aria-hidden="true">${PIX([
+  "......aaaaaaaa......",
+  "....aabbbbbbbbaa....",
+  "...abbccbbbbbbbba...",
+  "..abbcbbbbbbbbbbba..",
+  "..abbbbbbbaabbbbba..",
+  ".abbbbbbbaddabbbbba.",
+  ".abbbbbbbaddabbbbba.",
+  "..abbbbbbaddabbbba..",
+  "...abbbbbaddabbba...",
+  "....aabbbaddabaa....",
+  "......aaaaaaaa......"], CK_PAL)}</svg>`;
+const COOKIE_OPEN = `<svg viewBox="0 0 24 14" shape-rendering="crispEdges" aria-hidden="true">${PIX([
+  "........................",
+  "........................",
+  "...aaaa..........aaaa...",
+  "..abbbba........abbbba..",
+  ".abccbbda......adbbbbba.",
+  ".abcbbbdappppppadbbbbba.",
+  ".abbbbbdaprrpprpadbbbbba",
+  ".abbbbbdappppppadbbbbba.",
+  "..abbbda........adbbba..",
+  "...abbda........adbba...",
+  "....aaa..........aaa....",
+  "........................"], CK_PAL)}</svg>`;
+function cookieHtml(id){
+  return `<div class="pp-sec"><h3>Today's fortune</h3><div class="slot cookie" role="button" tabindex="0" data-cookie="${esc(id)}" aria-label="Crack open today's fortune">
+    <span class="ck">${COOKIE_CLOSED}</span><span class="ck-hint">Click to crack open today's fortune cookie</span></div></div>`;
+}
+function crackCookie(el){
+  if (el.classList.contains("open") || el.classList.contains("wobble")) return;
+  const id = el.dataset.cookie, p = players.find(x => x.id === id); if (!p) return;
+  const f = fortuneFor(id), odds = deathOdds(id);
+  const day = new Date().toLocaleDateString(undefined, {month: "short", day: "numeric"}).toUpperCase();
+  const open = () => {
+    el.classList.remove("wobble"); el.classList.add("open"); el.removeAttribute("role"); el.removeAttribute("tabindex"); el.removeAttribute("aria-label");
+    el.innerHTML = `<span class="ck">${COOKIE_OPEN}</span><div class="slip" role="status"><b class="hd">${esc(shortName(p).toUpperCase())} · ${esc(day)}</b>${esc(f.text)}<span class="odds">☠ ${odds}% chance of death today</span><span class="lucky">Lucky item: ${esc(f.lucky)}</span></div>`;
+  };
+  if (reduceMotion) return open();
+  el.classList.add("wobble"); setTimeout(open, 520);
+}
+document.addEventListener("click", e => { const c = e.target.closest("[data-cookie]"); if (c) crackCookie(c); });
+document.addEventListener("keydown", e => { const c = e.target.closest && e.target.closest("[data-cookie]"); if (c && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); crackCookie(c); } });
 // ---------- data ----------
 function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
 function updatePreview(){}
 render();
-fetch("data.json", {cache:"no-store"}).then(r => { if (!r.ok) throw 0; return r.json(); }).then(d => {
+let lastDataText = "";
+function applyData(d){
   meta = {priorDeaths: d.priorDeaths || 0};
   const cp = d.currentPunishment || {};
   $("cpText").textContent = cp.text || "None right now";
@@ -2107,9 +2415,20 @@ fetch("data.json", {cache:"no-store"}).then(r => { if (!r.ok) throw 0; return r.
   weatherMode = d.weather || "auto"; themeMode = d.theme || "auto"; setWeather(); applySeason(); drawPano();
   checkMilestones(d);
   render();
-  route();
+  renderTicker();
+  if (!$("overlay").hidden && location.hash.startsWith("#player-") && $("ovBody").querySelector(".cookie.open")) { /* keep an opened cookie open */ } else route();
   setStatus("Updated " + (d.updated || "recently"), "live");
-}).catch(() => setStatus("Couldn't load the standings. Refresh to try again.", "warn"));
+}
+// Load the data, then check for updates every minute so new deaths show up without refreshing.
+function loadData(first){
+  return fetch("data.json" + (first ? "" : "?t=" + Date.now()), {cache:"no-store"}).then(r => { if (!r.ok) throw 0; return r.text(); }).then(text => {
+    if (text === lastDataText) return;
+    lastDataText = text;
+    applyData(JSON.parse(text));
+  });
+}
+loadData(true).catch(() => setStatus("Couldn't load the standings. Refresh to try again.", "warn"));
+setInterval(() => { if (!document.hidden) loadData(false).catch(() => {}); }, 60000);
 </script>
 
 <div class="overlay" id="overlay" hidden>
