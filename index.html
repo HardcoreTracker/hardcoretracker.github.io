@@ -169,8 +169,9 @@ header.top{position:relative}
 .alive-top{position:absolute;left:50%;top:0;transform:translateX(-50%)}
 @media (max-width:760px){.alive-top{position:static;transform:none;order:-1;width:100%;display:flex;justify-content:center}}
 .shame{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
-.award{padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
-.award .label{color:#FFFF55;text-shadow:1px 1px 0 #3F3F15}
+.award{padding:12px 14px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0}
+.award .tag{font-family:var(--f-label);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#FFFF55;background:#3F3F3F;padding:3px 7px;box-shadow:inset 2px 2px 0 #5E5E5E, inset -2px -2px 0 #1E1E1E;text-shadow:2px 2px 0 #3F3F15}
+.award .who-row,.award .sub{align-self:stretch}
 .award .big{font-size:20px;font-weight:700;line-height:1.2;overflow-wrap:anywhere}
 .award .big small{font-size:13px;font-weight:400;opacity:.75}
 .award .sub{font-size:13px;opacity:.8}
@@ -1005,7 +1006,7 @@ function renderShame(){
   let tieNote = "";
   const names = ids => { if (ids.length > 2){ tieNote = ids.map(nm).join(", "); return ids.length + "-way tie"; } return ids.map(nm).join(" & "); };
   const hours = ms => { const m = Math.round(ms/60000), d = Math.floor(m/1440), hh = Math.floor(m%1440/60), mm = m%60; return (d ? d+"d " : "") + (d||hh ? hh+"h " : "") + mm+"m"; };
-  const dayOf = iso => iso.slice(0,10);
+  const dayOf = iso => { const t = new Date(iso); return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`; };
   const timed = sortedDeaths().filter(d => d.time && !d.reverted);
   const cards = [];
   const card = (label, big, sub, headId) => { cards.push({label, big, sub: tieNote ? sub + " · " + tieNote : sub, headId: tieNote ? null : headId}); tieNote = ""; };
@@ -1057,7 +1058,7 @@ function renderShame(){
   const fewest = players.map(p => [p.id, counts[p.id] || 0]).sort((a,b) => a[1]-b[1]);
   if (fewest.length){ const n = fewest[0][1], ids = fewest.filter(x => x[1] === n).map(x => x[0]); card("Survivor", names(ids), n ? `Only ${n} death${n===1?"":"s"}. Suspicious.` : "Never died. Suspicious.", ids[0]); }
 
-  box.innerHTML = cards.map(c => `<div class="slot award"><span class="label">${esc(c.label)}</span><div class="who-row">${c.headId ? `<canvas data-kind="head" data-skin="${esc(byId[c.headId]?.skin || "")}"></canvas>` : ""}<span class="big">${c.big.includes("<small>") ? c.big.replace(/^([^<]*)/, (m) => esc(m)) : esc(c.big)}</span></div><span class="sub">${esc(c.sub)}</span></div>`).join("");
+  box.innerHTML = cards.map(c => `<div class="panel award"><span class="tag">${esc(c.label)}</span><div class="who-row">${c.headId ? `<canvas data-kind="head" data-skin="${esc(byId[c.headId]?.skin || "")}"></canvas>` : ""}<span class="big">${c.big.includes("<small>") ? c.big.replace(/^([^<]*)/, (m) => esc(m)) : esc(c.big)}</span></div><span class="sub">${esc(c.sub)}</span></div>`).join("");
   box.querySelectorAll("canvas[data-kind]").forEach(cv => { drawHead(cv, null); const id = cv.dataset.skin; if (id) loadImg(id).then(im => { if (im) drawHead(cv, im); }); });
   sec.hidden = false;
 }
