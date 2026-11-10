@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Hardcore Point Tracker</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Silkscreen&display=swap">
 <style>
+@font-face{font-family:"Monocraft";src:url("fonts/Monocraft-Regular.otf") format("opentype");font-weight:400 600;font-display:swap}
+@font-face{font-family:"Monocraft";src:url("fonts/Monocraft-Bold.otf") format("opentype");font-weight:700 900;font-display:swap}
 /* Layout: in-game menu panels on a stone wall. Podium + spotlight up top, rules and stats as inventory slots, death log as a chest panel. */
 :root{
   --bg:#7F7F7F; --bg2:#8C8C8C; --bg3:#717171;
@@ -21,8 +21,8 @@
   --btn:#6F6F6F; --btn-hi:#A8A8A8; --btn-lo:#3A3A3A; --btn-fg:#FFFFFF; --btn-hover:#7E88BF;
   --age-wood:#8A6233; --age-copper:#C26B3B; --age-iron:#D2D2D2; --age-diamond:#4AEDD9; --age-end:#A065D8;
   --ok:#00AA00;
-  --f-pixel:"Pixelify Sans", "Courier New", monospace;
-  --f-label:"Silkscreen", "Pixelify Sans", "Courier New", monospace;
+  --f-pixel:"Monocraft", "Courier New", monospace;
+  --f-label:"Monocraft", "Courier New", monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#2C2C31; --bg2:#34343A; --bg3:#26262A;
