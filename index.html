@@ -554,23 +554,67 @@ function sizePano(){
   const w = Math.max(1, Math.ceil(PH * innerWidth / Math.max(1, innerHeight)));
   if (pano.width !== w){ pano.width = w; pano.height = PH; }
 }
+// Sky colors through the viewer's local day: [hour, top, bottom]
+const SKY_KEYS = [
+  [0, "#0B1026", "#1B2547"], [5, "#0B1026", "#26345E"], [6, "#3A4A8C", "#F29E6B"], [7, "#6E9EF7", "#F7C79A"],
+  [9, "#6E9EF7", "#BFD6FF"], [16.5, "#6E9EF7", "#BFD6FF"], [18, "#4A6FC9", "#F59A5B"], [19, "#2B2F66", "#C4677A"],
+  [20.5, "#141A3A", "#2B3463"], [24, "#0B1026", "#1B2547"]
+];
+function mixHex(a, b, f){
+  const pa = parseInt(a.slice(1),16), pb = parseInt(b.slice(1),16);
+  const c = (sh) => Math.round(((pa>>sh)&255) + ((((pb>>sh)&255) - ((pa>>sh)&255)) * f));
+  return "rgb(" + c(16) + "," + c(8) + "," + c(0) + ")";
+}
+function localHour(){ const d = new Date(); return d.getHours() + d.getMinutes()/60 + d.getSeconds()/3600; }
+function skyAt(hr){
+  for (let i = 1; i < SKY_KEYS.length; i++){
+    const [h1, t1, b1] = SKY_KEYS[i-1], [h2, t2, b2] = SKY_KEYS[i];
+    if (hr <= h2){ const f = (hr - h1) / (h2 - h1); return [mixHex(t1, t2, f), mixHex(b1, b2, f)]; }
+  }
+  return [SKY_KEYS[0][1], SKY_KEYS[0][2]];
+}
+// 0 = full day, 1 = full night
+function darknessAt(hr){
+  if (hr >= 7.5 && hr <= 17) return 0;
+  if (hr >= 20.5 || hr <= 5) return 1;
+  if (hr < 7.5) return 1 - (hr - 5) / 2.5;
+  return (hr - 17) / 3.5;
+}
+let dayScene = null, nightScene = null;
 function drawPano(){
-  if (!scene) return;
-  const W = pano.width, C = scene.C;
+  if (!dayScene || !nightScene) return;
+  const W = pano.width, hr = localHour(), dark = darknessAt(hr), [top, bottom] = skyAt(hr);
   pctx.imageSmoothingEnabled = false;
-  const g = pctx.createLinearGradient(0,0,0,PH); g.addColorStop(0,C.sky[0]); g.addColorStop(1,C.sky[1]);
+  pctx.globalAlpha = 1;
+  const g = pctx.createLinearGradient(0,0,0,PH); g.addColorStop(0, top); g.addColorStop(1, bottom);
   pctx.fillStyle = g; pctx.fillRect(0,0,W,PH);
-  pctx.fillStyle = "#FFFFFF";
-  scene.stars.forEach(([sx,sy]) => { const xx = (sx - panoT*1) % PW; for (let x0 = xx < 0 ? xx+PW : xx; x0 < W; x0 += PW) pctx.fillRect(Math.floor(x0), Math.floor(sy), 1, 1); });
-  pctx.fillStyle = C.body; pctx.fillRect(Math.floor(W*0.72), 18, 18, 18);
-  scene.layers.forEach(L => {
-    let o = (panoT * L.speed) % PW;
+  if (dark > 0){
+    pctx.globalAlpha = dark; pctx.fillStyle = "#FFFFFF";
+    nightScene.stars.forEach(([sx,sy]) => { const xx = (sx - panoT*1) % PW; for (let x0 = xx < 0 ? xx+PW : xx; x0 < W; x0 += PW) pctx.fillRect(Math.floor(x0), Math.floor(sy), 1, 1); });
+    pctx.globalAlpha = 1;
+  }
+  // Sun from 5:30 to 18:30, moon the rest of the time, both arcing across the sky
+  const sunUp = hr >= 5.5 && hr <= 18.5;
+  const prog = sunUp ? (hr - 5.5) / 13 : ((hr >= 18.5 ? hr - 18.5 : hr + 5.5) / 11);
+  const bx = Math.floor(W * (0.06 + 0.86 * prog)), by = Math.floor(PH * 0.62 - Math.sin(Math.PI * prog) * PH * 0.5);
+  pctx.fillStyle = sunUp ? (hr < 7 || hr > 17 ? "#FFB45A" : "#FFF6A8") : "#E8E8F0";
+  pctx.fillRect(bx, by, 18, 18);
+  if (!sunUp){ pctx.fillStyle = "rgba(160,165,190,.6)"; pctx.fillRect(bx + 4, by + 4, 4, 4); pctx.fillRect(bx + 11, by + 10, 3, 3); }
+  dayScene.layers.forEach((L, i) => {
+    const o = (panoT * L.speed) % PW;
     for (let x0 = -o; x0 < W; x0 += PW) pctx.drawImage(L.img, Math.floor(x0), 0);
+    if (dark > 0){
+      pctx.globalAlpha = dark;
+      const N = nightScene.layers[i];
+      for (let x0 = -o; x0 < W; x0 += PW) pctx.drawImage(N.img, Math.floor(x0), 0);
+      pctx.globalAlpha = 1;
+    }
   });
 }
-function paintStone(){ try { sizePano(); scene = buildScene(isDark()); drawPano(); } catch(e){} }
+function paintStone(){ try { sizePano(); if (!dayScene){ dayScene = buildScene(false); nightScene = buildScene(true); } drawPano(); } catch(e){} }
 paintStone();
 addEventListener("resize", () => { sizePano(); drawPano(); });
+if (reduceMotion) setInterval(drawPano, 60000);
 if (!reduceMotion){
   let last = 0, lastDraw = 0;
   const frame = ts => {
