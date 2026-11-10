@@ -421,7 +421,7 @@ body.has-ticker{padding-top:36px}
 .tk-gold{color:#FFD23F;font-weight:700}
 .ck-mini{display:inline-block;vertical-align:middle;margin-left:8px;line-height:0;filter:drop-shadow(1px 1px 0 rgba(0,0,0,.25))}
 .ck-mini svg{display:block}
-.ck-mini.gold{animation:miniGlow 1.6s steps(2) infinite}
+.ck-mini.gold:not(.cracked){animation:miniGlow 1.6s steps(2) infinite}
 @keyframes miniGlow{50%{filter:drop-shadow(0 0 3px #FFD23F) drop-shadow(1px 1px 0 rgba(0,0,0,.25))}}
 .pf-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .pf-list li{display:grid;grid-template-columns:auto 1fr auto auto;gap:6px 12px;align-items:center;padding:8px 10px;font-size:14px;color:#FFFFFF}
@@ -2497,10 +2497,15 @@ function pastFortunesHtml(id){
   return `<div class="pp-sec"><h3>Past fortunes</h3><ul class="pf-list">${rows.join("")}</ul></div>`;
 }
 const MINI_CK = {};
+// Small cookie next to each player's points: whole until this visitor cracks it, then broken
 function miniCookie(id){
-  const golden = isGolden(id), key = golden ? "g" : "n";
-  if (!MINI_CK[key]) MINI_CK[key] = COOKIE_CLOSED_SVG(golden ? CK_GOLD : CK_PAL).replace(/style="[^"]*"/, 'style="width:30px;height:auto"');
-  return `<span class="ck-mini${golden ? " gold" : ""}" title="${golden ? "Golden cookie today! Open their page to crack it" : "Today's fortune cookie: open their page to crack it"}">${MINI_CK[key]}</span>`;
+  const golden = isGolden(id), cracked = crackedToday().includes(id), key = (golden ? "g" : "n") + (cracked ? "o" : "c");
+  if (!MINI_CK[key]) MINI_CK[key] = (cracked ? COOKIE_OPEN_SVG : COOKIE_CLOSED_SVG)(golden ? CK_GOLD : CK_PAL).replace(/style="[^"]*"/, `style="width:${cracked ? 36 : 30}px;height:auto"`);
+  const tip = cracked ? "You cracked today's cookie. Open their page to read it again" : golden ? "Golden cookie today! Open their page to crack it" : "Today's fortune cookie: open their page to crack it";
+  return `<span class="ck-mini${golden ? " gold" : ""}${cracked ? " cracked" : ""}" data-ck="${esc(id)}" title="${tip}">${MINI_CK[key]}</span>`;
+}
+function refreshMiniCookies(id){
+  document.querySelectorAll(`.ck-mini[data-ck="${CSS.escape(id)}"]`).forEach(el => { el.outerHTML = miniCookie(id); });
 }
 function cookieHtml(id){
   const golden = isGolden(id);
@@ -2541,6 +2546,7 @@ function crackCookie(el){
     el.innerHTML = cookieOpenInner(id);
     if (burst) el.appendChild(burst);
     markCracked(id);
+    refreshMiniCookies(id);
   };
   if (reduceMotion) return open();
   el.classList.add("wobble"); setTimeout(open, 520);
