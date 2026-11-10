@@ -85,5 +85,9 @@
     "age": 4,
     "quest": 29,
     "totemFarm": false
+  },
+  "currentPunishment": {
+    "text": "",
+    "who": ""
   }
 }
