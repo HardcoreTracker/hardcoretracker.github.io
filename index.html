@@ -168,6 +168,14 @@ header.top .sub{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-siz
 header.top{position:relative}
 .alive-top{position:absolute;left:50%;top:0;transform:translateX(-50%)}
 @media (max-width:760px){.alive-top{position:static;transform:none;order:-1;width:100%;display:flex;justify-content:center}}
+.shame{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.award{padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.award .label{color:#FFFF55;text-shadow:1px 1px 0 #3F3F15}
+.award .big{font-size:20px;font-weight:700;line-height:1.2;overflow-wrap:anywhere}
+.award .big small{font-size:13px;font-weight:400;opacity:.75}
+.award .sub{font-size:13px;opacity:.8}
+.award .who-row{display:flex;align-items:center;gap:8px;min-width:0}
+.award canvas{width:24px;height:24px;image-rendering:pixelated;flex:none;box-shadow:0 0 0 2px var(--outline)}
 .tipbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:12px}
 .tipbar .tag{font-family:var(--f-label);font-weight:700;font-size:12px;letter-spacing:.08em;color:#FFFF55;background:#3F3F3F;padding:4px 8px;box-shadow:inset 2px 2px 0 #5E5E5E, inset -2px -2px 0 #1E1E1E;text-shadow:2px 2px 0 #3F3F15;flex:none}
 .tipbar .text{flex:1 1 240px;min-width:0;font-size:16px}
@@ -371,6 +379,11 @@ button:disabled{opacity:.5;cursor:default}
       </section>
     </aside>
   </div>
+
+  <section id="shameSec" hidden>
+    <div class="sect-head"><h2 class="mctitle">Hall of Shame</h2><span class="hint">Calculated from the death log</span></div>
+    <div class="shame" id="shame"></div>
+  </section>
 
   <section>
     <div class="sect-head"><h2 class="mctitle">Death log</h2><span class="hint">Newest first</span></div>
@@ -965,6 +978,75 @@ function startAliveTimer(iso){
   };
   tick(); aliveTimer = setInterval(tick, 1000);
 }
+
+// ---------- hall of shame ----------
+function renderShame(){
+  const sec = $("shameSec"), box = $("shame");
+  if (!deaths.length){ sec.hidden = true; return; }
+  const byId = Object.fromEntries(players.map(p => [p.id, p]));
+  const nm = id => { const p = byId[id]; return p ? (p.nick || p.name) : id; };
+  const killer = c => { const m = /(?:by|fighting) ([A-Z][A-Za-z ]*?)$/.exec(c || ""); return m ? m[1] : null; };
+  const count = arr => arr.reduce((m,k) => (k == null ? m : (m[k] = (m[k]||0) + 1, m)), {});
+  const top = obj => { const e = Object.entries(obj).sort((a,b) => b[1]-a[1]); if (!e.length) return null; const best = e[0][1]; return {n: best, keys: e.filter(x => x[1] === best).map(x => x[0])}; };
+  let tieNote = "";
+  const names = ids => { if (ids.length > 2){ tieNote = ids.map(nm).join(", "); return ids.length + "-way tie"; } return ids.map(nm).join(" & "); };
+  const hours = ms => { const m = Math.round(ms/60000), d = Math.floor(m/1440), hh = Math.floor(m%1440/60), mm = m%60; return (d ? d+"d " : "") + (d||hh ? hh+"h " : "") + mm+"m"; };
+  const dayOf = iso => iso.slice(0,10);
+  const timed = sortedDeaths().filter(d => d.time);
+  const cards = [];
+  const card = (label, big, sub, headId) => { cards.push({label, big, sub: tieNote ? sub + " · " + tieNote : sub, headId: tieNote ? null : headId}); tieNote = ""; };
+
+  const most = top(count(deaths.map(d => d.player)));
+  if (most) card("Frequent Flyer", `${names(most.keys)}`, `Most deaths: ${most.n}`, most.keys[0]);
+
+  const mobs = count(deaths.map(d => killer(d.cause)));
+  const mob = top(mobs);
+  if (mob) {
+    card("Public Enemy #1", mob.keys.join(" & "), `Deadliest mob: ${mob.n} kills`);
+    const fav = top(count(deaths.filter(d => killer(d.cause) === mob.keys[0]).map(d => d.player)));
+    if (fav) card(`${mob.keys[0]}'s Favorite`, names(fav.keys), `Taken out by ${mob.keys[0].toLowerCase()}s ${fav.n} times`, fav.keys[0]);
+  }
+  const creep = top(count(deaths.filter(d => /creeper/i.test(d.cause)).map(d => d.player)));
+  if (creep) card("Creeper Magnet", names(creep.keys), `Blown up ${creep.n} time${creep.n===1?"":"s"}`, creep.keys[0]);
+
+  const fall = top(count(deaths.filter(d => /fell|fall/i.test(d.cause)).map(d => d.player)));
+  if (fall) card("Gravity Check", names(fall.keys), `Lost to gravity ${fall.n} time${fall.n===1?"":"s"}`, fall.keys[0]);
+
+  const hot = top(count(deaths.filter(d => /lava|burn/i.test(d.cause)).map(d => d.player)));
+  if (hot) card("Hot Tub Enthusiast", names(hot.keys), `${hot.n} death${hot.n===1?"":"s"} by lava or fire`, hot.keys[0]);
+
+  const friendly = top(count(deaths.filter(d => /wolf|iron golem|enderman|bee|goat|polar bear|llama/i.test(d.cause)).map(d => d.player)));
+  if (friendly) card("Animal Control", names(friendly.keys), `Killed by something that started out friendly`, friendly.keys[0]);
+
+  const days = top(count(timed.map(d => dayOf(d.time))));
+  if (days) { const [y,m,dd] = days.keys[0].split("-").map(Number); card("Worst Day Ever", new Date(y,m-1,dd).toLocaleDateString(undefined,{month:"short",day:"numeric"}), `${days.n} deaths in one day`); }
+
+  let fast = null, slow = null;
+  for (let i = 1; i < timed.length; i++){
+    const gap = Date.parse(timed[i].time) - Date.parse(timed[i-1].time);
+    if (!fast || gap < fast.gap) fast = {gap, a: timed[i-1], b: timed[i]};
+    if (!slow || gap > slow.gap) slow = {gap, a: timed[i-1], b: timed[i]};
+  }
+  if (fast) card("Speedrun Any%", hours(fast.gap), `Shortest-lived world: ${nm(fast.a.player)}, then ${nm(fast.b.player)}`, fast.b.player);
+  if (slow) {
+    const last = timed[timed.length-1], now = Date.now() - Date.parse(last.time);
+    if (now > slow.gap) card("Golden Age", hours(now) + " <small>and counting</small>", "Longest survival ever: the current world!");
+    else card("Golden Age", hours(slow.gap), `Longest survival, ended by ${nm(slow.b.player)}`, slow.b.player);
+  }
+
+  let streak = {n:0}, cur = {n:0};
+  sortedDeaths().forEach(d => { cur = cur.p === d.player ? {p:d.player, n:cur.n+1} : {p:d.player, n:1}; if (cur.n > streak.n) streak = {...cur}; });
+  if (streak.n > 1) card("Can't Stop, Won't Stop", nm(streak.p), `Died ${streak.n} times in a row`, streak.p);
+
+
+  const counts = count(deaths.map(d => d.player));
+  const fewest = players.map(p => [p.id, counts[p.id] || 0]).sort((a,b) => a[1]-b[1]);
+  if (fewest.length){ const n = fewest[0][1], ids = fewest.filter(x => x[1] === n).map(x => x[0]); card("Survivor", names(ids), n ? `Only ${n} death${n===1?"":"s"}. Suspicious.` : "Never died. Suspicious.", ids[0]); }
+
+  box.innerHTML = cards.map(c => `<div class="slot award"><span class="label">${esc(c.label)}</span><div class="who-row">${c.headId ? `<canvas data-kind="head" data-skin="${esc(byId[c.headId]?.skin || "")}"></canvas>` : ""}<span class="big">${c.big.includes("<small>") ? c.big.replace(/^([^<]*)/, (m) => esc(m)) : esc(c.big)}</span></div><span class="sub">${esc(c.sub)}</span></div>`).join("");
+  box.querySelectorAll("canvas[data-kind]").forEach(cv => { drawHead(cv, null); const id = cv.dataset.skin; if (id) loadImg(id).then(im => { if (im) drawHead(cv, im); }); });
+  sec.hidden = false;
+}
 // ---------- data ----------
 function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
 function updatePreview(){}
@@ -976,6 +1058,7 @@ fetch("data.json", {cache:"no-store"}).then(r => { if (!r.ok) throw 0; return r.
   players = d.players || []; deaths = d.deaths || [];
   if (d.progress){ progress = d.progress; viewAge = progress.age; renderQuests(); }
   renderLastDeath(d.lastDeath);
+  renderShame();
   render();
   setStatus("Updated " + (d.updated || "recently"), "live");
 }).catch(() => setStatus("Couldn't load the standings. Refresh to try again.", "warn"));
