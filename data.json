@@ -84,8 +84,8 @@
     {
       "id": "d1",
       "player": "kanalumaddela",
-      "age": "wood",
-      "cause": "Not tracked (Wood Age)",
+      "age": "copper",
+      "cause": "Not tracked (Copper Age)",
       "legacy": true,
       "date": "",
       "time": ""
@@ -93,8 +93,8 @@
     {
       "id": "d2",
       "player": "kanalumaddela",
-      "age": "copper",
-      "cause": "Not tracked (Copper Age)",
+      "age": "wood",
+      "cause": "Not tracked (Wood Age)",
       "legacy": true,
       "date": "",
       "time": ""
