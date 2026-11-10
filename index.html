@@ -782,8 +782,8 @@ fetch("quests.json", {cache:"no-store"}).then(r => r.json()).then(q => { QUESTS 
 function fmtWhen(iso){
   const d = new Date(iso); if (isNaN(d)) return "";
   try{
-    const parts = Object.fromEntries(new Intl.DateTimeFormat(undefined, {month:"short", day:"2-digit", year:"numeric", hour:"numeric", minute:"2-digit", timeZoneName:"short"}).formatToParts(d).map(x => [x.type, x.value]));
-    return `${parts.month} ${parts.day}. ${parts.year} @ ${parts.hour}:${parts.minute} ${(parts.dayPeriod||"").toLowerCase()} ${parts.timeZoneName||""}`.replace(/\s+/g," ").trim();
+    const parts = Object.fromEntries(new Intl.DateTimeFormat(undefined, {month:"short", day:"2-digit", year:"numeric", hour:"numeric", minute:"2-digit"}).formatToParts(d).map(x => [x.type, x.value]));
+    return `${parts.month} ${parts.day}. ${parts.year} @ ${parts.hour}:${parts.minute} ${(parts.dayPeriod||"").toLowerCase()}`.replace(/\s+/g," ").trim();
   }catch(e){ return d.toLocaleString(); }
 }
 function renderLastDeath(ld){
