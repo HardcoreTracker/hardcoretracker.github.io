@@ -588,7 +588,7 @@ function render(){
   if (!cand.length){
     sb.innerHTML = `<div class="spot-head">A death right now costs <b>+${cost}</b></div><div class="spot-txt"><span class="away">Nobody would hit a punishment from one death in this age.</span></div>`;
   } else {
-    sb.innerHTML = `<div class="spot-head">A death right now costs <b>+${cost}</b>. These ${cand.length === 1 ? "player" : cand.length + " players"} would be punished:</div>
+    sb.innerHTML = `<div class="spot-head">A death right now costs <b>+${cost}</b>. These ${cand.length === 1 ? "player" : cand.length + " players"} could be punished:</div>
     <div class="spot-list">${cand.map(c => `<div class="spot-row">
       <div class="slot"><canvas data-skin="${esc(c.p.skin||"")}" data-kind="head" aria-label="${esc(c.p.name)}"></canvas></div>
       <div class="spot-txt">
