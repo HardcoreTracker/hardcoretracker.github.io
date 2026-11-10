@@ -286,6 +286,23 @@ body.ov-open{overflow:hidden}
 .season-halloween .tipbar .tag{color:#FF9A2E}
 .land-winter .panel{background-image:repeating-linear-gradient(90deg,#FFFFFF 0 10px,#EEF3FF 10px 16px,#FFFFFF 16px 22px);background-size:100% 5px;background-repeat:no-repeat;background-position:0 0}
 .land-winter .slot.panel,.land-winter .award{background-image:none}
+#decor{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;z-index:20}
+#decor .dc{position:absolute;line-height:0}
+#decor .dc.flip svg{transform:scaleX(-1)}
+#decor .dc.bob{animation:dc-bob 2.4s ease-in-out infinite}
+#decor .dc.bob.slow{animation-duration:3.3s}
+@keyframes dc-bob{50%{transform:translateY(-2px)}}
+#decor .spider{display:flex;flex-direction:column;align-items:center;animation:dc-spider 3.2s ease-in-out infinite;transform-origin:top center}
+#decor .spider .thread{flex:1;width:1px;background:rgba(235,235,245,.7)}
+@keyframes dc-spider{50%{transform:translateY(14px)}}
+#decor .snowcap{height:10px;background:#F4F7FB;clip-path:polygon(0 100%,0 40%,4% 20%,9% 45%,15% 10%,22% 40%,30% 15%,37% 45%,45% 5%,53% 40%,60% 15%,68% 45%,75% 10%,83% 40%,90% 20%,96% 45%,100% 30%,100% 100%)}
+#decor .lights{height:14px}
+#decor .lights svg{position:absolute;left:0;top:0;width:100%;height:12px}
+#decor .lights i{position:absolute;top:5px;width:6px;height:8px;margin-left:-3px;border:1px solid rgba(0,0,0,.5);box-shadow:0 0 6px currentColor;animation:dc-twinkle 1.7s steps(2,end) infinite}
+@keyframes dc-twinkle{50%{opacity:.35;box-shadow:none}}
+#decor .icicles{height:16px}
+#decor .icicles i{position:absolute;top:0;width:5px;background:linear-gradient(#FFFFFF,#BFE3FF);clip-path:polygon(0 0,100% 0,50% 100%)}
+@media (prefers-reduced-motion: reduce){#decor .dc,#decor .spider,#decor .lights i{animation:none}}
 .agechip{display:inline-flex;align-items:center;gap:7px;font-weight:600;white-space:nowrap}
 .agechip::before{content:"";width:10px;height:10px;background:var(--c);box-shadow:0 0 0 2px var(--outline);flex:none}
 
@@ -540,6 +557,15 @@ function buildLayer(seed, o){
     if (o.trees && r() < o.trees && col - lastTree > 3 && !(o.lava && hgt < o.lava)){
       lastTree = col;
       const kind = o.tree || "oak";
+      if (kind === "dead"){
+        const th = 4 + Math.floor(r()*2);
+        for (let i = 1; i <= th; i++){ x.fillStyle = shade(o.trunk, 0.85 + r()*0.3); blk(x, col, top - i); }
+        x.fillStyle = shade(o.trunk, 0.8);
+        px(col*PB - PB, (top - th + 1)*PB, PB, PB/2, x.fillStyle); px(col*PB - PB, (top - th)*PB, PB/2, PB, x.fillStyle);
+        px(col*PB + PB, (top - th + 2)*PB, PB, PB/2, x.fillStyle); px(col*PB + PB + PB/2, (top - th + 1)*PB, PB/2, PB, x.fillStyle);
+        px(col*PB + 2, (top - th - 1)*PB, 2, PB, x.fillStyle);
+        return;
+      }
       if (kind === "chorus"){
         const th = 3 + Math.floor(r()*3);
         for (let i = 1; i <= th; i++){ x.fillStyle = shade(o.trunk, 0.85 + r()*0.3); blk(x, col, top - i); }
@@ -570,7 +596,10 @@ function buildLayer(seed, o){
       }
       return;
     }
-    if (o.pumpkins && r() < o.pumpkins){
+    if (o.graves && r() < o.graves){
+      px(sx, sy - PB - 3, PB, PB + 3, "#8E8E96"); px(sx, sy - PB - 3, PB, 1, "#B4B4BC");
+      px(sx + 2, sy - PB - 1, 2, 4, "#5E5E66"); px(sx + 1, sy - PB, 4, 1, "#5E5E66");
+    } else if (o.pumpkins && r() < o.pumpkins){
       px(sx, sy - PB, PB, PB, "#E87A1A"); px(sx + 2, sy - PB - 1, 2, 1, "#3F7A2E");
       px(sx + 1, sy - PB + 2, 1, 1, "#FFE14D"); px(sx + 4, sy - PB + 2, 1, 1, "#FFE14D"); px(sx + 1, sy - PB + 4, 4, 1, "#FFE14D");
     } else if (o.eggs && r() < o.eggs){
@@ -580,6 +609,22 @@ function buildLayer(seed, o){
       px(sx + 2, sy - 3, 1, 3, "#3F7D2B"); px(sx + 1, sy - 4, 3, 2, pick(o.flowerColors));
     }
   });
+  if (o.bigTree){
+    const col = o.bigTree, top = rows - hs[col], th = 3;
+    const rows2 = [[0,"*"],[1,1],[2,2],[3,2],[4,3],[5,3],[6,4],[7,4]];
+    x.fillStyle = "#5A3A1A"; for (let i = 1; i <= th; i++) blk(x, col, top - i);
+    rows2.forEach(([i, w]) => {
+      const row = top - th - 9 + i;
+      if (w === "*"){ px(col*PB, row*PB, PB, PB, "#FFE14D"); return; }
+      for (let dx = -w; dx <= w; dx++){ x.fillStyle = shade(o.snowAll ? "#2F5A32" : "#2E6B2E", 0.88 + r()*0.24); blk(x, (col + dx + cols) % cols, row); }
+    });
+    const lc = ["#FF3B3B", "#FFD93B", "#3BFF6B", "#3BA8FF", "#FF5BE6"];
+    for (let i = 0; i < 26; i++){
+      const [ri, w] = rows2[1 + Math.floor(r() * 7)];
+      const dx = -w + Math.floor(r() * (2*w + 1));
+      px(((col + dx + cols) % cols)*PB + 1 + Math.floor(r()*3), (top - th - 9 + ri)*PB + 1 + Math.floor(r()*3), 2, 2, lc[i % lc.length]);
+    }
+  }
   return c;
 }
 function buildClouds(seed, color){
@@ -628,12 +673,15 @@ function palette(key, night){
     eggs: holiday === "easter" ? .08 : 0,
     lights: holiday === "christmas" || (season === "winter" && new Date().getMonth() === 11)
   };
-  const snowAll = season === "winter", tree = season === "winter" ? "spruce" : "oak";
+  const snowAll = season === "winter", spooky = holiday === "halloween";
+  const tree = spooky ? "dead" : season === "winter" ? "spruce" : "oak";
+  if (spooky){ grass[0] = "#5E6B32"; grass[1] = "#4E5A2A"; }
+  deco.graves = spooky ? .06 : 0;
   const P = {
     cloud: night ? "rgba(150,160,195,.30)" : (holiday === "stpatricks" ? "rgba(255,255,255,.95)" : "rgba(255,255,255,.92)"),
     far:  {top: N(snowAll ? "#F2F5FA" : "#9AA4B8"), dirt: N("#8A93A6"), stone: N("#7D8698"), snow: N("#F2F5FA"), snowPeaks: true, min:13, max:22},
-    mid:  {top: N(grass[0]), dirt: N("#866043"), stone: N("#7A7A7A"), snow: N("#F4F7FB"), snowAll, snowLeaves: snowAll, min:7, max:13, trees:.09, tree, trunk: N("#6B4F2A"), leaves: leaves[0].map(N), ...deco},
-    near: {top: N(grass[1]), dirt: N("#6F4F34"), stone: N("#666666"), snow: N("#EEF2F8"), snowAll, snowLeaves: snowAll, min:2, max:6, trees:.06, tree, trunk: N("#5A4122"), leaves: leaves[1].map(N), ...deco}
+    mid:  {top: N(grass[0]), dirt: N("#866043"), stone: N("#7A7A7A"), snow: N("#F4F7FB"), snowAll, snowLeaves: snowAll, min:7, max:13, trees:.09, tree, trunk: N(spooky ? "#3A3036" : "#6B4F2A"), leaves: leaves[0].map(N), ...deco, graves: 0, bigTree: holiday === "christmas" ? 60 : 0},
+    near: {top: N(grass[1]), dirt: N("#6F4F34"), stone: N("#666666"), snow: N("#EEF2F8"), snowAll, snowLeaves: snowAll, min:2, max:6, trees:.06, tree, trunk: N(spooky ? "#2E262C" : "#5A4122"), leaves: leaves[1].map(N), ...deco}
   };
   if (night){ P.mid.flowerColors = P.mid.flowerColors.map(N); P.near.flowerColors = P.near.flowerColors.map(N); }
   return P;
@@ -695,6 +743,17 @@ function drawPanoFireworks(W, colors){
   panoSparks = panoSparks.filter(p => { p.x += p.vx; p.y += p.vy; p.vy += 0.02; p.life--; pctx.globalAlpha = Math.max(0, Math.min(1, p.life/25)); pctx.fillStyle = p.col; pctx.fillRect(Math.floor(p.x), Math.floor(p.y), 1, 1); return p.life > 0; });
   pctx.globalAlpha = 1;
 }
+function drawBats(W){
+  pctx.fillStyle = "#1A1020";
+  for (let i = 0; i < 7; i++){
+    const sp = 9 + (i * 3) % 7, x = Math.floor(((i * 173) + panoT * sp) % (W + 20)) - 10;
+    const y = Math.floor(PH * (0.12 + ((i * 37) % 30) / 100) + Math.sin(panoT * 1.7 + i) * 4);
+    const up = Math.floor(panoT * 6 + i) % 2 === 0;
+    pctx.fillRect(x + 2, y, 2, 2);
+    if (up){ pctx.fillRect(x, y - 1, 2, 1); pctx.fillRect(x + 4, y - 1, 2, 1); }
+    else { pctx.fillRect(x, y + 1, 2, 1); pctx.fillRect(x + 4, y + 1, 2, 1); }
+  }
+}
 function drawRainbow(W){
   const cx = W * 0.7, cy = PH * 0.8, cols = ["#FF4B4B","#FF9A3B","#FFE14D","#55D255","#4B9BFF","#8B5BFF"];
   pctx.globalAlpha = 0.45; pctx.lineWidth = 3;
@@ -727,9 +786,16 @@ function drawPano(){
     const sunUp = hr >= 5.5 && hr <= 18.5;
     const prog = sunUp ? (hr - 5.5) / 13 : ((hr >= 18.5 ? hr - 18.5 : hr + 5.5) / 11);
     const bx = Math.floor(W * (0.06 + 0.86 * prog)), by = Math.floor(PH * 0.62 - Math.sin(Math.PI * prog) * PH * 0.5);
-    pctx.fillStyle = sunUp ? (hr < 7 || hr > 17 ? "#FFB45A" : "#FFF6A8") : "#E8E8F0";
-    pctx.fillRect(bx, by, 18, 18);
-    if (!sunUp){ pctx.fillStyle = "rgba(160,165,190,.6)"; pctx.fillRect(bx + 4, by + 4, 4, 4); pctx.fillRect(bx + 11, by + 10, 3, 3); }
+    if (holiday === "halloween"){ pctx.fillStyle = "rgba(70,0,90," + (0.28 * dark) + ")"; pctx.fillRect(0, 0, W, PH); }
+    if (!sunUp && holiday === "halloween"){
+      pctx.fillStyle = "#FF9A2E"; pctx.fillRect(bx - 5, by - 5, 28, 28);
+      pctx.fillStyle = "rgba(200,90,20,.6)"; pctx.fillRect(bx + 2, by + 3, 5, 5); pctx.fillRect(bx + 13, by + 12, 4, 4); pctx.fillRect(bx + 6, by + 15, 3, 3);
+    } else {
+      pctx.fillStyle = sunUp ? (hr < 7 || hr > 17 ? "#FFB45A" : "#FFF6A8") : "#E8E8F0";
+      pctx.fillRect(bx, by, 18, 18);
+      if (!sunUp){ pctx.fillStyle = "rgba(160,165,190,.6)"; pctx.fillRect(bx + 4, by + 4, 4, 4); pctx.fillRect(bx + 11, by + 10, 3, 3); }
+    }
+    if (holiday === "halloween") drawBats(W);
     if (holiday === "stpatricks" && dark < 0.5) drawRainbow(W);
     if ((holiday === "july4" || holiday === "newyear") && dark > 0.3) drawPanoFireworks(W, holiday === "july4" ? ["#FF3B3B","#FFFFFF","#3B6BFF"] : ["#FF5555","#FFAA00","#FFFF55","#55FF55","#55FFFF","#FF55FF","#FFFFFF"]);
   }
@@ -805,12 +871,22 @@ function drawFigure(canvas, im){
     part(ctx, im, 4,36,4,12, 4,20);
     part(ctx, im, 4,52,4,12, 8,20);
   }
+  santaHat(ctx, 4, 0);
+}
+// Pixel Santa hat drawn over the top of the head on Christmas
+function santaHat(ctx, ox, oy){
+  let hol = null; try { hol = holidayNow(); } catch(e){}
+  if (hol !== "christmas") return;
+  ctx.fillStyle = "#C8102E"; ctx.fillRect(ox + 1, oy, 5, 1); ctx.fillRect(ox, oy + 1, 8, 1);
+  ctx.fillStyle = "#9E0B22"; ctx.fillRect(ox + 5, oy, 1, 1);
+  ctx.fillStyle = "#F4F4F4"; ctx.fillRect(ox, oy + 2, 8, 1); ctx.fillRect(ox + 6, oy, 2, 1);
 }
 function drawHead(canvas, im){
   canvas.width = 8; canvas.height = 8;
   const ctx = canvas.getContext("2d"); ctx.imageSmoothingEnabled = false;
   if (!im){ drawStandIn(ctx, true); return; }
   part(ctx, im, 8,8,8,8, 0,0); part(ctx, im, 40,8,8,8, 0,0);
+  santaHat(ctx, 0, 0);
 }
 function drawStandIn(ctx, headOnly){
   const cs = getComputedStyle(document.documentElement);
@@ -1442,7 +1518,7 @@ function holidayNow(){
   if (m === 3 && day === 1) return "aprilfools";
   if (m === em && day === ed) return "easter";
   if (m === 6 && day === 4) return "july4";
-  if (m === 9 && day >= 15) return "halloween";
+  if (m === 9 && day === 31) return "halloween";
   if (m === 10 && day === nthWeekday(10, 4, 4)) return "thanksgiving";
   if (m === 11 && (day === 24 || day === 25)) return "christmas";
   return null;
@@ -1565,6 +1641,8 @@ function applySeason(){
     render();
   }
   sceneKey = ""; ensureScene();
+  scheduleDecor();
+  document.querySelectorAll("canvas[data-kind]").forEach(cv => { const id = cv.dataset.skin; if (id) loadImg(id).then(im => { if (im) (cv.dataset.kind === "fig" ? drawFigure : drawHead)(cv, im); }); });
 }
 
 // Fireworks drawn on their own layer above the page
@@ -1626,6 +1704,61 @@ function checkMilestones(d){
   setTimeout(() => box.remove(), 9000);
   launchFireworks(6000);
 }
+
+// ---------- page decorations (Halloween and Christmas only) ----------
+function pixSvg(rows, colors, scale){
+  const w = rows[0].length, hgt = rows.length; let r = "";
+  rows.forEach((row, y) => [...row].forEach((ch, x) => { if (colors[ch]) r += `<rect x="${x}" y="${y}" width="1" height="1" fill="${colors[ch]}"/>`; }));
+  return `<svg width="${w*scale}" height="${hgt*scale}" viewBox="0 0 ${w} ${hgt}" shape-rendering="crispEdges">${r}</svg>`;
+}
+const PUMPKIN = pixSvg(["...gg...","..oggo..","oooooooo","oyooooyo","oooooooo","oyyyyyyo",".oooooo."], {g:"#3F7A2E", o:"#E87A1A", y:"#FFE14D"}, 3);
+const WEB = `<svg width="56" height="56" viewBox="0 0 28 28" fill="none" stroke="rgba(235,235,245,.75)" stroke-width=".6" shape-rendering="crispEdges"><path d="M0 0L28 28M0 0L28 10M0 0L10 28M0 0L28 0M0 0L0 28"/><path d="M0 7Q4 4 7 0M0 14Q8 8 14 0M0 21Q12 12 21 0M0 27Q16 16 27 0"/></svg>`;
+const SPIDER = pixSvg(["k.k.k.k",".kkkkk.","kkrkrkk",".kkkkk.","k.k.k.k"], {k:"#151018", r:"#E03030"}, 3);
+const PRESENT = (c1, c2) => pixSvg(["..yy.yy..",".y..y..y.","ccccyyccc","ccccyyccc","ddddyyddd","ccccyyccc","ccccyyccc"], {c:c1, d:c2, y:"#FFE14D"}, 3);
+let decorLayer = null;
+function placeDecor(){
+  let hol = null; try { hol = holidayNow(); } catch(e){}
+  if (!decorLayer){ decorLayer = document.createElement("div"); decorLayer.id = "decor"; decorLayer.setAttribute("aria-hidden", "true"); document.body.appendChild(decorLayer); }
+  decorLayer.innerHTML = "";
+  if (hol !== "halloween" && hol !== "christmas") return;
+  const sy = scrollY, sx = scrollX;
+  const box = el => { const r = el.getBoundingClientRect(); return {l: r.left + sx, t: r.top + sy, w: r.width, h: r.height}; };
+  const add = (html, l, t, cls) => { const d = document.createElement("div"); d.className = "dc " + (cls || ""); d.style.left = l + "px"; d.style.top = t + "px"; d.innerHTML = html; decorLayer.appendChild(d); return d; };
+  const targets = [...document.querySelectorAll(".lastdeath:not([hidden]), .tipbar:not([hidden]), .podium-panel, .spot, #questSec, .rules, #punSec .pun-panel")].filter(el => el.offsetParent);
+  if (hol === "halloween"){
+    targets.forEach((el, i) => {
+      const b = box(el);
+      add(PUMPKIN, b.l + b.w * (i % 2 ? 0.78 : 0.12), b.t - 20, "bob");
+      if (b.w > 300 && i % 2 === 0) add(PUMPKIN, b.l + b.w * 0.5, b.t - 20, "bob slow");
+      add(WEB, b.l + 2, b.t + 2);
+      if (i % 2) add(WEB, b.l + b.w - 58, b.t + 2, "flip");
+    });
+    const title = document.querySelector("header.top h1");
+    if (title){ const b = box(title); const sp = add(`<span class="thread"></span>${SPIDER}`, b.l + Math.min(b.w - 30, 260), 0, "spider"); sp.style.height = (b.t + 6) + "px"; }
+  } else {
+    const cols = ["#FF3B3B", "#FFD93B", "#3BFF6B", "#3BA8FF", "#FF5BE6"];
+    targets.forEach((el, i) => {
+      const b = box(el);
+      add("", b.l - 2, b.t - 7, "snowcap").style.width = (b.w + 4) + "px";
+      const n = Math.max(3, Math.floor(b.w / 26));
+      let bulbs = "";
+      for (let k = 0; k < n; k++) bulbs += `<i style="left:${(k + 0.5) * (b.w / n)}px;background:${cols[(k + i) % cols.length]};color:${cols[(k + i) % cols.length]};animation-delay:${((k * 37) % 17) / 10}s"></i>`;
+      add(`<svg width="${b.w}" height="12" preserveAspectRatio="none" viewBox="0 0 ${n*10} 12"><path d="${Array.from({length:n}, (_, k) => `M${k*10} 2Q${k*10+5} 9 ${k*10+10} 2`).join("")}" stroke="#2A3A2A" stroke-width="1.2" fill="none"/></svg>${bulbs}`, b.l, b.t - 2, "lights").style.width = b.w + "px";
+      if (el.matches(".lastdeath, .tipbar")){
+        let ice = ""; for (let k = 0; k < Math.floor(b.w / 18); k++) ice += `<i style="left:${k*18 + (k*7)%9}px;height:${6 + (k*5)%9}px"></i>`;
+        add(ice, b.l, b.t + b.h - 2, "icicles").style.width = b.w + "px";
+      }
+    });
+    const pod = document.querySelector(".podium-panel");
+    if (pod){ const b = box(pod);
+      add(PRESENT("#C8102E", "#9E0B22"), b.l + 10, b.t + b.h - 30); add(PRESENT("#2E7DD7", "#1F5AA0"), b.l + 42, b.t + b.h - 30);
+      add(PRESENT("#2E9E4A", "#1F7234"), b.l + b.w - 38, b.t + b.h - 30); }
+  }
+}
+let decorTimer = null;
+function scheduleDecor(){ clearTimeout(decorTimer); decorTimer = setTimeout(placeDecor, 120); }
+addEventListener("resize", scheduleDecor);
+try { new ResizeObserver(scheduleDecor).observe(document.body); } catch(e){}
 // ---------- data ----------
 function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
 function updatePreview(){}
