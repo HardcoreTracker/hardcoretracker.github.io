@@ -79,7 +79,7 @@ header.top .sub{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-siz
 .status.warn::before{background:#FFAA00}
 
 /* top: podium + spotlight */
-.hero{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:stretch}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:stretch}
 @media (max-width:820px){.hero{grid-template-columns:1fr}}
 .podium-panel{display:flex;flex-direction:column;gap:12px}
 .podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:8px;padding-top:8px}
@@ -172,6 +172,15 @@ header.top .sub{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-siz
 .q-list li.q-head{grid-column:1/-1;padding:10px 0 2px}
 .q-head h4{margin:0;font-size:18px;color:var(--fg);text-shadow:none}
 .q-head h4 span{font-size:13px;color:var(--muted);font-weight:400;margin-left:6px}
+.lower{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.lower-left{display:flex;flex-direction:column;gap:28px;min-width:0}
+.lower-right{min-width:0;position:sticky;top:16px}
+.lower-right .quests{max-height:calc(100vh - 32px);overflow:hidden}
+.lower-right .quests > *{flex:none}
+.lower-right .quests > .q-list{flex:1 1 auto}
+.lower-right .q-list{overflow-y:auto;min-height:0;flex:1 1 auto;grid-template-columns:1fr;padding-right:4px}
+.lower .mid{grid-template-columns:1fr}
+@media (max-width:900px){.lower{grid-template-columns:1fr}.lower-right{position:static}.lower-right .quests{max-height:none}.lower-right .q-list{overflow:visible}}
 .agechip{display:inline-flex;align-items:center;gap:7px;font-weight:600;white-space:nowrap}
 .agechip::before{content:"";width:10px;height:10px;background:var(--c);box-shadow:0 0 0 2px var(--outline);flex:none}
 
@@ -278,37 +287,41 @@ button:disabled{opacity:.5;cursor:default}
     </div>
   </section>
 
-  <section class="panel quests" id="questSec" aria-label="Quest progress">
-    <div class="q-top">
-      <div><span class="label">Wilderness Bound progress</span><h3 id="qAge">Loading quests…</h3><div class="q-sub" id="qSub"></div></div>
-      <div class="q-cost" id="qCost"></div>
-    </div>
-    <div class="xp" id="qXp"><div class="xp-fill" id="qBar" style="width:0%"></div><span id="qBarText"></span></div>
-    <div class="slot q-now" id="qNow"></div>
-    <div class="q-tabs" id="qTabs" role="group" aria-label="Ages"></div>
-    <div class="q-unlocks" id="qUnlocks"></div>
-    <ol class="q-list" id="qList"></ol>
-  </section>
+  <div class="lower">
+    <div class="lower-left">
+      <section class="mid">
+        <div class="stats">
+          <div class="slot stat"><span class="label">Players</span><span class="v shadowed num" id="sWorld">0</span></div>
+          <div class="slot stat"><span class="label">Deaths</span><span class="v shadowed num" id="sDeaths">0</span></div>
+          <div class="slot stat"><span class="label">Points</span><span class="v shadowed num" id="sPoints">0</span></div>
+          <div class="slot stat"><span class="label">Punish&shy;ments</span><span class="v red shadowed num" id="sPun">0</span></div>
+        </div>
+        <div class="panel rules">
+          <h3>Points per death</h3>
+          <table id="ruleTable"></table>
+          <div class="note">Totem farm built: <b>+1</b> extra. Every <b>5 points</b> is a punishment.</div>
+        </div>
+      </section>
 
-  <section class="mid">
-    <div class="stats">
-      <div class="slot stat"><span class="label">Players</span><span class="v shadowed num" id="sWorld">0</span></div>
-      <div class="slot stat"><span class="label">Deaths</span><span class="v shadowed num" id="sDeaths">0</span></div>
-      <div class="slot stat"><span class="label">Points</span><span class="v shadowed num" id="sPoints">0</span></div>
-      <div class="slot stat"><span class="label">Punish&shy;ments</span><span class="v red shadowed num" id="sPun">0</span></div>
+      <section id="restSec">
+        <div class="sect-head"><h2 class="mctitle">Everyone else</h2><span class="hint">Sorted by total points</span></div>
+        <div id="players" class="players"></div>
+      </section>
     </div>
-    <div class="panel rules">
-      <h3>Points per death</h3>
-      <table id="ruleTable"></table>
-      <div class="note">Totem farm built: <b>+1</b> extra. Every <b>5 points</b> is a punishment.</div>
-    </div>
-  </section>
-
-
-  <section id="restSec">
-    <div class="sect-head"><h2 class="mctitle">Everyone else</h2><span class="hint">Sorted by total points</span></div>
-    <div id="players" class="players"></div>
-  </section>
+    <aside class="lower-right">
+      <section class="panel quests" id="questSec" aria-label="Quest progress">
+        <div class="q-top">
+          <div><span class="label">Wilderness Bound progress</span><h3 id="qAge">Loading quests…</h3><div class="q-sub" id="qSub"></div></div>
+          <div class="q-cost" id="qCost"></div>
+        </div>
+        <div class="xp" id="qXp"><div class="xp-fill" id="qBar" style="width:0%"></div><span id="qBarText"></span></div>
+        <div class="slot q-now" id="qNow"></div>
+        <div class="q-tabs" id="qTabs" role="group" aria-label="Ages"></div>
+        <div class="q-unlocks" id="qUnlocks"></div>
+        <ol class="q-list" id="qList"></ol>
+      </section>
+    </aside>
+  </div>
 
   <section>
     <div class="sect-head"><h2 class="mctitle">Death log</h2><span class="hint">Newest first</span></div>
@@ -726,6 +739,8 @@ function renderQuests(){
     const V = ages[viewAge - 1];
     $("qUnlocks").textContent = V.unlocks;
     $("qList").innerHTML = V.quests.map((q, k) => item(V, q, k)).join("");
+    const cur = $("qList").querySelector("li.cur"), list = $("qList");
+    if (cur && list.scrollHeight > list.clientHeight) list.scrollTop = Math.max(0, cur.offsetTop - list.offsetTop - 8);
   }
 }
 document.addEventListener("click", e => {
