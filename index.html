@@ -2249,7 +2249,27 @@ const FORTUNES = {
     "Phantoms are reading your sleep schedule.",
     "You will hear a fuse sound and immediately regret everything.",
     "Today you'll find a dungeon. It will find you first.",
-    "Every ravine is a trust fall. Nobody will catch you."
+    "Every ravine is a trust fall. Nobody will catch you.",
+    "Today's mood: crouching at every cliff edge.",
+    "The furnace is fine. The house is on fire.",
+    "Your inventory is full of dirt you will never use.",
+    "An allay will steal your heart. A zombie will steal the rest.",
+    "Don't name your horse. It knows.",
+    "A villager will hmm at you disapprovingly.",
+    "You will mistake a creeper for a bush. Once.",
+    "Somebody left a door open. It was you.",
+    "Your pickaxe has one use left. You'll find out at the worst time.",
+    "Today you'll build a staircase straight into a ravine.",
+    "The bees are fine as long as you don't touch anything.",
+    "Your elytra flight will end in a tree.",
+    "A wandering trader wants your emeralds and your dignity.",
+    "Do not sleep in the Nether. You know why.",
+    "Your torch placement will light up everything except the danger.",
+    "Hot tip: the lava is the orange one.",
+    "A goat is lining up the perfect shot.",
+    "Your shovel will hit gravel. The gravel will hit back.",
+    "That 'quick nap' will skip straight to a phantom attack.",
+    "You'll find a shipwreck and no treasure map. Classic."
   ],
   savage: [
     "The respawn screen misses you. Visit soon.",
@@ -2271,7 +2291,27 @@ const FORTUNES = {
     "Statistically, this is your day to ruin it for everyone.",
     "You fight like you have extra lives. You don't.",
     "Your bed has seen you less than the death screen has.",
-    "Nobody blames you. Yet."
+    "Nobody blames you. Yet.",
+    "Your survival instincts were left in the Wood Age.",
+    "You've been on the death screen so often it knows your name.",
+    "Even the respawn button is tired of you.",
+    "You bring the chaos. Everyone else brings the punishments.",
+    "The mobs aren't hunting you. You keep finding them.",
+    "Your armor stand survives longer than you do.",
+    "The group chat already has your death message drafted.",
+    "You'd lose a fight with a bunny. A baby one.",
+    "Hearts are a resource. You treat them like a suggestion.",
+    "Your best strategy today: don't touch anything.",
+    "If dying were a quest, you'd have finished it already.",
+    "You're the reason the punishment wheel has a dent in it.",
+    "Your parkour skills are the server's biggest threat.",
+    "Today is a great day to sit very still in a very safe box.",
+    "The skeletons have a group chat about you.",
+    "Somewhere, a creeper is saying your name with admiration.",
+    "Your armor has more scratches than your excuses.",
+    "Every boss is someone's final boss. Yours is a ladder.",
+    "Brave of you to log on after last time.",
+    "You'll have an excuse ready before you hit the ground."
   ],
   wholesome: [
     "Today is a good day to build something you're proud of.",
@@ -2293,13 +2333,53 @@ const FORTUNES = {
     "You've survived every bad day so far. Keep going.",
     "Good things grow when you tend to them. Like wheat.",
     "Today you'll laugh at something dumb with your friends.",
-    "You're braver than the Nether thinks you are."
+    "You're braver than the Nether thinks you are.",
+    "Your friends are glad you're here. Even after the last reset.",
+    "Today, a good trade will find you.",
+    "Plant something. Future you will thank you.",
+    "A calm day of mining is coming your way.",
+    "You'll find the perfect spot for something you've been wanting to build.",
+    "Your patience will pay off in diamonds.",
+    "Someone on the server is about to make you laugh.",
+    "Every block you place makes the world a little better.",
+    "You're doing great. Seriously.",
+    "A small kindness today will be remembered for a long time.",
+    "Today is a good day to help someone finish their build.",
+    "Your hard work is noticed, even when nobody says it.",
+    "The best adventures start with a deep breath.",
+    "Light up a dark place today, in game or out.",
+    "You'll leave the server better than you found it.",
+    "There's treasure just past the next hill.",
+    "Rest when you need to. The world will wait for you.",
+    "Teamwork makes the quest list go faster.",
+    "Your next idea is a good one. Build it.",
+    "A good day is ahead. Go enjoy it."
   ],
   killer: [
     "{k} is looking for you again.",
     "{k} remembers you. Fondly.",
     "Your rematch with {k} is closer than you think.",
-    "Stay far away from anything that looks like {k} today."
+    "Stay far away from anything that looks like {k} today.",
+    "{k} has been asking about you.",
+    "{k} is your nemesis. Act accordingly.",
+    "Today's forecast: cloudy with a chance of {k}.",
+    "You and {k} have unfinished business.",
+    "Somewhere out there, {k} is waiting.",
+    "Trust no one. Especially {k}.",
+    "{k} still talks about the last time you met.",
+    "Sleep with one eye open. {k} is nearby.",
+    "{k} is on a winning streak against you.",
+    "Your rival today: {k}. Your odds: questionable.",
+    "Bring a shield. {k} hasn't forgotten.",
+    "{k} would like a rematch. Decline politely.",
+    "Avoid dark places today. {k} likes those.",
+    "Rumor has it {k} has your coordinates.",
+    "Your history with {k} is not looking good.",
+    "{k} is the main character of your death log.",
+    "Note to self: run from {k}.",
+    "{k} sends its regards.",
+    "If you see {k}, don't be a hero.",
+    "Your shield was made for exactly one enemy: {k}."
   ]
 };
 const LUCKY = ["Copper","Diamond","Emerald","Lapis","Redstone","Gold","Iron","Coal","Amethyst","Quartz","Netherite","Wheat","Bread","Torches","A water bucket","A golden apple","Your bed","Cobblestone","A shield","Totem vibes"];
@@ -2314,7 +2394,7 @@ function fortuneFor(id, day){
   if (tone === "killer"){
     const counts = {}; killers.forEach(x => counts[x] = (counts[x] || 0) + 1);
     const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
-    text = text.startsWith("{k}") ? text.replace("{k}", "The " + top) : text.replace("{k}", (/^[AEIOU]/i.test(top) ? "an " : "a ") + top);
+    text = text.replace(/(^|[.!?] )\{k\}/, "$1The " + top).replace("{k}", "the " + top);
   }
   return {text, lucky: LUCKY[Math.floor(r("lucky") * LUCKY.length)]};
 }
@@ -2466,7 +2546,27 @@ const GOLDEN_FORTUNES = [
   "A golden day. Go do the dangerous thing you've been putting off.",
   "Your luck is maxed out. Mine some diamonds before it wears off.",
   "Even creepers are rooting for you today.",
-  "You found the golden cookie. That's already the best thing that'll happen today."
+  "You found the golden cookie. That's already the best thing that'll happen today.",
+  "Golden luck: the RNG is on your side today.",
+  "Today, every chest you open will be worth it.",
+  "The stars aligned just for you. Go mine something shiny.",
+  "Golden day. Even the creepers keep their distance.",
+  "Fortune favors you today. Be bold (but not dumb).",
+  "You were born for this day. Make it legendary.",
+  "The server's luckiest player today is you.",
+  "Today you could find a totem on a skeleton. Probably not, but you could.",
+  "A golden glow surrounds you. Mobs are confused.",
+  "Your luck is so good, the punishment wheel is scared of you.",
+  "Golden cookie energy: go do the big project today.",
+  "Fortune smiles on you. So do the villagers, for once.",
+  "Today you'll take zero fall damage. Spiritually.",
+  "Your luck stat is maxed. Spend it wisely.",
+  "The cookie is golden, and so are your chances.",
+  "Legendary drop: one perfect day.",
+  "Every arrow misses you today. Mostly.",
+  "You're glowing. Not the potion kind. The lucky kind.",
+  "The best loot of the week is waiting for you.",
+  "Golden days don't come often. Go make a memory."
 ];
 // Remember which cookies this visitor already cracked today (only on their own device)
 const CK_KEY = "hct-cookies";
