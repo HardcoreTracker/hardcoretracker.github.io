@@ -1,0 +1,1302 @@
+{
+ "ages": [
+  {
+   "n": 1,
+   "name": "Wood Age",
+   "goal": "Establish a homestead",
+   "unlocks": "Wood equipment, leather armor, beds, fishing rods, campfires, composters, bundles, basic storage, boats, wool building pieces and cushions. Stone equipment and furnaces remain locked.",
+   "quests": [
+    {
+     "t": "A New Beginning",
+     "d": "Obtain 8 logs."
+    },
+    {
+     "t": "Getting to Work",
+     "d": "Craft and place a Crafting Table."
+    },
+    {
+     "t": "Primitive Toolkit",
+     "d": "Craft a Wooden Pickaxe, Axe, Shovel, Hoe and Sword."
+    },
+    {
+     "t": "Nature's Supplies",
+     "d": "Gather 8 sticks, 4 saplings and 8 wheat seeds."
+    },
+    {
+     "t": "Basic Storage",
+     "d": "Craft and place a Chest."
+    },
+    {
+     "t": "A Place to Stay",
+     "d": "Place 24 wooden building blocks and a wooden Door."
+    },
+    {
+     "t": "Replant the Forest",
+     "d": "Plant 4 saplings."
+    },
+    {
+     "t": "Early Fuel",
+     "d": "Mine 4 Coal Ore with a Wooden Pickaxe."
+    },
+    {
+     "t": "Fire Starter",
+     "d": "Craft and place a Campfire."
+    },
+    {
+     "t": "Campfire Cooking",
+     "d": "Cook 4 food items on a Campfire."
+    },
+    {
+     "t": "Rest Through the Night",
+     "d": "Craft a Bed and sleep in it."
+    },
+    {
+     "t": "First Defense",
+     "d": "Defeat 3 hostile mobs with wooden weapons."
+    },
+    {
+     "t": "Preparing the Ground",
+     "d": "Till 8 Farmland blocks beside natural water."
+    },
+    {
+     "t": "First Planting",
+     "d": "Plant 8 wheat seeds."
+    },
+    {
+     "t": "Composting Scraps",
+     "d": "Craft and place a Composter; collect its first Bone Meal."
+    },
+    {
+     "t": "Helping Things Grow",
+     "d": "Successfully use Bone Meal on a crop."
+    },
+    {
+     "t": "Patient Farmer",
+     "d": "Harvest 12 mature Wheat crops."
+    },
+    {
+     "t": "Bread on the Table",
+     "d": "Craft 4 Bread."
+    },
+    {
+     "t": "Sugar Cane Starter",
+     "d": "Plant 4 Sugar Cane."
+    },
+    {
+     "t": "Animal Shelter",
+     "d": "Place 12 Fences and a Fence Gate."
+    },
+    {
+     "t": "Cattle Farmer",
+     "d": "Breed a pair of Cows."
+    },
+    {
+     "t": "Shepherd",
+     "d": "Breed a pair of Sheep."
+    },
+    {
+     "t": "Chicken Keeper",
+     "d": "Breed a pair of Chickens."
+    },
+    {
+     "t": "Gone Fishing",
+     "d": "Craft a Fishing Rod."
+    },
+    {
+     "t": "First Catch",
+     "d": "Catch a fish with the rod."
+    },
+    {
+     "t": "Patient Angler",
+     "d": "Catch 12 items while fishing."
+    },
+    {
+     "t": "Campfire Comfort",
+     "d": "Craft Wool Slabs, make a Cushion and sit on it."
+    },
+    {
+     "t": "Ready to Dig",
+     "d": "After the earlier quests, mine 24 Stone with wooden equipment; unlock Stone Age."
+    }
+   ]
+  },
+  {
+   "n": 2,
+   "name": "Stone Age",
+   "goal": "Build a lasting settlement",
+   "unlocks": "Stone equipment, furnaces and smokers. Copper prospecting opens at the final quest chain; copper equipment waits for Copper Age. Stonecutters wait for Iron Age.",
+   "quests": [
+    {
+     "t": "Stoneworker",
+     "d": "Craft a Stone Pickaxe, Axe, Shovel, Hoe and Sword."
+    },
+    {
+     "t": "Controlled Heat",
+     "d": "Craft and place a Furnace."
+    },
+    {
+     "t": "Charcoal Burner",
+     "d": "Smelt 8 logs into Charcoal."
+    },
+    {
+     "t": "Lighting the Way",
+     "d": "Craft and place 16 Torches."
+    },
+    {
+     "t": "First Glass",
+     "d": "Smelt 8 Sand into Glass."
+    },
+    {
+     "t": "Stone Supply",
+     "d": "Mine 128 Stone-family blocks."
+    },
+    {
+     "t": "A Mason's Palette",
+     "d": "Craft Stone Bricks and stone Stairs or Slabs."
+    },
+    {
+     "t": "Permanent Walls",
+     "d": "Place 64 stone building blocks."
+    },
+    {
+     "t": "Clay Worker",
+     "d": "Gather Clay and smelt 16 Bricks."
+    },
+    {
+     "t": "Potted Plants",
+     "d": "Craft and plant a Flower Pot."
+    },
+    {
+     "t": "Better Cooking",
+     "d": "Craft and place a Smoker."
+    },
+    {
+     "t": "Prepared Meals",
+     "d": "Cook 12 food items using the Smoker."
+    },
+    {
+     "t": "Expanded Fields",
+     "d": "Plant a second conventional crop species."
+    },
+    {
+     "t": "Crop Bounty",
+     "d": "Harvest 32 mature crops across at least two species."
+    },
+    {
+     "t": "Hay Storage",
+     "d": "Craft 3 Hay Bales."
+    },
+    {
+     "t": "Sleeping Under the Stars",
+     "d": "Craft Straw Beds and sleep in one away from your regular bed."
+    },
+    {
+     "t": "Growing Livestock",
+     "d": "Feed baby farm animals 5 times to accelerate growth."
+    },
+    {
+     "t": "Leatherworker",
+     "d": "Craft and equip Leather Boots."
+    },
+    {
+     "t": "A Small Pantry",
+     "d": "Craft and use a Barrel for food storage."
+    },
+    {
+     "t": "Packed and Prepared",
+     "d": "Craft a Bundle and store 6 different item types in it."
+    },
+    {
+     "t": "River Traveler",
+     "d": "Craft a Boat and travel 500 blocks in it."
+    },
+    {
+     "t": "Cargo on the River",
+     "d": "Craft a Chest Boat and transport stored supplies."
+    },
+    {
+     "t": "Beyond Wheat",
+     "d": "Plant and harvest either Pumpkins or Melons."
+    },
+    {
+     "t": "Smoked Catch",
+     "d": "Catch and smoke 4 Cod or Salmon."
+    },
+    {
+     "t": "Copper Prospecting",
+     "d": "When this quest opens, mine 8 Copper Ore; copper ore products become available."
+    },
+    {
+     "t": "First Metal",
+     "d": "Smelt 24 Copper Ingots; completing the chapter unlocks Copper Age."
+    }
+   ]
+  },
+  {
+   "n": 3,
+   "name": "Copper Age",
+   "goal": "Work metal and investigate the land",
+   "unlocks": "Copper tools, weapons, armor and matching mount armor; copper storage, the Brush, Spyglass and copper building family. Iron equipment, buckets, shears and iron workstations remain locked.",
+   "quests": [
+    {
+     "t": "Copper Toolkit",
+     "d": "Craft a Copper Pickaxe, Axe, Shovel and Hoe."
+    },
+    {
+     "t": "Copper Clad",
+     "d": "Craft and equip a full set of Copper Armor."
+    },
+    {
+     "t": "A New Weapon",
+     "d": "Craft a Copper Spear."
+    },
+    {
+     "t": "Spear Practice",
+     "d": "Defeat 5 hostile mobs using a Copper Spear."
+    },
+    {
+     "t": "Copper Reserve",
+     "d": "Smelt a further 32 Copper Ingots for construction."
+    },
+    {
+     "t": "Copper Craftsmanship",
+     "d": "Craft and place Cut Copper Stairs and Slabs."
+    },
+    {
+     "t": "A Metal Entrance",
+     "d": "Craft and place a Copper Door."
+    },
+    {
+     "t": "Storm Preparation",
+     "d": "Craft and place a Lightning Rod."
+    },
+    {
+     "t": "Copper Storage",
+     "d": "Craft and place a Copper Chest."
+    },
+    {
+     "t": "On Display",
+     "d": "Craft a Shelf and fill its three slots."
+    },
+    {
+     "t": "Brighter Workshop",
+     "d": "Craft and place a Copper Torch."
+    },
+    {
+     "t": "Geode Explorer",
+     "d": "Find an Amethyst Geode."
+    },
+    {
+     "t": "Crystal Harvest",
+     "d": "Harvest 4 Amethyst Shards from fully grown clusters."
+    },
+    {
+     "t": "A Closer Look",
+     "d": "Craft a Spyglass and use it to look at a mob."
+    },
+    {
+     "t": "The Archaeologist's Brush",
+     "d": "Craft a Brush."
+    },
+    {
+     "t": "Unearthed History",
+     "d": "Brush 4 suspicious blocks successfully."
+    },
+    {
+     "t": "A Fragment of the Past",
+     "d": "Recover a Pottery Sherd through brushing."
+    },
+    {
+     "t": "Armadillo Care",
+     "d": "Brush an Armadillo to collect Scutes."
+    },
+    {
+     "t": "A Loyal Companion",
+     "d": "Tame a Wolf."
+    },
+    {
+     "t": "Protect Your Companion",
+     "d": "Craft and equip Wolf Armor."
+    },
+    {
+     "t": "Working Dog",
+     "d": "Repair damaged Wolf Armor with Scutes."
+    },
+    {
+     "t": "Outcrop Survey",
+     "d": "Mine and collect Granite, Diorite, Andesite and Tuff."
+    },
+    {
+     "t": "Iron Prospecting",
+     "d": "When this quest opens, mine 12 Iron Ore; iron ore products become available."
+    },
+    {
+     "t": "The Iron Age",
+     "d": "Smelt 24 Iron Ingots; completing the chapter unlocks Iron Age."
+    }
+   ]
+  },
+  {
+   "n": 4,
+   "name": "Iron Age",
+   "goal": "Build tools, infrastructure and community",
+   "unlocks": "Iron and gold equipment, chainmail, shields, every bucket variant, shears, Flint and Steel, crossbows, saddles, Stonecutters, Anvils, Blast Furnaces and basic Redstone machinery. Gold prospecting opens within this Age.",
+   "quests": [
+    {
+     "t": "Iron Toolkit",
+     "d": "Craft an Iron Pickaxe, Axe, Shovel and Hoe."
+    },
+    {
+     "t": "Iron Warrior",
+     "d": "Craft an Iron Sword or Spear and defeat 8 hostile mobs."
+    },
+    {
+     "t": "Suit Up",
+     "d": "Craft and equip a full set of Iron Armor."
+    },
+    {
+     "t": "Shield Bearer",
+     "d": "Craft a Shield and block a hostile projectile."
+    },
+    {
+     "t": "Water Management",
+     "d": "Craft a Bucket; collect and place water."
+    },
+    {
+     "t": "Irrigation",
+     "d": "Create a water source that hydrates your planted Farmland."
+    },
+    {
+     "t": "Lava Handling",
+     "d": "Collect lava in a Bucket."
+    },
+    {
+     "t": "Renewable Stone",
+     "d": "Build a working Cobblestone generator and mine 32 blocks from it."
+    },
+    {
+     "t": "Wool Production",
+     "d": "Craft Shears and shear 3 Sheep."
+    },
+    {
+     "t": "Farm Produce",
+     "d": "Milk a Cow and collect Eggs."
+    },
+    {
+     "t": "Precision Masonry",
+     "d": "Craft a Stonecutter and cut three different building variants."
+    },
+    {
+     "t": "Faster Smelting",
+     "d": "Craft a Blast Furnace and smelt 16 raw metal items."
+    },
+    {
+     "t": "The Anvil",
+     "d": "Craft and place an Anvil."
+    },
+    {
+     "t": "Repair and Reuse",
+     "d": "Repair damaged iron equipment using an Anvil."
+    },
+    {
+     "t": "A Named Companion",
+     "d": "Craft a Name Tag, rename it and use it on an animal."
+    },
+    {
+     "t": "Gold Prospector",
+     "d": "When this quest opens, mine Gold Ore and smelt 8 Gold Ingots."
+    },
+    {
+     "t": "Tiny Takeover",
+     "d": "Craft a Golden Dandelion and use it to stop a baby animal from aging."
+    },
+    {
+     "t": "Beekeeper",
+     "d": "Breed a pair of Bees."
+    },
+    {
+     "t": "Honeycomb Harvest",
+     "d": "Safely collect Honeycomb with Shears and Campfire smoke."
+    },
+    {
+     "t": "Bottled Honey",
+     "d": "Safely collect Honey using a Glass Bottle."
+    },
+    {
+     "t": "A Home for Bees",
+     "d": "Craft and place a Beehive."
+    },
+    {
+     "t": "Wax On, Wax Off",
+     "d": "Wax a Copper block and remove its wax with an Axe."
+    },
+    {
+     "t": "Mechanical Companion",
+     "d": "Carve a Pumpkin and summon a Copper Golem."
+    },
+    {
+     "t": "Sorting Assistant",
+     "d": "Have your Copper Golem sort three different item types."
+    },
+    {
+     "t": "Redstone Fundamentals",
+     "d": "Mine Redstone Ore and craft Redstone Torches and a Repeater."
+    },
+    {
+     "t": "Piston Power",
+     "d": "Craft a Piston and use it to move a block."
+    },
+    {
+     "t": "Automatic Transfer",
+     "d": "Move 16 items between containers using a Hopper."
+    },
+    {
+     "t": "A Helping Hand",
+     "d": "Activate a Dispenser to fire a projectile or place water."
+    },
+    {
+     "t": "Repeating Signals",
+     "d": "Build a repeating redstone circuit that activates a copper bulb 5 times."
+    },
+    {
+     "t": "Ready at a Touch",
+     "d": "Power a Shelf and use its hotbar-swapping function."
+    },
+    {
+     "t": "Simple Production",
+     "d": "Use a Crafter to produce an item automatically."
+    },
+    {
+     "t": "First Trade",
+     "d": "Complete 3 Villager trades."
+    },
+    {
+     "t": "Professional Network",
+     "d": "Trade with three different Villager professions."
+    },
+    {
+     "t": "Growing Commerce",
+     "d": "Advance a Villager to Journeyman through your trades."
+    },
+    {
+     "t": "Cartographer",
+     "d": "Craft a Map and enlarge it using a Cartography Table."
+    },
+    {
+     "t": "Homeward Bound",
+     "d": "Craft a Lodestone and bind a Compass to it."
+    },
+    {
+     "t": "Mounted Travel",
+     "d": "Craft a Saddle, tame a Horse and ride 500 blocks."
+    },
+    {
+     "t": "Rail Engineer",
+     "d": "Build a rail route using Powered Rails and ride a Minecart along it."
+    },
+    {
+     "t": "Ranged Defense",
+     "d": "Craft a Bow and Crossbow; hit a hostile mob with each."
+    },
+    {
+     "t": "Lapis Prospector",
+     "d": "Mine Lapis Ore and collect 16 Lapis Lazuli."
+    },
+    {
+     "t": "Ready for an Expedition",
+     "d": "Pack a Map, Compass, Water Bucket, Shield, 4 Straw Beds, 16 Bread and 64 blocks; unlock Exploration Age."
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "name": "Exploration Age",
+   "goal": "Turn maps into discoveries",
+   "unlocks": "Expedition chapter using Iron-Age equipment. Wind Charges are allowed after the Breeze quest; Diamond acquisition opens only at the final prospecting quest. Enchanting, Diamond gear and Nether travel stay locked.",
+   "quests": [
+    {
+     "t": "The Abandoned Camp",
+     "d": "Discover an Abandoned Camp."
+    },
+    {
+     "t": "Supplies on the Trail",
+     "d": "Loot a naturally generated Camp Chest or Barrel."
+    },
+    {
+     "t": "A Map in the Ruins",
+     "d": "Obtain a structure Explorer Map from Camp loot."
+    },
+    {
+     "t": "Follow the Map",
+     "d": "Reach a structure shown on an Explorer Map."
+    },
+    {
+     "t": "Autumn Canopy",
+     "d": "Enter a Dappled Forest."
+    },
+    {
+     "t": "Poplar Workshop",
+     "d": "Grow a Poplar Sapling and craft with its wood."
+    },
+    {
+     "t": "Colors of Autumn",
+     "d": "Collect Red, Orange and Yellow Poplar Leaves using Shears."
+    },
+    {
+     "t": "Forest Stew",
+     "d": "Gather Shelf Mushrooms and use them to prepare Mushroom Stew."
+    },
+    {
+     "t": "Growing the Understory",
+     "d": "Grow a Shelf Mushroom and spread a Red Shrub with Bone Meal."
+    },
+    {
+     "t": "Trailside Outpost",
+     "d": "Place a Campfire, Chest, Straw Bed and Cushion together at an expedition stop."
+    },
+    {
+     "t": "Sulfur Below",
+     "d": "Follow a Sulfur Spring down into a Sulfur Cave."
+    },
+    {
+     "t": "Mineral Colors",
+     "d": "Collect Sulfur and Cinnabar and craft their building variants."
+    },
+    {
+     "t": "A Curious Appetite",
+     "d": "Have a Sulfur Cube absorb a wooden block."
+    },
+    {
+     "t": "Changing Its Nature",
+     "d": "Remove a Cube's block with Shears and replace it with a metal block."
+    },
+    {
+     "t": "Bring Home the Cube",
+     "d": "Collect a Sulfur Cube in a Bucket."
+    },
+    {
+     "t": "Harnessing the Spring",
+     "d": "Build a working Geyser using Potent Sulfur, water and magma or lava."
+    },
+    {
+     "t": "Beneath the Mines",
+     "d": "Explore a Mineshaft and open a generated Chest Minecart."
+    },
+    {
+     "t": "Desert Relics",
+     "d": "Enter a Desert Pyramid and brush a suspicious block."
+    },
+    {
+     "t": "Pieces of History",
+     "d": "Recover four Pottery Sherds and craft a decorated pot from them."
+    },
+    {
+     "t": "A Sunken Journey",
+     "d": "Explore a Shipwreck and recover a Buried Treasure Map."
+    },
+    {
+     "t": "X Marks the Spot",
+     "d": "Follow the map and recover a Heart of the Sea."
+    },
+    {
+     "t": "Ocean Archaeology",
+     "d": "Brush suspicious blocks in a Warm Ocean Ruin."
+    },
+    {
+     "t": "Aquatic Companion",
+     "d": "Tame and saddle a Nautilus."
+    },
+    {
+     "t": "Breath of the Nautilus",
+     "d": "Travel 500 blocks underwater while riding your Nautilus."
+    },
+    {
+     "t": "Mounted Mayhem",
+     "d": "Defeat a Zombie Horse's rider and claim the mount."
+    },
+    {
+     "t": "Desert Riders",
+     "d": "Defeat the riders of a Camel Husk and ride the surviving mount."
+    },
+    {
+     "t": "Buried Trials",
+     "d": "Locate and enter a Trial Chamber."
+    },
+    {
+     "t": "Trial by Combat",
+     "d": "Participate in completing 3 ordinary Trial Spawner encounters."
+    },
+    {
+     "t": "A Change in the Air",
+     "d": "Defeat a Breeze and collect a Breeze Rod."
+    },
+    {
+     "t": "Wind at Your Feet",
+     "d": "Craft Wind Charges and use one to launch yourself upward."
+    },
+    {
+     "t": "Under Lock and Key",
+     "d": "Obtain a Trial Key and open an ordinary Vault."
+    },
+    {
+     "t": "The Pale Night",
+     "d": "Encounter a Creaking in a Pale Garden at night."
+    },
+    {
+     "t": "Follow the Resin",
+     "d": "Collect Resin generated by the encounter, then destroy the linked Creaking Heart."
+    },
+    {
+     "t": "Diamonds!",
+     "d": "When this quest opens, mine 5 Diamond Ore; completing the chapter unlocks Diamond Age."
+    }
+   ]
+  },
+  {
+   "n": 6,
+   "name": "Diamond Age",
+   "goal": "Refine equipment and recover knowledge",
+   "unlocks": "Diamond equipment and mount armor, Tridents, Enchanting Tables and Smithing Tables. Ender Chests become usable here but still need Nether materials to craft. Nether entry opens only at the final portal milestone.",
+   "quests": [
+    {
+     "t": "Diamond Standard",
+     "d": "Craft a Diamond Pickaxe."
+    },
+    {
+     "t": "Diamond Toolkit",
+     "d": "Craft a Diamond Axe, Shovel and Hoe."
+    },
+    {
+     "t": "Diamond Warrior",
+     "d": "Craft a Diamond Sword or Spear."
+    },
+    {
+     "t": "Diamond Clad",
+     "d": "Craft and equip a full set of Diamond Armor."
+    },
+    {
+     "t": "Obsidian Collector",
+     "d": "Mine 14 Obsidian."
+    },
+    {
+     "t": "Knowledge and Power",
+     "d": "Craft and place an Enchanting Table."
+    },
+    {
+     "t": "The Enchanting Library",
+     "d": "Supply the table with 15 correctly positioned Bookshelves."
+    },
+    {
+     "t": "Experienced",
+     "d": "Reach experience level 30."
+    },
+    {
+     "t": "Greater Enchantment",
+     "d": "Perform a level-30 Enchanting Table enchantment."
+    },
+    {
+     "t": "Specialized Equipment",
+     "d": "Enchant a tool, a weapon and an armor piece."
+    },
+    {
+     "t": "Fortunate Mining",
+     "d": "Apply Fortune to a Pickaxe and use it to mine ore."
+    },
+    {
+     "t": "Magical Combination",
+     "d": "Combine compatible enchanted equipment in an Anvil."
+    },
+    {
+     "t": "Enchanted Knowledge",
+     "d": "Apply an Enchanted Book to equipment using an Anvil."
+    },
+    {
+     "t": "A Fresh Start",
+     "d": "Use a Grindstone to remove a non-curse enchantment."
+    },
+    {
+     "t": "Magical Commerce",
+     "d": "Obtain an Enchanted Book through Villager trading."
+    },
+    {
+     "t": "Master Merchant",
+     "d": "Advance a Villager to Master and complete a trade at that level."
+    },
+    {
+     "t": "Smithing with Style",
+     "d": "Apply an Armor Trim at a Smithing Table."
+    },
+    {
+     "t": "Gentle Extraction",
+     "d": "Obtain Silk Touch and use it to harvest an otherwise fragile block intact."
+    },
+    {
+     "t": "Moving the Hive",
+     "d": "Relocate an occupied Bee Nest using Silk Touch."
+    },
+    {
+     "t": "Three-Dimensional Building",
+     "d": "Craft Concrete Stairs and Slabs and use both in a build."
+    },
+    {
+     "t": "The Deep Dark",
+     "d": "Enter the Deep Dark and avoid triggering a Sculk Sensor while sneaking."
+    },
+    {
+     "t": "Ancient Archives",
+     "d": "Locate an Ancient City and open a generated chest."
+    },
+    {
+     "t": "Echoes of Recovery",
+     "d": "Obtain 8 Echo Shards and craft a Recovery Compass."
+    },
+    {
+     "t": "The Sleeping Past",
+     "d": "Obtain a Sniffer Egg through Ocean Archaeology and hatch it."
+    },
+    {
+     "t": "Ancient Seeds",
+     "d": "Let your Sniffer uncover seeds; grow Torchflowers and Pitcher Plants."
+    },
+    {
+     "t": "Shell Sanctuary",
+     "d": "Breed Turtles and protect eggs until they hatch."
+    },
+    {
+     "t": "Turtle Keeper",
+     "d": "Collect Scutes as baby Turtles grow and craft a Turtle Shell."
+    },
+    {
+     "t": "A Throwaway Joke",
+     "d": "Obtain a Trident and hit a hostile mob with a thrown attack."
+    },
+    {
+     "t": "Allay Rescue",
+     "d": "Free an Allay and have it return an item to you."
+    },
+    {
+     "t": "Portal Construction",
+     "d": "Construct and ignite a Nether Portal; completing the chapter unlocks Nether travel and Nether Age."
+    }
+   ]
+  },
+  {
+   "n": 7,
+   "name": "Nether Age",
+   "goal": "Master another dimension",
+   "unlocks": "Nether travel and materials, brewing and potion use, quartz machinery, Ender Chests by recipe access, and Happy Ghast flight. Netherite smithing opens after its research chain. End Eyes and portal entry open at the final chain.",
+   "quests": [
+    {
+     "t": "Into the Nether",
+     "d": "Enter the Nether."
+    },
+    {
+     "t": "A Foothold in the Fire",
+     "d": "Place protective blocks around your arrival point and return through your portal."
+    },
+    {
+     "t": "Nether Materials",
+     "d": "Gather Netherrack, Blackstone, Quartz and Glowstone."
+    },
+    {
+     "t": "Nether Lumber",
+     "d": "Grow and harvest both Crimson and Warped Huge Fungi."
+    },
+    {
+     "t": "Golden Protection",
+     "d": "Equip Gold Armor before approaching Piglins."
+    },
+    {
+     "t": "Piglin Exchange",
+     "d": "Complete 8 Piglin barters."
+    },
+    {
+     "t": "Barter Collection",
+     "d": "Receive four different barter outputs."
+    },
+    {
+     "t": "Bastion Expedition",
+     "d": "Enter a Bastion Remnant and loot a generated chest."
+    },
+    {
+     "t": "Forgotten Smithing",
+     "d": "Recover a Netherite Upgrade Template."
+    },
+    {
+     "t": "A Terrible Fortress",
+     "d": "Locate and enter a Nether Fortress."
+    },
+    {
+     "t": "Blaze Hunter",
+     "d": "Defeat 6 Blazes."
+    },
+    {
+     "t": "Into Fire",
+     "d": "Obtain 8 Blaze Rods from Blazes."
+    },
+    {
+     "t": "Soul Farming",
+     "d": "Collect Soul Sand and Nether Wart; plant a Wart patch."
+    },
+    {
+     "t": "Wart Farmer",
+     "d": "Harvest 16 mature Nether Wart."
+    },
+    {
+     "t": "Local Brewery",
+     "d": "Craft and place a Brewing Stand."
+    },
+    {
+     "t": "Awkward Beginnings",
+     "d": "Brew an Awkward Potion."
+    },
+    {
+     "t": "Fireproof",
+     "d": "Brew and drink a Potion of Fire Resistance."
+    },
+    {
+     "t": "Combat Alchemy",
+     "d": "Brew a Potion of Strength."
+    },
+    {
+     "t": "Healing Alchemy",
+     "d": "Brew a Potion of Healing."
+    },
+    {
+     "t": "Extended Brewing",
+     "d": "Extend a potion's duration using Redstone."
+    },
+    {
+     "t": "Potent Brewing",
+     "d": "Strengthen a compatible potion using Glowstone."
+    },
+    {
+     "t": "Splash Alchemy",
+     "d": "Brew a Splash Potion."
+    },
+    {
+     "t": "Zombie Doctor",
+     "d": "Weaken and cure a Zombie Villager."
+    },
+    {
+     "t": "Eyes in the Dark",
+     "d": "Brew Night Vision and Water Breathing potions."
+    },
+    {
+     "t": "A Softer Landing",
+     "d": "Collect a Phantom Membrane and brew Slow Falling."
+    },
+    {
+     "t": "Nether Lighting",
+     "d": "Craft and operate a Copper Bulb."
+    },
+    {
+     "t": "Observed Motion",
+     "d": "Use an Observer to trigger a Piston."
+    },
+    {
+     "t": "Measured Signals",
+     "d": "Use a Comparator to read a container's contents."
+    },
+    {
+     "t": "A Smarter Farm",
+     "d": "Automatically harvest and collect Sugar Cane or Bamboo."
+    },
+    {
+     "t": "Storage Between Worlds",
+     "d": "Craft two Ender Chests and retrieve an item placed in the other."
+    },
+    {
+     "t": "This Boat Has Legs",
+     "d": "Saddle a Strider and steer it across 250 blocks of lava."
+    },
+    {
+     "t": "Hot Tourist Destinations",
+     "d": "Visit all five Nether biomes."
+    },
+    {
+     "t": "A Second Chance",
+     "d": "Craft, charge and set your spawn at a Respawn Anchor in the Nether."
+    },
+    {
+     "t": "A Shorter Road Home",
+     "d": "Link two portal sites and travel at least 1,000 Overworld blocks using the Nether."
+    },
+    {
+     "t": "Stay Hydrated",
+     "d": "Obtain a Dried Ghast and rehydrate it into a Ghastling."
+    },
+    {
+     "t": "Chase the Skies",
+     "d": "Raise the Ghastling, craft a Harness and fly your Happy Ghast."
+    },
+    {
+     "t": "Hidden in the Depths",
+     "d": "When this quest opens, mine 4 Ancient Debris."
+    },
+    {
+     "t": "Netherite Material",
+     "d": "Smelt the debris and craft a Netherite Ingot."
+    },
+    {
+     "t": "Netherite Research",
+     "d": "Duplicate an Upgrade Template; this unlocks Netherite smithing."
+    },
+    {
+     "t": "The First Upgrade",
+     "d": "Upgrade a Diamond Pickaxe into a Netherite Pickaxe."
+    },
+    {
+     "t": "Pearl Collector",
+     "d": "Obtain 16 Ender Pearls; completing this unlocks Eye crafting and frame insertion."
+    },
+    {
+     "t": "Eyes of Ender",
+     "d": "Craft 16 Eyes of Ender."
+    },
+    {
+     "t": "Following the Eye",
+     "d": "Use Eyes to locate and enter a Stronghold."
+    },
+    {
+     "t": "The Portal Awaits",
+     "d": "Find and activate an End Portal, or reach one already activated; completing the chapter unlocks End entry."
+    }
+   ]
+  },
+  {
+   "n": 8,
+   "name": "End Age",
+   "goal": "Earn storage and flight",
+   "unlocks": "End travel and resources. Shulker Boxes unlock after collecting shells; Elytra use unlocks after recovering the wings. The Mace and proposed Wither/Beacon progression remain locked until Post-End.",
+   "quests": [
+    {
+     "t": "The End?",
+     "d": "Enter the End and reach its central island."
+    },
+    {
+     "t": "Strange Stone",
+     "d": "Mine 32 End Stone."
+    },
+    {
+     "t": "Crystal Breaker",
+     "d": "Contribute to destroying the Dragon's healing crystals."
+    },
+    {
+     "t": "Dragon Hunter",
+     "d": "Deal damage to the Ender Dragon."
+    },
+    {
+     "t": "Free the End",
+     "d": "Participate in defeating the Dragon."
+    },
+    {
+     "t": "Bottled Breath",
+     "d": "Collect Dragon's Breath during a Dragon encounter."
+    },
+    {
+     "t": "Dragon Trophy",
+     "d": "Recover or interact with a placed Dragon Egg trophy; shared encounter credit also counts."
+    },
+    {
+     "t": "Beyond the Gateway",
+     "d": "Travel through an End Gateway."
+    },
+    {
+     "t": "Chorus Gatherer",
+     "d": "Collect Chorus Fruit and a Chorus Flower."
+    },
+    {
+     "t": "Chorus Farmer",
+     "d": "Plant Chorus and harvest fruit from your grown plant."
+    },
+    {
+     "t": "Purpur Crafting",
+     "d": "Smelt Popped Chorus Fruit and craft Purpur and End Rods."
+    },
+    {
+     "t": "The City at the End",
+     "d": "Discover an End City."
+    },
+    {
+     "t": "Shulker Hunter",
+     "d": "Defeat 6 Shulkers."
+    },
+    {
+     "t": "Shell Collector",
+     "d": "Collect 2 Shulker Shells; this unlocks Shulker Box crafting and use."
+    },
+    {
+     "t": "Portable Storage",
+     "d": "Craft a Shulker Box and transport items inside it."
+    },
+    {
+     "t": "Colored Storage",
+     "d": "Dye a Shulker Box."
+    },
+    {
+     "t": "The End Ship",
+     "d": "Reach an End Ship."
+    },
+    {
+     "t": "Sky Sailor",
+     "d": "Recover Elytra; this unlocks equipping and gliding."
+    },
+    {
+     "t": "Taking Flight",
+     "d": "Glide 1,000 blocks with Elytra."
+    },
+    {
+     "t": "Powered Flight",
+     "d": "Craft Rockets and use 8 to boost while gliding."
+    },
+    {
+     "t": "Return Journey",
+     "d": "Return to the Overworld with your End discoveries."
+    },
+    {
+     "t": "Lingering Alchemy",
+     "d": "Brew a Lingering Potion using Dragon's Breath and craft Tipped Arrows."
+    },
+    {
+     "t": "Dragon Rematch",
+     "d": "Craft and place 4 End Crystals to respawn the Dragon."
+    },
+    {
+     "t": "End Mastery",
+     "d": "Defeat the respawned Dragon; completing the chapter unlocks Post-End Age."
+    }
+   ]
+  },
+  {
+   "n": 9,
+   "name": "Post-End Age",
+   "goal": "Master the whole world",
+   "unlocks": "Mace crafting and use; proposed Wither summoning and Beacon gates. All ordinary equipment is now available. Every listed quest is required for full completion.",
+   "quests": [
+    {
+     "t": "Skull Collector",
+     "d": "Obtain 3 Wither Skeleton Skulls."
+    },
+    {
+     "t": "Withering Heights",
+     "d": "Summon the Wither."
+    },
+    {
+     "t": "The Wither",
+     "d": "Participate in defeating the Wither."
+    },
+    {
+     "t": "Beacon Builder",
+     "d": "Craft and activate a Beacon."
+    },
+    {
+     "t": "Full Power",
+     "d": "Build a four-layer pyramid and activate a level-II Beacon power."
+    },
+    {
+     "t": "Netherite Clad",
+     "d": "Upgrade and equip full Netherite Armor."
+    },
+    {
+     "t": "Ultimate Toolkit",
+     "d": "Upgrade the remaining tools and a Sword or Spear to Netherite."
+    },
+    {
+     "t": "Armored Companions",
+     "d": "Upgrade Diamond Horse Armor to Netherite Horse Armor."
+    },
+    {
+     "t": "Ominous Preparations",
+     "d": "Obtain an Ominous Bottle and trigger an Ominous Trial."
+    },
+    {
+     "t": "Revaulting",
+     "d": "Complete Ominous Trials and open an Ominous Vault."
+    },
+    {
+     "t": "Heavy Discovery",
+     "d": "Obtain a Heavy Core."
+    },
+    {
+     "t": "The Mace",
+     "d": "Craft a Mace and land a smash attack."
+    },
+    {
+     "t": "Wind and Thunder",
+     "d": "Combine a Wind Charge jump with a Mace smash attack."
+    },
+    {
+     "t": "Village Defender",
+     "d": "Participate in winning a Raid."
+    },
+    {
+     "t": "Postmortal",
+     "d": "Obtain and activate a Totem of Undying."
+    },
+    {
+     "t": "Monument Conqueror",
+     "d": "Defeat the three Elder Guardians of an Ocean Monument, with team credit."
+    },
+    {
+     "t": "Underwater Construction",
+     "d": "Collect wet Sponges, dry them and use them to drain water."
+    },
+    {
+     "t": "Conduit Power",
+     "d": "Craft and fully activate a Conduit."
+    },
+    {
+     "t": "Axolotl Ally",
+     "d": "Catch an Axolotl in a Bucket and assist it in winning a fight."
+    },
+    {
+     "t": "Frog Nursery",
+     "d": "Breed Frogs and collect a Tadpole in a Bucket."
+    },
+    {
+     "t": "Three Climates",
+     "d": "Raise Tadpoles into all three Frog variants."
+    },
+    {
+     "t": "With Our Powers Combined",
+     "d": "Produce all three Froglight colors."
+    },
+    {
+     "t": "New Life",
+     "d": "Duplicate an Allay using an Amethyst Shard while music plays."
+    },
+    {
+     "t": "Allay Logistics",
+     "d": "Have an Allay deliver collected items to a Note Block."
+    },
+    {
+     "t": "Controlled Chaos",
+     "d": "Have a Sulfur Cube absorb TNT and detonate it in an excavating area."
+    },
+    {
+     "t": "Sticky Engineering",
+     "d": "Use Honey Blocks or Slime Blocks in a working Piston mechanism."
+    },
+    {
+     "t": "Listening to the World",
+     "d": "Build a device activated by a Sculk Sensor."
+    },
+    {
+     "t": "Selective Hearing",
+     "d": "Use a Calibrated Sculk Sensor to respond to a selected vibration frequency."
+    },
+    {
+     "t": "Heart Transplanter",
+     "d": "Craft a Creaking Heart and activate it between correctly aligned Pale Oak Logs."
+    },
+    {
+     "t": "Automated Workshop",
+     "d": "Connect material storage, automatic smelting and a Crafter; produce 64 final items through the chain."
+    },
+    {
+     "t": "Potion Master",
+     "d": "Brew Regeneration, Swiftness, Invisibility, Leaping, Poison, Weakness, Slowness, Harming and Turtle Master potions."
+    },
+    {
+     "t": "Unusual Alchemy",
+     "d": "Brew Infestation, Oozing, Weaving and Wind Charging potions."
+    },
+    {
+     "t": "Master Farmer",
+     "d": "Grow and harvest every crop in the 24-entry cultivation checklist below."
+    },
+    {
+     "t": "A Balanced Diet",
+     "d": "Complete the vanilla advancement for eating every required food."
+    },
+    {
+     "t": "Master Breeder",
+     "d": "Complete vanilla's Two by Two breeding criteria, including producing a Mule."
+    },
+    {
+     "t": "Companions of the World",
+     "d": "Tame a Cat, Parrot, Donkey and Llama; breed a Mule."
+    },
+    {
+     "t": "Rare Journeys",
+     "d": "Ride a Camel and a Zombie Nautilus; obtain a Goat Horn."
+    },
+    {
+     "t": "Master Angler",
+     "d": "Fish up all four fish species, three junk types and three treasure types."
+    },
+    {
+     "t": "Diverse Economy",
+     "d": "Trade with every trading Villager profession and the Wandering Trader."
+    },
+    {
+     "t": "Master Builder",
+     "d": "Use Bricks, Terracotta, Glazed Terracotta, Concrete, Glass and multiple wood and stone families in builds."
+    },
+    {
+     "t": "Personal Touch",
+     "d": "Decorate a Banner with a Loom; display it, a Painting and an Armor Stand."
+    },
+    {
+     "t": "A World in Color",
+     "d": "Craft all 16 dyes and use them across your builds."
+    },
+    {
+     "t": "Armor Trim Collection",
+     "d": "Apply 8 different Armor Trim patterns."
+    },
+    {
+     "t": "Archaeological Record",
+     "d": "Obtain 12 different Pottery Sherds."
+    },
+    {
+     "t": "Music Collector",
+     "d": "Obtain and play 8 different Music Discs."
+    },
+    {
+     "t": "Cartographer's Atlas",
+     "d": "Reach the destinations of 8 different Explorer Map types."
+    },
+    {
+     "t": "Adventuring Time",
+     "d": "Complete the vanilla biome exploration advancement."
+    },
+    {
+     "t": "Master of Travel",
+     "d": "Travel 1,000 blocks each by rail, boat and mount; fly 5,000 blocks with Elytra."
+    },
+    {
+     "t": "Vanilla Progression Complete",
+     "d": "Complete every preceding quest in all nine Ages."
+    }
+   ]
+  }
+ ],
+ "cultivation": [
+  "Wheat",
+  "Carrots",
+  "Potatoes",
+  "Beetroot",
+  "Pumpkins",
+  "Melons",
+  "Sugar Cane",
+  "Bamboo",
+  "Cactus",
+  "Cocoa",
+  "Sweet Berries",
+  "Glow Berries",
+  "Kelp",
+  "Brown Mushrooms",
+  "Red Mushrooms",
+  "Shelf Mushrooms",
+  "Nether Wart",
+  "Chorus",
+  "Torchflowers",
+  "Pitcher Plants",
+  "Crimson Huge Fungi",
+  "Warped Huge Fungi",
+  "Weeping Vines",
+  "Twisting Vines"
+ ]
+}

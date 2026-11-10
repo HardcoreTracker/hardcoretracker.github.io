@@ -80,5 +80,10 @@
       "skin": "skins/shrinppy.png"
     }
   ],
-  "deaths": []
+  "deaths": [],
+  "progress": {
+    "age": 1,
+    "quest": 1,
+    "totemFarm": false
+  }
 }

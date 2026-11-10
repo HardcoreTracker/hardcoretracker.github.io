@@ -139,6 +139,36 @@ header.top .sub{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-siz
 .tipbar .tag{font-family:var(--f-label);font-weight:700;font-size:12px;letter-spacing:.08em;color:#FFFF55;background:#3F3F3F;padding:4px 8px;box-shadow:inset 2px 2px 0 #5E5E5E, inset -2px -2px 0 #1E1E1E;text-shadow:2px 2px 0 #3F3F15;flex:none}
 .tipbar .text{flex:1 1 240px;min-width:0;font-size:16px}
 .tipbar button{flex:none}
+.quests{display:flex;flex-direction:column;gap:14px}
+.q-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.q-top h3{font-size:24px;margin:2px 0 0}
+.q-top .label{color:var(--muted)}
+.q-sub{font-size:14px;color:var(--muted)}
+.q-cost{font-size:14px;text-align:right}
+.q-cost b{color:var(--accent);font-size:22px}
+.xp{position:relative;height:18px;background:#1E1E1E;border:2px solid var(--outline)}
+.xp-fill{position:absolute;inset:0 auto 0 0;background:#80FF20;box-shadow:inset 0 3px 0 #B6FF74, inset 0 -3px 0 #4FA80F}
+.xp span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#FFFFFF;text-shadow:1px 1px 0 #000000}
+.q-now{padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.q-now .label{color:#FFFF55}
+.q-now .t{font-size:19px;font-weight:700}
+.q-now .d{font-size:15px;opacity:.9}
+.q-tabs{display:flex;flex-wrap:wrap;gap:6px}
+.q-tabs button{font-size:13px;padding:4px 9px}
+.q-tabs button.done{background:#3F7A2E;box-shadow:inset 2px 2px 0 #6FB24E, inset -2px -3px 0 #1F3F15}
+.q-tabs button.cur{background:#B8860B;box-shadow:inset 2px 2px 0 #E7B94A, inset -2px -3px 0 #5A4005}
+.q-tabs button[aria-pressed="true"]{border-color:#FFFFFF}
+.q-unlocks{font-size:14px;color:var(--muted)}
+.q-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px}
+.q-list li{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;min-width:0}
+.q-list .mark{flex:none;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:2px solid var(--outline);background:var(--slot-lo);color:#FFFFFF}
+.q-list li.done .mark{background:#3F7A2E}
+.q-list li.cur .mark{background:#FFAA00;color:#000000}
+.q-list li.cur{outline:2px solid #FFAA00;outline-offset:-2px}
+.q-list li.todo{opacity:.62}
+.q-list .qt{font-weight:700;font-size:14px}
+.q-list .qd{font-size:13px;opacity:.85}
+.q-list li > div{min-width:0}
 .agechip{display:inline-flex;align-items:center;gap:7px;font-weight:600;white-space:nowrap}
 .agechip::before{content:"";width:10px;height:10px;background:var(--c);box-shadow:0 0 0 2px var(--outline);flex:none}
 
@@ -243,6 +273,18 @@ button:disabled{opacity:.5;cursor:default}
       <span class="label">On the chopping block</span>
       <div id="spotBody"></div>
     </div>
+  </section>
+
+  <section class="panel quests" id="questSec" aria-label="Quest progress">
+    <div class="q-top">
+      <div><span class="label">Wilderness Bound progress</span><h3 id="qAge">Loading quests…</h3><div class="q-sub" id="qSub"></div></div>
+      <div class="q-cost" id="qCost"></div>
+    </div>
+    <div class="xp" id="qXp"><div class="xp-fill" id="qBar" style="width:0%"></div><span id="qBarText"></span></div>
+    <div class="slot q-now" id="qNow"></div>
+    <div class="q-tabs" id="qTabs" role="group" aria-label="Ages"></div>
+    <div class="q-unlocks" id="qUnlocks"></div>
+    <ol class="q-list" id="qList"></ol>
   </section>
 
   <section class="mid">
@@ -642,6 +684,47 @@ const TIPS = [
     i = n; show();
   });
 })();
+// ---------- quests ----------
+const AGE_POINTS = [1,1,2,3,3,4,4,5,5];
+let QUESTS = null, progress = {age:1, quest:1}, viewAge = null;
+function questState(a, i){
+  if (a < progress.age) return "done";
+  if (a > progress.age) return "todo";
+  return i < progress.quest ? "done" : i === progress.quest ? "cur" : "todo";
+}
+function renderQuests(){
+  if (!QUESTS) return;
+  const ages = QUESTS.ages, A = ages[progress.age - 1];
+  if (!A) return;
+  if (viewAge == null) viewAge = progress.age;
+  const doneBefore = ages.slice(0, progress.age - 1).reduce((s,a)=>s+a.quests.length, 0) + (progress.quest - 1);
+  const total = ages.reduce((s,a)=>s+a.quests.length, 0);
+  const inAge = progress.quest - 1, ageLen = A.quests.length;
+  $("qAge").textContent = `Age ${A.n} · ${A.name}`;
+  $("qSub").textContent = `${A.goal} · ${doneBefore} of ${total} quests done overall`;
+  const cost = AGE_POINTS[A.n - 1] + (progress.totemFarm ? 1 : 0);
+  $("qCost").innerHTML = `Dying right now costs <b>+${cost}</b>${progress.totemFarm ? "<br>(totem farm +1 included)" : ""}`;
+  $("qBar").style.width = (inAge / ageLen * 100) + "%";
+  $("qBarText").textContent = `${inAge} / ${ageLen} quests in this age`;
+  const Q = A.quests[progress.quest - 1];
+  $("qNow").innerHTML = Q ? `<span class="label">Current quest · #${progress.quest}</span><span class="t shadowed">${esc(Q.t)}</span><span class="d">${esc(Q.d)}</span>` : "";
+  $("qTabs").innerHTML = ages.map(a => {
+    const st = a.n < progress.age ? "done" : a.n === progress.age ? "cur" : "";
+    return `<button type="button" class="${st}" data-age="${a.n}" aria-pressed="${a.n===viewAge}">${a.n}. ${esc(a.name.replace(" Age",""))}</button>`;
+  }).join("");
+  const V = ages[viewAge - 1];
+  $("qUnlocks").textContent = V.unlocks;
+  $("qList").innerHTML = V.quests.map((q, k) => {
+    const st = questState(V.n, k + 1);
+    return `<li class="slot ${st}"><span class="mark">${st==="done"?"✓":st==="cur"?"!":""}</span><div><div class="qt">${k+1}. ${esc(q.t)}</div><div class="qd">${esc(q.d)}</div></div></li>`;
+  }).join("");
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("#qTabs button[data-age]"); if (!b) return;
+  viewAge = Number(b.dataset.age); renderQuests();
+});
+fetch("quests.json", {cache:"no-store"}).then(r => r.json()).then(q => { QUESTS = q; renderQuests(); }).catch(() => { $("qAge").textContent = "Couldn't load the quest list."; });
+
 // ---------- data ----------
 function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
 function updatePreview(){}
@@ -649,6 +732,7 @@ render();
 fetch("data.json", {cache:"no-store"}).then(r => { if (!r.ok) throw 0; return r.json(); }).then(d => {
   meta = {priorDeaths: d.priorDeaths || 0};
   players = d.players || []; deaths = d.deaths || [];
+  if (d.progress){ progress = d.progress; viewAge = progress.age; renderQuests(); }
   render();
   setStatus("Updated " + (d.updated || "recently"), "live");
 }).catch(() => setStatus("Couldn't load the standings. Refresh to try again.", "warn"));
