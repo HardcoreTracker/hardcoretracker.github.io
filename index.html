@@ -168,15 +168,16 @@ header.top .sub{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-siz
 header.top{position:relative}
 .alive-top{position:absolute;left:50%;top:0;transform:translateX(-50%)}
 @media (max-width:760px){.alive-top{position:static;transform:none;order:-1;width:100%;display:flex;justify-content:center}}
-.shame{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
-.award{padding:12px 14px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0}
-.award .tag{font-family:var(--f-label);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#FFFF55;background:#3F3F3F;padding:3px 7px;box-shadow:inset 2px 2px 0 #5E5E5E, inset -2px -2px 0 #1E1E1E;text-shadow:2px 2px 0 #3F3F15}
-.award .who-row,.award .sub{align-self:stretch}
-.award .big{font-size:20px;font-weight:700;line-height:1.2;overflow-wrap:anywhere}
-.award .big small{font-size:13px;font-weight:400;opacity:.75}
-.award .sub{font-size:13px;opacity:.8}
-.award .who-row{display:flex;align-items:center;gap:8px;min-width:0}
-.award canvas{width:24px;height:24px;image-rendering:pixelated;flex:none;box-shadow:0 0 0 2px var(--outline)}
+.shame{display:flex;flex-direction:column;gap:10px}
+.award{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:12px;min-width:0}
+.award .tag{flex:none;min-width:19em;white-space:nowrap;text-align:center;font-family:var(--f-label);font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#FFFF55;background:#3F3F3F;padding:4px 8px;box-shadow:inset 2px 2px 0 #5E5E5E, inset -2px -2px 0 #1E1E1E;text-shadow:2px 2px 0 #3F3F15}
+.award .who-row{display:flex;align-items:center;gap:8px;flex:none;min-width:0}
+.award .big{font-size:16px;font-weight:700;line-height:1.2}
+.award .big small{font-size:12px;font-weight:400;opacity:.75}
+.award .sub{flex:1 1 160px;min-width:0;font-size:14px;opacity:.8}
+.award .tag{}
+@media (max-width:620px){.award .tag{min-width:0;white-space:normal}}
+.award canvas{width:22px;height:22px;image-rendering:pixelated;flex:none;box-shadow:0 0 0 2px var(--outline)}
 .pun-panel{padding:10px;max-height:560px;overflow-y:auto}
 .pun-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .pun-list li{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:9px 12px}
