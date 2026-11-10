@@ -1202,6 +1202,12 @@ function rulesHtml(){
   const rows = AGES.map(a => `<tr><td>${ageChip(a.key)}</td><td>+${a.pts}</td></tr>`).join("");
   return `<div class="rules-body">
     <h2 id="ovTitle">Server rules</h2>
+    <div class="pp-sec"><h3>Standing rules</h3><ul>
+      <li><b>No dying on purpose.</b> Anyone who intentionally dies this far in gets banned from Hearthigen.</li>
+      <li><b>No griefing or trolling</b>, as determined by SubKiwi. This includes but isn't limited to lava casting, dirt pyramids and vein mining the house.</li>
+      <li><b>No combat logging.</b> If you log out to escape a fight, you'll be /killed and given that age's points.</li>
+      <li><b>Totem farm penalty.</b> Once a totem farm has been built, every death adds 1 extra point.</li>
+    </ul></div>
     <div class="pp-sec"><h3>Shared life</h3><ul>
       <li>This is a shared-life hardcore world. If anyone dies, the world resets for everyone.</li>
       <li>Deaths that get rolled back are marked as reverted and don't end the world.</li>
