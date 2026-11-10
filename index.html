@@ -132,6 +132,10 @@ header.top .sub{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-siz
 .rules .note{font-size:14px;color:var(--muted);margin-top:8px}
 .rules .note b{color:var(--accent)}
 
+.tipbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:12px}
+.tipbar .tag{font-family:var(--f-label);font-weight:700;font-size:12px;letter-spacing:.08em;color:#FFFF55;background:#3F3F3F;padding:4px 8px;box-shadow:inset 2px 2px 0 #5E5E5E, inset -2px -2px 0 #1E1E1E;text-shadow:2px 2px 0 #3F3F15;flex:none}
+.tipbar .text{flex:1 1 240px;min-width:0;font-size:16px}
+.tipbar button{flex:none}
 .agechip{display:inline-flex;align-items:center;gap:7px;font-weight:600;white-space:nowrap}
 .agechip::before{content:"";width:10px;height:10px;background:var(--c);box-shadow:0 0 0 2px var(--outline);flex:none}
 
@@ -218,6 +222,12 @@ button:disabled{opacity:.5;cursor:default}
     </div>
     <div class="status" id="status">Loading the server's record…</div>
   </header>
+
+  <section class="panel tipbar" aria-label="Survival tip">
+    <span class="tag">TIP</span>
+    <span class="text" id="tipText">Carry a water bucket. One click mid-fall turns a death drop into a splash.</span>
+    <button type="button" id="tipNext">Next tip</button>
+  </section>
 
   <section class="hero">
     <div class="panel podium-panel">
@@ -481,6 +491,56 @@ function fmtDate(s){
   return new Date(y, m-1, d).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"});
 }
 
+const TIPS = [
+"Carry a water bucket. One click mid-fall turns a death drop into a splash.",
+"Never dig straight down. Lava loves a surprise guest.",
+"Sleep every couple of nights, or the phantoms come to collect.",
+"A raised shield blocks creeper blasts and skeleton arrows.",
+"Torches on one side of the cave wall only. Follow them back out.",
+"Hear a hiss? Back away. Swinging at a creeper is how worlds end.",
+"Sneak near ledges. Crouching stops you from walking off the edge.",
+"Write down your base coordinates with F3. Lost at night is a bad place to be.",
+"Wear one piece of gold armor in the Nether so piglins leave you alone.",
+"A fire resistance potion turns lava from a death into a hot tub.",
+"Golden carrots are some of the best food you can carry.",
+"Stone tools at night? Running is a strategy, not cowardice.",
+"Surrounded? Jump and place blocks under yourself to pillar up out of reach.",
+"Don't look endermen in the eyes. A carved pumpkin on your head helps.",
+"Endermen are three blocks tall. Duck under a two-block-high roof and they can't follow.",
+"Keep a spare set of gear in a second chest, far from your main base.",
+"Always carry a stack of blocks. Instant wall, bridge or emergency hut.",
+"On Hard, an empty hunger bar can actually kill you. Pack food.",
+"Hear a heartbeat in the Deep Dark? Sneak away. Nobody beats a warden.",
+"Ghast fireballs can be punched back at the ghast.",
+"Beds explode in the Nether and the End. Do not try to sleep there.",
+"Hold a totem of undying in your offhand. It cheats death exactly once.",
+"Drowned can throw tridents. Oceans at night are no place for a swim.",
+"Skeletons and zombies burn in daylight. Sometimes the best move is to wait for sunrise.",
+"Baby zombies are fast and hard to hit. Never ignore one.",
+"Milk clears every status effect, including poison and wither.",
+"Landing in water cancels fall damage. Even a single block of it.",
+"Hay bales soak up most fall damage. Handy at the bottom of a drop.",
+"Ender pearls hurt when you land. Check your hearts before you throw.",
+"Leather boots let you walk on powder snow instead of freezing in it.",
+"Sneak across magma blocks and they won't burn you.",
+"Light up the area around your base. Mobs only spawn in the dark.",
+"Mark your Nether portal with something bright so you can find it again.",
+"Shared life means your death is everyone's death. No pressure.",
+"Dying in the End age costs 5 points. Maybe let someone else fight the dragon.",
+"Once a totem farm exists, every death costs an extra point. Choose wisely.",
+"Before doing something risky, ask yourself: is this worth 5 points?",
+"Five points is a punishment. Check the chopping block before your next bad idea."
+];
+(function(){
+  let i = Math.floor(Math.random() * TIPS.length);
+  const el = document.getElementById("tipText");
+  const show = () => { el.textContent = TIPS[i]; };
+  show();
+  document.getElementById("tipNext").addEventListener("click", () => {
+    let n; do { n = Math.floor(Math.random() * TIPS.length); } while (TIPS.length > 1 && n === i);
+    i = n; show();
+  });
+})();
 // ---------- data ----------
 function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
 function updatePreview(){}
