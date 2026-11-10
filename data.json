@@ -464,5 +464,91 @@
     "player": "subkiwi",
     "cause": "Skeleton",
     "time": "2026-11-09T18:00:00-08:00"
-  }
+  },
+  "punishments": [
+    {
+      "id": "p1",
+      "time": "2026-10-10T20:07:00-07:00",
+      "player": "kanalumaddela",
+      "text": "AI dance video"
+    },
+    {
+      "id": "p2",
+      "time": "2026-10-12T15:40:00-07:00",
+      "player": "mysticdragbax",
+      "text": "Teach a class over a given topic"
+    },
+    {
+      "id": "p3",
+      "time": "2026-10-12T21:02:00-07:00",
+      "player": "kanalumaddela",
+      "text": "Farm a stack of wheat with no bonemeal"
+    },
+    {
+      "id": "p4",
+      "time": "2026-10-13T19:28:00-07:00",
+      "player": "kanalumaddela",
+      "text": "Watch a video on how to get better at survival Minecraft and take handwritten notes"
+    },
+    {
+      "id": "p5",
+      "time": "2026-10-14T22:28:00-07:00",
+      "player": "deim0s_v1",
+      "text": "30 minutes on a Minecraft training server or tutorial map"
+    },
+    {
+      "id": "p6",
+      "time": "2026-10-15T20:40:00-07:00",
+      "player": "subkiwi",
+      "text": "Write a handwritten apology letter"
+    },
+    {
+      "id": "p7",
+      "time": "2026-10-16T19:06:00-07:00",
+      "player": "mysticdragbax",
+      "text": "Karaoke chosen by others"
+    },
+    {
+      "id": "p8",
+      "time": "2026-10-22T20:31:00-07:00",
+      "player": "incendiaryblitz",
+      "text": "Make a cringe TikTok"
+    },
+    {
+      "id": "p9",
+      "time": "2026-10-24T18:44:00-07:00",
+      "player": "monkey____",
+      "text": "Discord name for a week, chosen by others"
+    },
+    {
+      "id": "p10",
+      "time": "2026-11-02T17:17:00-08:00",
+      "player": "silver3gaming",
+      "text": "500 piece jigsaw puzzle"
+    },
+    {
+      "id": "p11",
+      "time": "2026-11-02T17:18:00-08:00",
+      "player": "silver3gaming",
+      "text": "Gather dirt, build a tower from sea level to build limit, and mine it all back. No VeinMiner, no shovels."
+    },
+    {
+      "id": "p12",
+      "time": "2026-11-02T17:18:30-08:00",
+      "player": "nagalooge",
+      "text": "Mine 5 obsidian by hand, no scrolling reels"
+    },
+    {
+      "id": "p13",
+      "time": "2026-11-03T20:13:00-08:00",
+      "player": "kanalumaddela",
+      "text": "PowerPoint presentation on why you suck at Minecraft, detailing each of your deaths and how to prevent them"
+    },
+    {
+      "id": "p14",
+      "time": "2026-11-06T23:13:00-08:00",
+      "player": "subkiwi",
+      "text": "Drink a glass of milk"
+    }
+  ]
 }

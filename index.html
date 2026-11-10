@@ -176,6 +176,15 @@ header.top{position:relative}
 .award .sub{font-size:13px;opacity:.8}
 .award .who-row{display:flex;align-items:center;gap:8px;min-width:0}
 .award canvas{width:24px;height:24px;image-rendering:pixelated;flex:none;box-shadow:0 0 0 2px var(--outline)}
+.pun-panel{padding:10px;max-height:560px;overflow-y:auto}
+.pun-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.pun-list li{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:9px 12px}
+.pun-list .n{font-weight:700;color:var(--accent-bright);font-size:18px;min-width:2.2em}
+.pun-list canvas{width:28px;height:28px;image-rendering:pixelated;box-shadow:0 0 0 2px var(--outline)}
+.pun-list .pt{font-size:15px;line-height:1.3;min-width:0}
+.pun-list .pt b{display:block;font-size:13px;font-weight:400;opacity:.75;margin-bottom:2px}
+.pun-list .pd{font-size:13px;opacity:.7;white-space:nowrap}
+@media (max-width:620px){.pun-list li{grid-template-columns:auto auto minmax(0,1fr)}.pun-list .pd{grid-column:3}}
 .tipbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:12px}
 .tipbar .tag{font-family:var(--f-label);font-weight:700;font-size:12px;letter-spacing:.08em;color:#FFFF55;background:#3F3F3F;padding:4px 8px;box-shadow:inset 2px 2px 0 #5E5E5E, inset -2px -2px 0 #1E1E1E;text-shadow:2px 2px 0 #3F3F15;flex:none}
 .tipbar .text{flex:1 1 240px;min-width:0;font-size:16px}
@@ -383,6 +392,11 @@ button:disabled{opacity:.5;cursor:default}
   <section id="shameSec" hidden>
     <div class="sect-head"><h2 class="mctitle">Hall of Shame</h2><span class="hint">Calculated from the death log</span></div>
     <div class="shame" id="shame"></div>
+  </section>
+
+  <section id="punSec" hidden>
+    <div class="sect-head"><h2 class="mctitle">Punishment history</h2><span class="hint">Newest first</span></div>
+    <div class="panel pun-panel"><ol class="pun-list" id="punList"></ol></div>
   </section>
 
   <section>
@@ -1047,6 +1061,21 @@ function renderShame(){
   box.querySelectorAll("canvas[data-kind]").forEach(cv => { drawHead(cv, null); const id = cv.dataset.skin; if (id) loadImg(id).then(im => { if (im) drawHead(cv, im); }); });
   sec.hidden = false;
 }
+
+// ---------- punishment history ----------
+function renderPunishments(list){
+  const sec = $("punSec");
+  if (!list || !list.length){ sec.hidden = true; return; }
+  const byId = Object.fromEntries(players.map(p => [p.id, p]));
+  const sorted = [...list].sort((a,b) => Date.parse(a.time||0) - Date.parse(b.time||0));
+  $("punList").innerHTML = sorted.map((x, i) => {
+    const p = byId[x.player];
+    const who = p ? `${esc(p.name)}${p.nick && p.nick !== p.name ? " (" + esc(p.nick) + ")" : ""}` : esc(x.player || "");
+    return `<li class="slot"><span class="n">#${i+1}</span><canvas data-kind="head" data-skin="${esc(p?.skin||"")}"></canvas><span class="pt"><b>${who}</b>${esc(x.text)}</span><span class="pd">${x.time ? esc(fmtWhen(x.time).replace(/ @ .*/, "")) : ""}</span></li>`;
+  }).reverse().join("");
+  $("punList").querySelectorAll("canvas[data-kind]").forEach(cv => { drawHead(cv, null); const id = cv.dataset.skin; if (id) loadImg(id).then(im => { if (im) drawHead(cv, im); }); });
+  sec.hidden = false;
+}
 // ---------- data ----------
 function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
 function updatePreview(){}
@@ -1059,6 +1088,7 @@ fetch("data.json", {cache:"no-store"}).then(r => { if (!r.ok) throw 0; return r.
   if (d.progress){ progress = d.progress; viewAge = progress.age; renderQuests(); }
   renderLastDeath(d.lastDeath);
   renderShame();
+  renderPunishments(d.punishments);
   render();
   setStatus("Updated " + (d.updated || "recently"), "live");
 }).catch(() => setStatus("Couldn't load the standings. Refresh to try again.", "warn"));
