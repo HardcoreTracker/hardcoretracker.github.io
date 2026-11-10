@@ -115,8 +115,6 @@ header.top .sub{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-siz
 .cur-pun{padding:12px 14px;display:flex;flex-direction:column;gap:4px}
 .cur-pun .label{color:#FF5555}
 .cp-text{font-size:19px;font-weight:700;line-height:1.25;overflow-wrap:anywhere}
-.cp-who{font-size:14px;opacity:.85}
-.cp-who:empty{display:none}
 .spot-head{font-size:17px;line-height:1.2}
 .spot-head b{color:var(--accent);font-size:24px}
 .spot-list{display:flex;flex-direction:column;gap:10px}
@@ -295,7 +293,6 @@ button:disabled{opacity:.5;cursor:default}
       <div class="slot cur-pun" id="curPun">
         <span class="label">Current punishment</span>
         <span class="cp-text shadowed" id="cpText">None right now</span>
-        <span class="cp-who" id="cpWho"></span>
       </div>
       <span class="label">On the chopping block</span>
       <div id="spotBody"></div>
@@ -774,7 +771,6 @@ fetch("data.json", {cache:"no-store"}).then(r => { if (!r.ok) throw 0; return r.
   meta = {priorDeaths: d.priorDeaths || 0};
   const cp = d.currentPunishment || {};
   $("cpText").textContent = cp.text || "None right now";
-  $("cpWho").textContent = cp.who ? "Being served by " + cp.who : "";
   players = d.players || []; deaths = d.deaths || [];
   if (d.progress){ progress = d.progress; viewAge = progress.age; renderQuests(); }
   render();
