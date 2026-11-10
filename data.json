@@ -376,7 +376,8 @@
       "cause": "Tried to swim in lava",
       "legacy": true,
       "date": "2026-10-30",
-      "time": "2026-10-30T20:25:00-07:00"
+      "time": "2026-10-30T20:25:00-07:00",
+      "reverted": true
     },
     {
       "id": "d34",

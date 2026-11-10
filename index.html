@@ -686,7 +686,7 @@ function render(){
         <td class="num">${esc(d.time ? fmtWhen(d.time) : d.date ? fmtDate(d.date) : "Not tracked")}</td>
         <td><span class="who"><canvas data-skin="${esc(p?.skin||"")}" data-kind="head"></canvas>${esc(nm)}${nickHtml(p)}</span></td>
         <td>${d.age ? ageChip(d.age) : "—"}${d.totem?'<span class="totem">TOTEM</span>':""}</td>
-        <td class="cause">${esc(d.cause)}${d.reason?`<div class="reason">${esc(d.reason)}</div>`:""}</td>
+        <td class="cause">${esc(d.cause)}${d.reverted ? '<span class="totem" title="This death was rolled back and did not reset the world">REVERTED</span>' : ""}${d.reason?`<div class="reason">${esc(d.reason)}</div>`:""}</td>
         <td class="r">${d.legacy ? '<span title="Already counted in their starting points">—</span>' : `<span class="plus">+${gain}</span>`}</td>
         <td class="r num">${d.legacy ? "—" : after}${!d.legacy && crossed>0?`<span class="punish">PUNISHED${crossed>1?" ×"+crossed:""}</span>`:""}</td>
         ${canEdit?`<td class="r"><span><button class="small danger" data-act="askdeld" data-id="${esc(d.id)}">Delete</button></span></td>`:""}
@@ -992,7 +992,7 @@ function renderShame(){
   const names = ids => { if (ids.length > 2){ tieNote = ids.map(nm).join(", "); return ids.length + "-way tie"; } return ids.map(nm).join(" & "); };
   const hours = ms => { const m = Math.round(ms/60000), d = Math.floor(m/1440), hh = Math.floor(m%1440/60), mm = m%60; return (d ? d+"d " : "") + (d||hh ? hh+"h " : "") + mm+"m"; };
   const dayOf = iso => iso.slice(0,10);
-  const timed = sortedDeaths().filter(d => d.time);
+  const timed = sortedDeaths().filter(d => d.time && !d.reverted);
   const cards = [];
   const card = (label, big, sub, headId) => { cards.push({label, big, sub: tieNote ? sub + " · " + tieNote : sub, headId: tieNote ? null : headId}); tieNote = ""; };
 
