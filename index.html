@@ -4,6 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Hardcore Point Tracker</title>
+<meta name="description" content="Points, punishments, quest progress and the death log for our shared-life hardcore Minecraft server.">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#B3261E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hardcore Point Tracker">
+<meta property="og:title" content="Hardcore Point Tracker">
+<meta property="og:description" content="Points, punishments, quest progress and the death log for our shared-life hardcore Minecraft server.">
+<meta property="og:url" content="https://hardcoretracker.github.io/">
+<meta property="og:image" content="https://hardcoretracker.github.io/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 
 <style>
 @font-face{font-family:"Monocraft";src:url("fonts/Monocraft-Regular.otf") format("opentype");font-weight:400 600;font-display:swap}
@@ -114,7 +127,7 @@ header.top .sub{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-siz
 .spot .meter svg{width:22px;height:20px}
 .spot .ties{font-size:13px;color:var(--muted)}
 .cur-pun{padding:12px 14px;display:flex;flex-direction:column;gap:4px}
-.cur-pun .label{color:#FF5555}
+.cur-pun .label{color:#FFFF55;text-shadow:1px 1px 0 #3F3F15}
 .cp-text{font-size:19px;font-weight:700;line-height:1.25;overflow-wrap:anywhere}
 .spot-head{font-size:17px;line-height:1.2}
 .spot-head b{color:var(--accent);font-size:24px}
@@ -150,6 +163,8 @@ header.top .sub{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-siz
 .ld-text b{font-weight:700}
 .ld-text .nick{display:inline;font-size:inherit;color:var(--muted);margin:0 2px}
 .ld-time{font-size:14px;color:var(--muted);flex:none}
+.ld-alive{flex:none;font-size:14px;font-weight:700;color:#FFFFFF;background:#3F7A2E;padding:3px 8px;border:2px solid var(--outline);box-shadow:inset 2px 2px 0 #6FB24E, inset -2px -2px 0 #1F3F15;text-shadow:1px 1px 0 #1F3F15;font-variant-numeric:tabular-nums}
+.ld-alive:empty{display:none}
 .tipbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:12px}
 .tipbar .tag{font-family:var(--f-label);font-weight:700;font-size:12px;letter-spacing:.08em;color:#FFFF55;background:#3F3F3F;padding:4px 8px;box-shadow:inset 2px 2px 0 #5E5E5E, inset -2px -2px 0 #1E1E1E;text-shadow:2px 2px 0 #3F3F15;flex:none}
 .tipbar .text{flex:1 1 240px;min-width:0;font-size:16px}
@@ -292,6 +307,7 @@ button:disabled{opacity:.5;cursor:default}
     <span class="ld-head slot"><canvas id="ldHead" data-kind="head" data-skin=""></canvas></span>
     <span class="ld-text" id="ldText"></span>
     <span class="ld-time" id="ldTime"></span>
+    <span class="ld-alive" id="ldAlive"></span>
   </section>
 
   <section class="panel tipbar" aria-label="Survival tip">
@@ -927,6 +943,21 @@ function renderLastDeath(ld){
   const cv = $("ldHead"); drawHead(cv, null);
   if (p && p.skin) loadImg(p.skin).then(im => { if (im) drawHead(cv, im); });
   box.hidden = false;
+  startAliveTimer(ld.time);
+}
+let aliveTimer = null;
+function startAliveTimer(iso){
+  clearInterval(aliveTimer);
+  const since = new Date(iso).getTime(), el = $("ldAlive");
+  if (!iso || isNaN(since)){ el.textContent = ""; return; }
+  const tick = () => {
+    let s = Math.max(0, Math.floor((Date.now() - since) / 1000));
+    const d = Math.floor(s / 86400); s %= 86400;
+    const hh = Math.floor(s / 3600); s %= 3600;
+    const mm = Math.floor(s / 60); s %= 60;
+    el.textContent = "Survived " + (d ? d + "d " : "") + hh + "h " + String(mm).padStart(2,"0") + "m " + String(s).padStart(2,"0") + "s";
+  };
+  tick(); aliveTimer = setInterval(tick, 1000);
 }
 // ---------- data ----------
 function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
