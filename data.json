@@ -1,6 +1,6 @@
 {
   "updated": "Nov 10, 2026",
-  "priorDeaths": 40,
+  "priorDeaths": 0,
   "players": [
     {
       "id": "kanalumaddela",
@@ -80,7 +80,386 @@
       "skin": "skins/shrinppy.png"
     }
   ],
-  "deaths": [],
+  "deaths": [
+    {
+      "id": "d1",
+      "player": "kanalumaddela",
+      "age": "wood",
+      "cause": "Not tracked (Wood Age)",
+      "legacy": true,
+      "date": "",
+      "time": ""
+    },
+    {
+      "id": "d2",
+      "player": "kanalumaddela",
+      "age": "copper",
+      "cause": "Not tracked (Copper Age)",
+      "legacy": true,
+      "date": "",
+      "time": ""
+    },
+    {
+      "id": "d3",
+      "player": "nagalooge",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-10-10",
+      "time": "2026-10-10T21:18:00-07:00"
+    },
+    {
+      "id": "d4",
+      "player": "feniul",
+      "age": "",
+      "cause": "Impaled by Drowned",
+      "legacy": true,
+      "date": "2026-10-10",
+      "time": "2026-10-10T21:47:00-07:00"
+    },
+    {
+      "id": "d5",
+      "player": "mysticdragbax",
+      "age": "",
+      "cause": "Blown up by Creeper",
+      "legacy": true,
+      "date": "2026-10-11",
+      "time": "2026-10-11T00:41:00-07:00"
+    },
+    {
+      "id": "d6",
+      "player": "shrinppy",
+      "age": "",
+      "cause": "Fell off some vines",
+      "legacy": true,
+      "date": "2026-10-12",
+      "time": "2026-10-12T14:09:00-07:00"
+    },
+    {
+      "id": "d7",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Fell from a high place",
+      "legacy": true,
+      "date": "2026-10-12",
+      "time": "2026-10-12T15:02:00-07:00"
+    },
+    {
+      "id": "d8",
+      "player": "deim0s_v1",
+      "age": "",
+      "cause": "Slain by Wolf",
+      "legacy": true,
+      "date": "2026-10-12",
+      "time": "2026-10-12T15:52:00-07:00"
+    },
+    {
+      "id": "d9",
+      "player": "incendiaryblitz",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-10-12",
+      "time": "2026-10-12T16:10:00-07:00"
+    },
+    {
+      "id": "d10",
+      "player": "soulgiver039",
+      "age": "",
+      "cause": "Tried to swim in lava",
+      "legacy": true,
+      "date": "2026-10-12",
+      "time": "2026-10-12T18:41:00-07:00"
+    },
+    {
+      "id": "d11",
+      "player": "silver3gaming",
+      "age": "",
+      "cause": "Fell from a high place",
+      "legacy": true,
+      "date": "2026-10-12",
+      "time": "2026-10-12T18:44:00-07:00"
+    },
+    {
+      "id": "d12",
+      "player": "mysticdragbax",
+      "age": "",
+      "cause": "Doomed to fall by Skeleton",
+      "legacy": true,
+      "date": "2026-10-12",
+      "time": "2026-10-12T20:58:00-07:00"
+    },
+    {
+      "id": "d13",
+      "player": "soulgiver039",
+      "age": "",
+      "cause": "Slain by Enderman",
+      "legacy": true,
+      "date": "2026-10-12",
+      "time": "2026-10-12T21:11:00-07:00"
+    },
+    {
+      "id": "d14",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Impaled by Drowned",
+      "legacy": true,
+      "date": "2026-10-13",
+      "time": "2026-10-13T17:20:00-07:00"
+    },
+    {
+      "id": "d15",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-10-13",
+      "time": "2026-10-13T17:39:00-07:00"
+    },
+    {
+      "id": "d16",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-10-13",
+      "time": "2026-10-13T18:10:00-07:00"
+    },
+    {
+      "id": "d17",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-10-13",
+      "time": "2026-10-13T19:21:00-07:00"
+    },
+    {
+      "id": "d18",
+      "player": "subkiwi",
+      "age": "",
+      "cause": "Blown up by Creeper",
+      "legacy": true,
+      "date": "2026-10-13",
+      "time": "2026-10-13T22:02:00-07:00"
+    },
+    {
+      "id": "d19",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Slain by Zombie",
+      "legacy": true,
+      "date": "2026-10-14",
+      "time": "2026-10-14T01:56:00-07:00"
+    },
+    {
+      "id": "d20",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Tried to swim in lava",
+      "legacy": true,
+      "date": "2026-10-14",
+      "time": "2026-10-14T13:32:00-07:00"
+    },
+    {
+      "id": "d21",
+      "player": "deim0s_v1",
+      "age": "",
+      "cause": "Slain by Zombie",
+      "legacy": true,
+      "date": "2026-10-14",
+      "time": "2026-10-14T14:27:00-07:00"
+    },
+    {
+      "id": "d22",
+      "player": "mysticdragbax",
+      "age": "",
+      "cause": "Burned to death",
+      "legacy": true,
+      "date": "2026-10-14",
+      "time": "2026-10-14T19:18:00-07:00"
+    },
+    {
+      "id": "d23",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-10-14",
+      "time": "2026-10-14T22:20:00-07:00"
+    },
+    {
+      "id": "d24",
+      "player": "deim0s_v1",
+      "age": "",
+      "cause": "Slain by Zombie",
+      "legacy": true,
+      "date": "2026-10-15",
+      "time": "2026-10-15T20:25:00-07:00"
+    },
+    {
+      "id": "d25",
+      "player": "subkiwi",
+      "age": "",
+      "cause": "Impaled by Drowned",
+      "legacy": true,
+      "date": "2026-10-16",
+      "time": "2026-10-16T18:55:00-07:00"
+    },
+    {
+      "id": "d26",
+      "player": "deim0s_v1",
+      "age": "",
+      "cause": "Blown up by Creeper",
+      "legacy": true,
+      "date": "2026-10-17",
+      "time": "2026-10-17T23:03:00-07:00"
+    },
+    {
+      "id": "d27",
+      "player": "mysticdragbax",
+      "age": "",
+      "cause": "Slain by Vindicator",
+      "legacy": true,
+      "date": "2026-10-22",
+      "time": "2026-10-22T19:48:00-07:00"
+    },
+    {
+      "id": "d28",
+      "player": "nagalooge",
+      "age": "",
+      "cause": "Slain by Enderman",
+      "legacy": true,
+      "date": "2026-10-22",
+      "time": "2026-10-22T23:50:00-07:00"
+    },
+    {
+      "id": "d29",
+      "player": "feniul",
+      "age": "",
+      "cause": "Blown up by Creeper",
+      "legacy": true,
+      "date": "2026-10-23",
+      "time": "2026-10-23T19:41:00-07:00"
+    },
+    {
+      "id": "d30",
+      "player": "monkey____",
+      "age": "",
+      "cause": "Impaled by Drowned",
+      "legacy": true,
+      "date": "2026-10-23",
+      "time": "2026-10-23T21:40:00-07:00"
+    },
+    {
+      "id": "d31",
+      "player": "incendiaryblitz",
+      "age": "",
+      "cause": "Speared by Zombie",
+      "legacy": true,
+      "date": "2026-10-24",
+      "time": "2026-10-24T13:48:00-07:00"
+    },
+    {
+      "id": "d32",
+      "player": "incendiaryblitz",
+      "age": "",
+      "cause": "Slain by Zombie",
+      "legacy": true,
+      "date": "2026-10-24",
+      "time": "2026-10-24T14:31:00-07:00"
+    },
+    {
+      "id": "d33",
+      "player": "monkey____",
+      "age": "",
+      "cause": "Tried to swim in lava",
+      "legacy": true,
+      "date": "2026-10-30",
+      "time": "2026-10-30T20:25:00-07:00"
+    },
+    {
+      "id": "d34",
+      "player": "silver3gaming",
+      "age": "",
+      "cause": "Fell from a high place",
+      "legacy": true,
+      "date": "2026-11-02",
+      "time": "2026-11-02T12:16:00-08:00"
+    },
+    {
+      "id": "d35",
+      "player": "deim0s_v1",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-11-02",
+      "time": "2026-11-02T17:03:00-08:00"
+    },
+    {
+      "id": "d36",
+      "player": "subkiwi",
+      "age": "",
+      "cause": "Fell from a high place",
+      "legacy": true,
+      "date": "2026-11-02",
+      "time": "2026-11-02T19:11:00-08:00"
+    },
+    {
+      "id": "d37",
+      "player": "silver3gaming",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-11-03",
+      "time": "2026-11-03T17:18:00-08:00"
+    },
+    {
+      "id": "d38",
+      "player": "silver3gaming",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-11-03",
+      "time": "2026-11-03T19:39:00-08:00"
+    },
+    {
+      "id": "d39",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Burned to a crisp while fighting Skeleton",
+      "legacy": true,
+      "date": "2026-11-05",
+      "time": "2026-11-05T19:49:00-08:00"
+    },
+    {
+      "id": "d40",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Slain by Iron Golem",
+      "legacy": true,
+      "date": "2026-11-06",
+      "time": "2026-11-06T23:06:00-08:00"
+    },
+    {
+      "id": "d41",
+      "player": "incendiaryblitz",
+      "age": "",
+      "cause": "Blown up by Creeper",
+      "legacy": true,
+      "date": "2026-11-08",
+      "time": "2026-11-08T09:54:00-08:00"
+    },
+    {
+      "id": "d42",
+      "player": "subkiwi",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-11-09",
+      "time": "2026-11-09T18:00:00-08:00"
+    }
+  ],
   "progress": {
     "age": 4,
     "quest": 29,

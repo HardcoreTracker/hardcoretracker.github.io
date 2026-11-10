@@ -236,7 +236,9 @@ header.top .sub{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-siz
 .pactions{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 
 /* log */
-.logwrap{overflow-x:auto;padding:0}
+.logwrap{overflow:auto;padding:0;max-height:640px}
+table.log td:first-child{white-space:nowrap}
+table.log thead th{position:sticky;top:0;z-index:1;background:var(--panel)}
 table.log{width:100%;border-collapse:separate;border-spacing:0 6px;min-width:740px;font-size:15px;padding:4px 10px 6px}
 table.log th{font-family:var(--f-label);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 10px 0;font-weight:400}
 table.log td{padding:9px 10px;vertical-align:top;background:var(--slot);color:var(--slot-fg);text-shadow:1px 1px 0 var(--slot-lo)}
@@ -387,7 +389,7 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const ageChip = k => { const a = AGE[k]; return a ? `<span class="agechip" style="--c:var(${a.c})">${esc(a.label)}</span>` : esc(k); };
 const nickHtml = p => p && p.nick ? ` <span class="nick">(${esc(p.nick)})</span>` : "";
-const deathPts = d => (AGE[d.age]?.pts || 0) + (d.totem ? 1 : 0);
+const deathPts = d => d.legacy ? 0 : (AGE[d.age]?.pts || 0) + (d.totem ? 1 : 0);
 
 let meta = {};
 let players = [], deaths = [], canEdit = false, db = null, assets = null;
@@ -578,7 +580,8 @@ function totals(){
   return t;
 }
 function sortedDeaths(){
-  return [...deaths].sort((a,b) => (a.date||"").localeCompare(b.date||"") || (a.createdAt||0) - (b.createdAt||0));
+  const key = d => d.time ? Date.parse(d.time) : (d.date ? Date.parse(d.date + "T12:00:00") : 0);
+  return [...deaths].sort((a,b) => key(a) - key(b) || (a.createdAt||0) - (b.createdAt||0) || String(a.id).localeCompare(String(b.id), undefined, {numeric:true}));
 }
 const editBtns = p => canEdit ? `<div class="pactions"><button class="small" data-act="editp" data-id="${esc(p.id)}">Edit</button><span><button class="small danger" data-act="askdelp" data-id="${esc(p.id)}">Remove</button></span></div>` : "";
 
@@ -664,12 +667,12 @@ function render(){
     </tr></thead><tbody>${rows.reverse().map(({d,idx,gain,after,crossed}) => {
       const p = byId[d.player]; const nm = p ? p.name : (d.playerName || "Removed player");
       return `<tr>
-        <td class="num">${esc(fmtDate(d.date))}</td>
+        <td class="num">${esc(d.time ? fmtWhen(d.time) : d.date ? fmtDate(d.date) : "Not tracked")}</td>
         <td><span class="who"><canvas data-skin="${esc(p?.skin||"")}" data-kind="head"></canvas>${esc(nm)}${nickHtml(p)}</span></td>
-        <td>${ageChip(d.age)}${d.totem?'<span class="totem">TOTEM</span>':""}</td>
+        <td>${d.age ? ageChip(d.age) : "—"}${d.totem?'<span class="totem">TOTEM</span>':""}</td>
         <td class="cause">${esc(d.cause)}${d.reason?`<div class="reason">${esc(d.reason)}</div>`:""}</td>
-        <td class="r"><span class="plus">+${gain}</span></td>
-        <td class="r num">${after}${crossed>0?`<span class="punish">PUNISHED${crossed>1?" ×"+crossed:""}</span>`:""}</td>
+        <td class="r">${d.legacy ? '<span title="Already counted in their starting points">—</span>' : `<span class="plus">+${gain}</span>`}</td>
+        <td class="r num">${d.legacy ? "—" : after}${!d.legacy && crossed>0?`<span class="punish">PUNISHED${crossed>1?" ×"+crossed:""}</span>`:""}</td>
         ${canEdit?`<td class="r"><span><button class="small danger" data-act="askdeld" data-id="${esc(d.id)}">Delete</button></span></td>`:""}
       </tr>`;}).join("")}</tbody></table></div>`;
   }
