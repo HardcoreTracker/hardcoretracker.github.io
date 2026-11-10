@@ -189,8 +189,8 @@ header.top{position:relative}
 @media (max-width:620px){.pun-list li{grid-template-columns:auto auto minmax(0,1fr)}.pun-list .pd{grid-column:3}}
 .tipbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:12px}
 .tipbar .tag{font-family:var(--f-label);font-weight:700;font-size:12px;letter-spacing:.08em;color:#FFFF55;background:#3F3F3F;padding:4px 8px;box-shadow:inset 2px 2px 0 #5E5E5E, inset -2px -2px 0 #1E1E1E;text-shadow:2px 2px 0 #3F3F15;flex:none}
-#tipText{transition:opacity .4s ease}
-#tipText.tip-out{opacity:0}
+#tipText,#shame,#shameTag{transition:opacity .4s ease}
+#tipText.tip-out,#shame.tip-out,#shameTag.tip-out{opacity:0}
 .tipbar .text{flex:1 1 240px;min-width:0;font-size:16px}
 .tipbar button{flex:none}
 .quests{display:flex;flex-direction:column;gap:14px}
@@ -1337,10 +1337,19 @@ function showShame(){
   const cv = $("shame").querySelector("canvas");
   if (cv){ drawHead(cv, null); if (c.skin) loadImg(c.skin).then(im => { if (im) drawHead(cv, im); }); }
 }
+let shameFade = null, shameTimer = null;
+function nextShame(){
+  if (shameCards.length < 2) return;
+  const swap = () => { let n; do { n = Math.floor(Math.random() * shameCards.length); } while (n === shameIdx); shameIdx = n; showShame(); };
+  if (reduceMotion){ swap(); return; }
+  clearTimeout(shameFade);
+  $("shame").classList.add("tip-out"); $("shameTag").classList.add("tip-out");
+  shameFade = setTimeout(() => { swap(); $("shame").classList.remove("tip-out"); $("shameTag").classList.remove("tip-out"); }, 400);
+}
+function restartShame(){ clearInterval(shameTimer); shameTimer = setInterval(() => { if (!document.hidden) nextShame(); }, 10000); }
 document.addEventListener("click", e => {
-  if (!e.target.closest("#shameNext") || shameCards.length < 2) return;
-  let n; do { n = Math.floor(Math.random() * shameCards.length); } while (n === shameIdx);
-  shameIdx = n; showShame();
+  if (!e.target.closest("#shameNext")) return;
+  nextShame(); restartShame();
 });
 
 function renderShame(){
@@ -1406,11 +1415,53 @@ function renderShame(){
   const fewest = players.map(p => [p.id, counts[p.id] || 0]).sort((a,b) => a[1]-b[1]);
   if (fewest.length){ const n = fewest[0][1], ids = fewest.filter(x => x[1] === n).map(x => x[0]); card("Survivor", names(ids), n ? `Only ${n} death${n===1?"":"s"}. Suspicious.` : "Never died. Suspicious.", ids[0]); }
 
+  // ----- more awards -----
+  const ptsAll = totals();
+  const punCount = count((punData || []).map(x => x.player));
+  const mp = top(punCount);
+  if (mp) card("Most Punished", names(mp.keys), `${mp.n} punishments served`, mp.keys[0]);
+  const clean = players.filter(p => !punCount[p.id]).map(p => p.id);
+  if (clean.length) card("Clean Record", names(clean), "Never been punished. Yet.", clean[0]);
+  const edge = players.filter(p => (ptsAll[p.id] || 0) % PER_PUNISH === PER_PUNISH - 1).map(p => p.id);
+  if (edge.length) card("Living on the Edge", names(edge), "One point away from a punishment", edge[0]);
+  const zom = top(count(deaths.filter(d => /zombie/i.test(d.cause)).map(d => d.player)));
+  if (zom) card("Zombie Chew Toy", names(zom.keys), `Eaten by zombies ${zom.n} time${zom.n===1?"":"s"}`, zom.keys[0]);
+  const drw = top(count(deaths.filter(d => /drowned/i.test(d.cause)).map(d => d.player)));
+  if (drw) card("Fish Food", names(drw.keys), `Dragged under by drowned ${drw.n} time${drw.n===1?"":"s"}`, drw.keys[0]);
+  const ender = top(count(deaths.filter(d => /enderman/i.test(d.cause)).map(d => d.player)));
+  if (ender) card("Lost a Staring Contest", names(ender.keys), "Killed by an enderman", ender.keys[0]);
+  if (timed.length) card("First Blood", nm(timed[0].player), "First death on record", timed[0].player);
+  const byPlayer = {};
+  timed.forEach(d => (byPlayer[d.player] = byPlayer[d.player] || []).push(Date.parse(d.time)));
+  let quick = null, late = null;
+  Object.entries(byPlayer).forEach(([id, ts]) => {
+    for (let k = 1; k < ts.length; k++){ const g = ts[k] - ts[k-1]; if (!quick || g < quick.g) quick = {id, g}; }
+    if (!late || ts[0] > late.t) late = {id, t: ts[0]};
+  });
+  if (quick) card("Back So Soon?", nm(quick.id), `Died twice in ${hours(quick.g)}`, quick.id);
+  if (late && players.length > 1) card("Late to the Party", nm(late.id), `Didn't die until ${new Date(late.t).toLocaleDateString(undefined, {month:"short", day:"numeric"})}`, late.id);
+  const weekend = top(count(timed.filter(d => { const w = new Date(d.time).getDay(); return w === 0 || w === 6; }).map(d => d.player)));
+  if (weekend) card("Weekend Warrior", names(weekend.keys), `${weekend.n} weekend death${weekend.n===1?"":"s"}`, weekend.keys[0]);
+  const night = top(count(timed.filter(d => new Date(d.time).getHours() < 5).map(d => d.player)));
+  if (night) card("Night Shift", names(night.keys), `${night.n} death${night.n===1?"":"s"} between midnight and 5 am`, night.keys[0]);
+  const ways = {};
+  deaths.forEach(d => { const k = (killer(d.cause) || d.cause || "").toLowerCase().replace(/ while .*/, ""); (ways[d.player] = ways[d.player] || new Set()).add(k); });
+  const variety = top(Object.fromEntries(Object.entries(ways).map(([id, s]) => [id, s.size])));
+  if (variety && variety.n > 1) card("Variety Pack", names(variety.keys), `Died ${variety.n} different ways`, variety.keys[0]);
+  const dcount = count(deaths.map(d => d.player));
+  const avgs = players.filter(p => dcount[p.id]).map(p => ({id: p.id, a: (ptsAll[p.id] || 0) / dcount[p.id]}));
+  if (avgs.length > 1){
+    avgs.sort((a, b) => b.a - a.a);
+    card("Expensive Taste", nm(avgs[0].id), `${avgs[0].a.toFixed(1)} points per death`, avgs[0].id);
+    const cheap = avgs[avgs.length - 1];
+    card("Bargain Bin", nm(cheap.id), `Only ${cheap.a.toFixed(1)} points per death`, cheap.id);
+  }
   awardsBy = {};
   cards.filter(c => c.holders.length <= 2).forEach(c => c.holders.forEach(id => { if (!byId[id]) return; (awardsBy[id] = awardsBy[id] || []).push({label: c.label, sub: c.sub}); }));
   shameCards = cards.map(c => ({...c, skin: c.headId ? (byId[c.headId]?.skin || "") : null}));
   if (shameIdx == null || shameIdx >= shameCards.length) shameIdx = Math.floor(Math.random() * shameCards.length);
   showShame();
+  if (!shameTimer) restartShame();
   sec.hidden = false;
 }
 
@@ -1859,6 +1910,7 @@ fetch("data.json", {cache:"no-store"}).then(r => { if (!r.ok) throw 0; return r.
   players = d.players || []; deaths = d.deaths || [];
   if (d.progress){ progress = d.progress; viewAge = progress.age; renderQuests(); }
   renderLastDeath(d.lastDeath);
+  punData = d.punishments || [];
   renderShame();
   punData = d.punishments || [];
   renderPunishments(d.punishments);
