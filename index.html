@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hardcore Point Tracker</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Silkscreen&display=swap">
+<style>
+/* Layout: in-game menu panels on a stone wall. Podium + spotlight up top, rules and stats as inventory slots, death log as a chest panel. */
+:root{
+  --bg:#7F7F7F; --bg2:#8C8C8C; --bg3:#717171;
+  --panel:#C6C6C6; --hi:#FFFFFF; --lo:#555555; --outline:#000000;
+  --fg:#3F3F3F; --muted:#5E5E5E;
+  --slot:#8B8B8B; --slot-lo:#373737; --slot-hi:#FFFFFF; --slot-fg:#FFFFFF;
+  --title:#FFFFFF; --tshadow:#3F3F3F;
+  --accent:#AA0000; --accent-bright:#FF5555; --danger-panel:#E4B4B4;
+  --gold:#FFAA00; --gold-step:#E5B53A; --iron-step:#D8D8D8; --copper-step:#C77B4B;
+  --field-bg:#000000; --field-fg:#FFFFFF; --field-line:#A0A0A0;
+  --btn:#6F6F6F; --btn-hi:#A8A8A8; --btn-lo:#3A3A3A; --btn-fg:#FFFFFF; --btn-hover:#7E88BF;
+  --age-wood:#8A6233; --age-copper:#C26B3B; --age-iron:#D2D2D2; --age-diamond:#4AEDD9; --age-end:#A065D8;
+  --ok:#00AA00;
+  --f-pixel:"Pixelify Sans", "Courier New", monospace;
+  --f-label:"Silkscreen", "Pixelify Sans", "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#2C2C31; --bg2:#34343A; --bg3:#26262A;
+  --panel:#3B3B42; --hi:#5C5C66; --lo:#1C1C21; --outline:#000000;
+  --fg:#E4E4E8; --muted:#A9A9B4;
+  --slot:#24242A; --slot-lo:#0F0F12; --slot-hi:#4C4C55; --slot-fg:#FFFFFF;
+  --title:#FFFFFF; --tshadow:#0E0E10;
+  --accent:#FF5555; --accent-bright:#FF5555; --danger-panel:#4A2A2E;
+  --gold:#FFAA00; --gold-step:#C9971F; --iron-step:#9A9AA2; --copper-step:#A85F36;
+  --field-bg:#000000; --field-fg:#FFFFFF; --field-line:#6E6E78;
+  --btn:#55555E; --btn-hi:#7C7C87; --btn-lo:#25252A; --btn-fg:#FFFFFF; --btn-hover:#7E88BF;
+  --age-wood:#B88A52; --age-copper:#E08A55; --age-iron:#D2D2D2; --age-diamond:#4AEDD9; --age-end:#B98BEA;
+  --ok:#55FF55; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#2C2C31; --bg2:#34343A; --bg3:#26262A;
+  --panel:#3B3B42; --hi:#5C5C66; --lo:#1C1C21; --outline:#000000;
+  --fg:#E4E4E8; --muted:#A9A9B4;
+  --slot:#24242A; --slot-lo:#0F0F12; --slot-hi:#4C4C55; --slot-fg:#FFFFFF;
+  --title:#FFFFFF; --tshadow:#0E0E10;
+  --accent:#FF5555; --accent-bright:#FF5555; --danger-panel:#4A2A2E;
+  --gold:#FFAA00; --gold-step:#C9971F; --iron-step:#9A9AA2; --copper-step:#A85F36;
+  --field-bg:#000000; --field-fg:#FFFFFF; --field-line:#6E6E78;
+  --btn:#55555E; --btn-hi:#7C7C87; --btn-lo:#25252A; --btn-fg:#FFFFFF; --btn-hover:#7E88BF;
+  --age-wood:#B88A52; --age-copper:#E08A55; --age-iron:#D2D2D2; --age-diamond:#4AEDD9; --age-end:#B98BEA;
+  --ok:#55FF55; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background-color:var(--bg);background-size:96px 96px;image-rendering:auto;color:var(--fg);font-family:var(--f-pixel);font-size:16px;line-height:1.45}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:28px 56px;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--f-pixel);font-weight:700;margin:0;text-wrap:balance}
+.mctitle{color:var(--title);text-shadow:3px 3px 0 var(--tshadow)}
+h1{font-size:clamp(30px,6vw,52px);line-height:1.05;letter-spacing:.02em}
+h2{font-size:24px}
+.label{font-family:var(--f-label);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.num{font-variant-numeric:tabular-nums}
+
+/* Minecraft panel + slot */
+.panel{background:var(--panel);border:2px solid var(--outline);box-shadow:inset 3px 3px 0 var(--hi), inset -3px -3px 0 var(--lo);padding:16px;
+  clip-path:polygon(4px 0,calc(100% - 4px) 0,100% 4px,100% calc(100% - 4px),calc(100% - 4px) 100%,4px 100%,0 calc(100% - 4px),0 4px)}
+.slot{background:var(--slot);box-shadow:inset 2px 2px 0 var(--slot-lo), inset -2px -2px 0 var(--slot-hi);color:var(--slot-fg)}
+.slot .shadowed,.shadowed{text-shadow:2px 2px 0 var(--slot-lo)}
+
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px}
+header.top .title{display:flex;flex-direction:column;gap:8px}
+header.top .sub{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-size:13px}
+.status{font-size:14px;color:var(--title);text-shadow:2px 2px 0 var(--tshadow);display:flex;align-items:center;gap:8px}
+.status::before{content:"";width:10px;height:10px;background:var(--muted);box-shadow:0 0 0 2px var(--outline)}
+.status.live::before{background:#55FF55}
+.status.warn{color:#FFFF55}
+.status.warn::before{background:#FFAA00}
+
+/* top: podium + spotlight */
+.hero{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:stretch}
+@media (max-width:820px){.hero{grid-template-columns:1fr}}
+.podium-panel{display:flex;flex-direction:column;gap:12px}
+.podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:8px;padding-top:8px}
+.pod{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.pod .figure{width:clamp(52px,12vw,76px);height:auto;aspect-ratio:1/2}
+.pod.p1 .figure{width:clamp(64px,15vw,96px)}
+.pod .name{font-weight:700;font-size:17px;max-width:100%;overflow-wrap:anywhere;text-align:center;line-height:1.15}
+.nick{display:block;font-weight:500;font-size:.82em;color:var(--muted)}
+.who .nick,.log .nick{display:inline;color:inherit;opacity:.75;margin-left:4px}
+.pod .pts{font-weight:700;font-size:22px;color:var(--accent)}
+.pod .pts small{font-size:13px;color:var(--muted);margin-left:3px}
+.step{width:100%;display:flex;align-items:flex-start;justify-content:center;padding-top:6px;border:2px solid var(--outline);box-shadow:inset 3px 3px 0 rgba(255,255,255,.45), inset -3px -3px 0 rgba(0,0,0,.35)}
+.step span{font-weight:700;font-size:28px;color:#FFFFFF;text-shadow:2px 2px 0 rgba(0,0,0,.55)}
+.p1 .step{height:96px;background:var(--gold-step)}
+.p2 .step{height:68px;background:var(--iron-step)}
+.p3 .step{height:46px;background:var(--copper-step)}
+.pod.ghost{visibility:hidden}
+
+.spot{background:var(--danger-panel);display:flex;flex-direction:column;gap:12px}
+.spot .label{color:var(--accent)}
+.spot-body{display:flex;gap:14px;align-items:center;min-width:0}
+.spot-body .slot{padding:8px;flex:none}
+.spot-body canvas{width:64px;height:64px;image-rendering:pixelated;display:block}
+.spot-txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.spot-txt .name{font-size:22px;font-weight:700;overflow-wrap:anywhere;line-height:1.1}
+.spot-txt .away{font-size:15px}
+.spot-txt .away b{color:var(--accent);font-size:20px}
+.spot .meter svg{width:22px;height:20px}
+.spot .ties{font-size:13px;color:var(--muted)}
+.spot-head{font-size:17px;line-height:1.2}
+.spot-head b{color:var(--accent);font-size:24px}
+.spot-list{display:flex;flex-direction:column;gap:10px}
+.spot-row{display:flex;gap:12px;align-items:center;min-width:0}
+.spot-row .slot{padding:5px;flex:none}
+.spot-row canvas{width:40px;height:40px;image-rendering:pixelated;display:block}
+.spot-row .spot-txt .name{font-size:17px}
+.spot-row .which{font-size:13px;color:var(--muted)}
+.spot-row .meter svg{width:16px;height:14px}
+
+/* stats + rules */
+.mid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px}
+@media (max-width:820px){.mid{grid-template-columns:1fr}}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:520px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{padding:10px 10px 8px;display:flex;flex-direction:column;justify-content:space-between;gap:6px;min-height:84px}
+.stat .label{color:var(--slot-fg);opacity:.85}
+.stat .v{font-weight:700;font-size:30px;line-height:1;text-align:right}
+.stat .v.red{color:var(--accent-bright)}
+.panel h3{font-size:18px;margin-bottom:10px}
+.rules table{width:100%;border-collapse:collapse;font-size:15px}
+.rules td{padding:4px 0}
+.rules td:last-child{text-align:right;font-weight:700;color:var(--accent)}
+.rules .note{font-size:14px;color:var(--muted);margin-top:8px}
+.rules .note b{color:var(--accent)}
+
+.agechip{display:inline-flex;align-items:center;gap:7px;font-weight:600;white-space:nowrap}
+.agechip::before{content:"";width:10px;height:10px;background:var(--c);box-shadow:0 0 0 2px var(--outline);flex:none}
+
+/* rest of standings */
+.sect-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.sect-head .hint{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-size:13px}
+.players{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.pcard{padding:12px 10px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative}
+.rank{position:absolute;top:6px;left:8px;font-size:14px;font-weight:700;color:var(--muted)}
+.pcard .figure{width:56px;height:112px}
+.figure{image-rendering:pixelated;display:block;max-width:100%}
+.pcard .name{font-weight:700;font-size:16px;max-width:100%;overflow-wrap:anywhere;text-align:center;line-height:1.15}
+.pcard .pts{font-weight:700;font-size:20px;color:var(--accent);line-height:1}
+.pcard .pts small{font-size:12px;color:var(--muted);margin-left:3px}
+.meter{display:flex;gap:3px}
+.meter svg{width:18px;height:16px}
+.meter .on{fill:var(--accent-bright);stroke:var(--outline);stroke-width:.6}
+.meter .off{fill:var(--slot);stroke:var(--outline);stroke-width:.6}
+.owed{font-size:13px;color:var(--muted);text-align:center}
+.owed b{color:var(--accent)}
+.pactions{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+
+/* log */
+.logwrap{overflow-x:auto;padding:0}
+table.log{width:100%;border-collapse:separate;border-spacing:0 6px;min-width:740px;font-size:15px;padding:4px 10px 6px}
+table.log th{font-family:var(--f-label);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 10px 0;font-weight:400}
+table.log td{padding:9px 10px;vertical-align:top;background:var(--slot);color:var(--slot-fg);text-shadow:1px 1px 0 var(--slot-lo)}
+table.log td:first-child{box-shadow:inset 2px 2px 0 var(--slot-lo), inset 0 -2px 0 var(--slot-hi)}
+table.log td{box-shadow:inset 0 2px 0 var(--slot-lo), inset 0 -2px 0 var(--slot-hi)}
+table.log td:last-child{box-shadow:inset 0 2px 0 var(--slot-lo), inset -2px -2px 0 var(--slot-hi)}
+table.log td.r,table.log th.r{text-align:right}
+.who{display:flex;align-items:center;gap:8px;font-weight:600}
+.who canvas{width:22px;height:22px;image-rendering:pixelated;flex:none;box-shadow:0 0 0 2px var(--outline)}
+.totem{font-family:var(--f-label);font-size:9px;color:var(--gold);border:2px solid var(--gold);padding:1px 4px;margin-left:6px;white-space:nowrap;text-shadow:none}
+.cause{max-width:340px;min-width:0}
+.cause .reason{opacity:.75;font-size:13px}
+.plus{font-weight:700;color:var(--accent-bright)}
+.punish{font-family:var(--f-label);font-size:9px;background:var(--accent-bright);color:#000000;text-shadow:none;padding:2px 5px;margin-left:6px;white-space:nowrap;box-shadow:0 0 0 2px var(--outline)}
+.log .agechip{text-shadow:1px 1px 0 var(--slot-lo)}
+
+.empty{text-align:center;color:var(--muted);padding:26px 18px}
+.empty strong{display:block;color:var(--fg);font-size:20px;margin-bottom:4px}
+
+/* editor */
+.editor{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+@media (max-width:820px){.editor{grid-template-columns:1fr}}
+.editor form{display:flex;flex-direction:column;gap:10px;min-width:0}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label,.check{font-size:14px;font-weight:600;color:var(--fg)}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+input[type=text],input[type=date],select,textarea{font:inherit;font-size:15px;color:var(--field-fg);background:var(--field-bg);border:2px solid var(--field-line);border-radius:0;padding:7px 9px;width:100%;min-width:0}
+input:focus,select:focus,textarea:focus{border-color:#FFFFFF;outline:none}
+textarea{resize:vertical;min-height:60px}
+input[type=file]{font:inherit;font-size:13px;color:var(--fg);max-width:100%}
+.check{display:flex;align-items:center;gap:8px;font-weight:500}
+.check input{width:18px;height:18px;accent-color:var(--gold)}
+.preview{font-size:14px;color:var(--muted)}
+.preview b{color:var(--accent)}
+button{font:inherit;font-size:15px;font-weight:500;color:var(--btn-fg);background:var(--btn);border:2px solid var(--outline);border-radius:0;padding:6px 14px;cursor:pointer;
+  box-shadow:inset 2px 2px 0 var(--btn-hi), inset -2px -3px 0 var(--btn-lo);text-shadow:2px 2px 0 var(--btn-lo)}
+button:hover:not(:disabled){border-color:var(--btn-hover);box-shadow:inset 2px 2px 0 var(--btn-hover), inset -2px -3px 0 var(--btn-lo)}
+button.primary{background:#3F7A2E;box-shadow:inset 2px 2px 0 #6FB24E, inset -2px -3px 0 #1F3F15}
+button.small{font-size:13px;padding:2px 8px}
+button.danger{background:#8E2A2A;box-shadow:inset 2px 2px 0 #C45252, inset -2px -3px 0 #4A1212}
+button:disabled{opacity:.5;cursor:default}
+:focus-visible{outline:2px solid #FFFFFF;outline-offset:2px}
+.msg{font-size:14px;min-height:1.2em}
+.msg.err{color:var(--accent)}
+.msg.ok{color:var(--ok);text-shadow:1px 1px 0 var(--lo)}
+.confirm{display:inline-flex;gap:4px;align-items:center;font-size:13px}
+@media (prefers-reduced-motion: no-preference){
+  .spot .meter .on.next{animation:pulse 1s steps(2,end) infinite}
+}
+@keyframes pulse{50%{fill:var(--slot)}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="title">
+      <span class="label sub">Shared-life hardcore · Wilderness Bound</span>
+      <h1 class="mctitle">Hardcore Point Tracker</h1>
+    </div>
+    <div class="status" id="status">Loading the server's record…</div>
+  </header>
+
+  <section class="hero">
+    <div class="panel podium-panel">
+      <h3>Most points</h3>
+      <div id="podium"></div>
+    </div>
+    <div class="panel spot" id="spot">
+      <span class="label">On the chopping block</span>
+      <div id="spotBody"></div>
+    </div>
+  </section>
+
+  <section class="mid">
+    <div class="stats">
+      <div class="slot stat"><span class="label">Players</span><span class="v shadowed num" id="sWorld">0</span></div>
+      <div class="slot stat"><span class="label">Deaths</span><span class="v shadowed num" id="sDeaths">0</span></div>
+      <div class="slot stat"><span class="label">Points</span><span class="v shadowed num" id="sPoints">0</span></div>
+      <div class="slot stat"><span class="label">Punish&shy;ments</span><span class="v red shadowed num" id="sPun">0</span></div>
+    </div>
+    <div class="panel rules">
+      <h3>Points per death</h3>
+      <table id="ruleTable"></table>
+      <div class="note">Totem farm built: <b>+1</b> extra. Every <b>5 points</b> is a punishment.</div>
+    </div>
+  </section>
+
+
+  <section id="restSec">
+    <div class="sect-head"><h2 class="mctitle">Everyone else</h2><span class="hint">Sorted by total points</span></div>
+    <div id="players" class="players"></div>
+  </section>
+
+  <section>
+    <div class="sect-head"><h2 class="mctitle">Death log</h2><span class="hint">Newest first</span></div>
+    <div id="log"></div>
+  </section>
+</div>
+
+<script>
+const AGES = [
+  {key:"wood",   label:"Wood – Stone",     pts:1, c:"--age-wood"},
+  {key:"copper", label:"Copper",           pts:2, c:"--age-copper"},
+  {key:"iron",   label:"Iron – Explore",   pts:3, c:"--age-iron"},
+  {key:"diamond",label:"Diamond – Nether", pts:4, c:"--age-diamond"},
+  {key:"end",    label:"End – Post End",   pts:5, c:"--age-end"},
+];
+const AGE = Object.fromEntries(AGES.map(a=>[a.key,a]));
+const PER_PUNISH = 5;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ageChip = k => { const a = AGE[k]; return a ? `<span class="agechip" style="--c:var(${a.c})">${esc(a.label)}</span>` : esc(k); };
+const nickHtml = p => p && p.nick ? ` <span class="nick">(${esc(p.nick)})</span>` : "";
+const deathPts = d => (AGE[d.age]?.pts || 0) + (d.totem ? 1 : 0);
+
+let meta = {};
+let players = [], deaths = [], canEdit = false, db = null, assets = null;
+let editingId = null;
+
+$("ruleTable").innerHTML = AGES.map(a => `<tr><td>${ageChip(a.key)}</td><td>+${a.pts}</td></tr>`).join("");
+
+// ---------- stone background ----------
+function paintStone(){
+  try{
+    const cs = getComputedStyle(document.documentElement);
+    const cols = ["--bg","--bg2","--bg3"].map(v => cs.getPropertyValue(v).trim());
+    const c = document.createElement("canvas"); c.width = 32; c.height = 32;
+    const x = c.getContext("2d");
+    let s = 1337; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < 32; i++) for (let j = 0; j < 32; j++){
+      const r = rnd(); x.fillStyle = r < .55 ? cols[0] : r < .8 ? cols[1] : cols[2]; x.fillRect(i,j,1,1);
+    }
+    // scale up crisply
+    const big = document.createElement("canvas"); big.width = 96; big.height = 96;
+    const bx = big.getContext("2d"); bx.imageSmoothingEnabled = false; bx.drawImage(c,0,0,96,96);
+    document.body.style.backgroundImage = `url(${big.toDataURL()})`;
+  }catch(e){}
+}
+paintStone();
+try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { paintStone(); render(); }); }catch(e){}
+try{ new MutationObserver(() => { paintStone(); render(); }).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]}); }catch(e){}
+
+// ---------- skin rendering ----------
+const imgCache = new Map();
+function loadImg(id){
+  if (!id) return Promise.resolve(null);
+  if (!imgCache.has(id)) imgCache.set(id, new Promise(res => {
+    const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = id;
+  }));
+  return imgCache.get(id);
+}
+function isSlim(im){
+  if (im.height < 64) return false;
+  try{
+    const c = document.createElement("canvas"); c.width = 64; c.height = 64;
+    const x = c.getContext("2d"); x.drawImage(im,0,0);
+    return x.getImageData(54,20,1,1).data[3] === 0;
+  }catch(e){ return false; }
+}
+function part(ctx, im, sx, sy, w, h, dx, dy, mirror){
+  if (mirror){ ctx.save(); ctx.translate(dx + w, dy); ctx.scale(-1,1); ctx.drawImage(im,sx,sy,w,h,0,0,w,h); ctx.restore(); }
+  else ctx.drawImage(im,sx,sy,w,h,dx,dy,w,h);
+}
+function drawFigure(canvas, im){
+  canvas.width = 16; canvas.height = 32;
+  const ctx = canvas.getContext("2d"); ctx.imageSmoothingEnabled = false; ctx.clearRect(0,0,16,32);
+  if (!im){ drawStandIn(ctx, false); return; }
+  const legacy = im.height < 64, slim = isSlim(im), aw = slim ? 3 : 4;
+  part(ctx, im, 8,8,8,8, 4,0);
+  part(ctx, im, 20,20,8,12, 4,8);
+  part(ctx, im, 44,20,aw,12, 4-aw,8);
+  if (legacy) part(ctx, im, 44,20,4,12, 12,8, true); else part(ctx, im, 36,52,aw,12, 12,8);
+  part(ctx, im, 4,20,4,12, 4,20);
+  if (legacy) part(ctx, im, 4,20,4,12, 8,20, true); else part(ctx, im, 20,52,4,12, 8,20);
+  part(ctx, im, 40,8,8,8, 4,0);
+  if (!legacy){
+    part(ctx, im, 20,36,8,12, 4,8);
+    part(ctx, im, 44,36,aw,12, 4-aw,8);
+    part(ctx, im, 52,52,aw,12, 12,8);
+    part(ctx, im, 4,36,4,12, 4,20);
+    part(ctx, im, 4,52,4,12, 8,20);
+  }
+}
+function drawHead(canvas, im){
+  canvas.width = 8; canvas.height = 8;
+  const ctx = canvas.getContext("2d"); ctx.imageSmoothingEnabled = false;
+  if (!im){ drawStandIn(ctx, true); return; }
+  part(ctx, im, 8,8,8,8, 0,0); part(ctx, im, 40,8,8,8, 0,0);
+}
+function drawStandIn(ctx, headOnly){
+  const cs = getComputedStyle(document.documentElement);
+  const a = cs.getPropertyValue("--slot").trim(), b = cs.getPropertyValue("--slot-lo").trim();
+  ctx.fillStyle = a;
+  if (headOnly){ ctx.fillRect(0,0,8,8); ctx.fillStyle = b; ctx.fillRect(2,3,1,1); ctx.fillRect(5,3,1,1); return; }
+  ctx.fillRect(4,0,8,8); ctx.fillRect(4,8,8,12); ctx.fillRect(0,8,4,12); ctx.fillRect(12,8,4,12); ctx.fillRect(4,20,4,12); ctx.fillRect(8,20,4,12);
+  ctx.fillStyle = b; ctx.fillRect(6,3,1,1); ctx.fillRect(9,3,1,1); ctx.fillRect(4,20,8,1);
+}
+
+// ---------- render ----------
+const HEART = (on, extra="") => `<svg viewBox="0 0 9 8" aria-hidden="true"><path class="${on?"on":"off"} ${extra}" d="M1 0h2v1h1v1h1V1h1V0h2v1h1v3H8v1H7v1H6v1H5v1H4V7H3V6H2V5H1V4H0V1h1z"/></svg>`;
+
+function totals(){
+  const t = {};
+  players.forEach(p => t[p.id] = Number(p.base) || 0);
+  deaths.forEach(d => { t[d.player] = (t[d.player] || 0) + deathPts(d); });
+  return t;
+}
+function sortedDeaths(){
+  return [...deaths].sort((a,b) => (a.date||"").localeCompare(b.date||"") || (a.createdAt||0) - (b.createdAt||0));
+}
+const editBtns = p => canEdit ? `<div class="pactions"><button class="small" data-act="editp" data-id="${esc(p.id)}">Edit</button><span><button class="small danger" data-act="askdelp" data-id="${esc(p.id)}">Remove</button></span></div>` : "";
+
+function render(){
+  const t = totals();
+  const allPts = Object.values(t).reduce((s,v)=>s+v,0);
+  const allPun = Object.values(t).reduce((s,v)=>s+Math.floor(v/PER_PUNISH),0);
+  $("sWorld").textContent = players.length;
+  $("sDeaths").textContent = (Number(meta.priorDeaths) || 0) + deaths.length;
+  $("sPoints").textContent = allPts;
+  $("sPun").textContent = allPun;
+
+  const pl = [...players].sort((a,b) => (t[b.id]||0) - (t[a.id]||0) || a.name.localeCompare(b.name));
+
+  // podium
+  const podEl = $("podium");
+  if (!pl.length){
+    podEl.innerHTML = `<div class="empty"><strong>No players yet</strong>${canEdit ? "Add each player's username and skin below." : "Players show up here once the tracker is set up."}</div>`;
+  } else {
+    const slots = [pl[1], pl[0], pl[2]]; const cls = ["p2","p1","p3"]; const rk = [2,1,3];
+    podEl.innerHTML = `<div class="podium">${slots.map((p,i) => p ? `
+      <div class="pod ${cls[i]}">
+        <canvas class="figure" data-skin="${esc(p.skin||"")}" data-kind="fig" aria-label="${esc(p.name)}'s skin"></canvas>
+        <div class="name">${esc(p.name)}${nickHtml(p)}</div>
+        <div class="pts num">${t[p.id]||0}<small>pts</small></div>
+        ${editBtns(p)}
+        <div class="step"><span>${rk[i]}</span></div>
+      </div>` : `<div class="pod ${cls[i]} ghost"><div class="step"></div></div>`).join("")}</div>`;
+  }
+
+  // spotlight
+  const cand = pl.filter(p => (t[p.id]||0) > 0).map(p => {
+    const pts = t[p.id]; return {p, pts, toNext: PER_PUNISH - pts % PER_PUNISH, next: Math.floor(pts/PER_PUNISH) + 1};
+  }).sort((a,b) => a.toNext - b.toNext || b.pts - a.pts);
+  const sb = $("spotBody");
+  if (!cand.length){
+    sb.innerHTML = `<div class="spot-txt"><span class="name">Nobody yet</span><span class="away">Whoever dies first takes this spot.</span></div>`;
+  } else {
+    const away = cand[0].toNext, group = cand.filter(c => c.toNext === away);
+    const prog = PER_PUNISH - away;
+    sb.innerHTML = `<div class="spot-head"><b>${away}</b> pt${away===1?"":"s"} from their next punishment</div>
+    <div class="spot-list">${group.map(c => `<div class="spot-row">
+      <div class="slot"><canvas data-skin="${esc(c.p.skin||"")}" data-kind="head" aria-label="${esc(c.p.name)}"></canvas></div>
+      <div class="spot-txt">
+        <span class="name">${esc(c.p.name)}${nickHtml(c.p)}</span>
+        <span class="which">Punishment #${c.next} next · ${c.pts} pts total</span>
+        <div class="meter">${Array.from({length:PER_PUNISH},(_,k)=>HEART(k<prog)).join("")}</div>
+      </div>
+    </div>`).join("")}</div>`;
+  }
+
+  // rest grid
+  const rest = pl.slice(3);
+  $("restSec").hidden = !rest.length;
+  $("players").innerHTML = rest.map((p,i) => {
+    const pts = t[p.id] || 0, pun = Math.floor(pts/PER_PUNISH), prog = pts % PER_PUNISH, toNext = PER_PUNISH - prog;
+    return `<article class="panel pcard">
+      <span class="rank">#${i+4}</span>
+      <canvas class="figure" data-skin="${esc(p.skin||"")}" data-kind="fig" aria-label="${esc(p.name)}'s skin"></canvas>
+      <div class="name">${esc(p.name)}${nickHtml(p)}</div>
+      <div class="pts num">${pts}<small>pts</small></div>
+      <div class="meter" title="${prog} of ${PER_PUNISH} toward the next punishment">${Array.from({length:PER_PUNISH},(_,k)=>HEART(k<prog)).join("")}</div>
+      <div class="owed"><b>${pun}</b> punishment${pun===1?"":"s"} · ${toNext} to next</div>
+      ${editBtns(p)}
+    </article>`;
+  }).join("");
+
+  // log
+  const lEl = $("log");
+  if (!deaths.length){
+    lEl.innerHTML = `<div class="panel empty"><strong>No deaths logged</strong>${canEdit ? "Use “Log a death” above for past and future deaths. Points add up automatically." : "Deaths will show up here as they're logged."}</div>`;
+  } else {
+    const run = Object.fromEntries(players.map(p => [p.id, Number(p.base) || 0])), rows = [];
+    sortedDeaths().forEach((d, idx) => {
+      const before = run[d.player] || 0, gain = deathPts(d), after = before + gain;
+      run[d.player] = after;
+      rows.push({d, idx, gain, after, crossed: Math.floor(after/PER_PUNISH) - Math.floor(before/PER_PUNISH)});
+    });
+    const byId = Object.fromEntries(players.map(p=>[p.id,p]));
+    lEl.innerHTML = `<div class="panel logwrap"><table class="log"><thead><tr>
+      <th>Date</th><th>Player</th><th>Age</th><th>Cause</th><th class="r">Pts</th><th class="r">Total</th>${canEdit?"<th></th>":""}
+    </tr></thead><tbody>${rows.reverse().map(({d,idx,gain,after,crossed}) => {
+      const p = byId[d.player]; const nm = p ? p.name : (d.playerName || "Removed player");
+      return `<tr>
+        <td class="num">${esc(fmtDate(d.date))}</td>
+        <td><span class="who"><canvas data-skin="${esc(p?.skin||"")}" data-kind="head"></canvas>${esc(nm)}${nickHtml(p)}</span></td>
+        <td>${ageChip(d.age)}${d.totem?'<span class="totem">TOTEM</span>':""}</td>
+        <td class="cause">${esc(d.cause)}${d.reason?`<div class="reason">${esc(d.reason)}</div>`:""}</td>
+        <td class="r"><span class="plus">+${gain}</span></td>
+        <td class="r num">${after}${crossed>0?`<span class="punish">PUNISHED${crossed>1?" ×"+crossed:""}</span>`:""}</td>
+        ${canEdit?`<td class="r"><span><button class="small danger" data-act="askdeld" data-id="${esc(d.id)}">Delete</button></span></td>`:""}
+      </tr>`;}).join("")}</tbody></table></div>`;
+  }
+
+  // draw skins
+  document.querySelectorAll("canvas[data-kind]").forEach(cv => {
+    const id = cv.dataset.skin;
+    const draw = im => cv.dataset.kind === "fig" ? drawFigure(cv, im) : drawHead(cv, im);
+    draw(null);
+    if (id) loadImg(id).then(im => { if (im) draw(im); });
+  });
+
+  return;
+  const sel = $("dPlayer"), keep = sel.value;
+  sel.innerHTML = players.length ? [...players].sort((a,b)=>a.name.localeCompare(b.name)).map(p=>`<option value="${esc(p.id)}">${esc(p.name)}${p.nick ? ` (${esc(p.nick)})` : ""}</option>`).join("") : `<option value="">Add a player first</option>`;
+  if (players.some(p=>p.id===keep)) sel.value = keep;
+  $("dSubmit").disabled = !players.length;
+  updatePreview();
+}
+function fmtDate(s){
+  if (!s) return "—";
+  const [y,m,d] = s.split("-").map(Number);
+  return new Date(y, m-1, d).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"});
+}
+
+// ---------- data ----------
+function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
+function updatePreview(){}
+render();
+fetch("data.json", {cache:"no-store"}).then(r => { if (!r.ok) throw 0; return r.json(); }).then(d => {
+  meta = {priorDeaths: d.priorDeaths || 0};
+  players = d.players || []; deaths = d.deaths || [];
+  render();
+  setStatus("Updated " + (d.updated || "recently"), "live");
+}).catch(() => setStatus("Couldn't load the standings. Refresh to try again.", "warn"));
+</script>
+
+</body>
+</html>

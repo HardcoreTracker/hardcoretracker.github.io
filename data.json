@@ -1,0 +1,84 @@
+{
+  "updated": "Nov 10, 2026",
+  "priorDeaths": 40,
+  "players": [
+    {
+      "id": "kanalumaddela",
+      "name": "kanalumaddela",
+      "nick": "Kana",
+      "base": 22,
+      "skin": "skins/kanalumaddela.png"
+    },
+    {
+      "id": "silver3gaming",
+      "name": "Silver3Gaming",
+      "nick": "SilverE",
+      "base": 12,
+      "skin": "skins/Silver3Gaming.png"
+    },
+    {
+      "id": "mysticdragbax",
+      "name": "Mysticdragbax",
+      "nick": "Mystic",
+      "base": 10,
+      "skin": "skins/Mysticdragbax.png"
+    },
+    {
+      "id": "subkiwi",
+      "name": "SubKiwi",
+      "nick": "SubKiwi",
+      "base": 10,
+      "skin": "skins/SubKiwi.png"
+    },
+    {
+      "id": "deim0s_v1",
+      "name": "Deim0s_v1",
+      "nick": "Deimos",
+      "base": 9,
+      "skin": "skins/Deim0s_v1.png"
+    },
+    {
+      "id": "incendiaryblitz",
+      "name": "IncendiaryBlitz",
+      "nick": "Incend",
+      "base": 9,
+      "skin": "skins/IncendiaryBlitz.png"
+    },
+    {
+      "id": "nagalooge",
+      "name": "Nagalooge",
+      "nick": "DevMod",
+      "base": 7,
+      "skin": "skins/Nagalooge.png"
+    },
+    {
+      "id": "monkey____",
+      "name": "monkey____",
+      "nick": "Sage",
+      "base": 7,
+      "skin": "skins/monkey____.png"
+    },
+    {
+      "id": "soulgiver039",
+      "name": "Soulgiver039",
+      "nick": "Soulgiver",
+      "base": 4,
+      "skin": "skins/Soulgiver039.png"
+    },
+    {
+      "id": "feniul",
+      "name": "Feniul",
+      "nick": "Feniul",
+      "base": 3,
+      "skin": "skins/Feniul.png"
+    },
+    {
+      "id": "shrinppy",
+      "name": "shrinppy",
+      "nick": "Proper",
+      "base": 3,
+      "skin": "skins/shrinppy.png"
+    }
+  ],
+  "deaths": []
+}
