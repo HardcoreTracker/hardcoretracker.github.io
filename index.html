@@ -295,6 +295,10 @@ body.ov-open{overflow:hidden}
 #decor .spider{display:flex;flex-direction:column;align-items:center;animation:dc-spider 3.2s ease-in-out infinite;transform-origin:top center}
 #decor .spider .thread{flex:1;width:1px;background:rgba(235,235,245,.7)}
 @keyframes dc-spider{50%{transform:translateY(14px)}}
+#decor .menorah .flame{animation:dc-flame .5s steps(2,end) infinite}
+@keyframes dc-flame{50%{fill:#FF9A2E}}
+#decor .spin{animation:dc-spin 1.6s ease-in-out infinite}
+@keyframes dc-spin{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
 #decor .snowcap{height:10px;background:#F4F7FB;clip-path:polygon(0 100%,0 40%,4% 20%,9% 45%,15% 10%,22% 40%,30% 15%,37% 45%,45% 5%,53% 40%,60% 15%,68% 45%,75% 10%,83% 40%,90% 20%,96% 45%,100% 30%,100% 100%)}
 #decor .lights{height:14px}
 #decor .lights svg{position:absolute;left:0;top:0;width:100%;height:12px}
@@ -302,7 +306,7 @@ body.ov-open{overflow:hidden}
 @keyframes dc-twinkle{50%{opacity:.35;box-shadow:none}}
 #decor .icicles{height:16px}
 #decor .icicles i{position:absolute;top:0;width:5px;background:linear-gradient(#FFFFFF,#BFE3FF);clip-path:polygon(0 0,100% 0,50% 100%)}
-@media (prefers-reduced-motion: reduce){#decor .dc,#decor .spider,#decor .lights i{animation:none}}
+@media (prefers-reduced-motion: reduce){#decor .menorah .flame,#decor .spin,#decor .dc,#decor .spider,#decor .lights i{animation:none}}
 .agechip{display:inline-flex;align-items:center;gap:7px;font-weight:600;white-space:nowrap}
 .agechip::before{content:"";width:10px;height:10px;background:var(--c);box-shadow:0 0 0 2px var(--outline);flex:none}
 
@@ -754,6 +758,24 @@ function drawBats(W){
     else { pctx.fillRect(x, y + 1, 2, 1); pctx.fillRect(x + 4, y + 1, 2, 1); }
   }
 }
+function drawMenorah(W, lit){
+  const gold = "#E8B23A", dark = "#A8781E", bx = Math.floor(W * 0.16), by = PH - 12;
+  pctx.fillStyle = dark; pctx.fillRect(bx - 6, by + 4, 13, 2);
+  pctx.fillStyle = gold; pctx.fillRect(bx - 3, by + 2, 7, 2); pctx.fillRect(bx, by - 14, 1, 16);
+  pctx.fillRect(bx - 16, by - 12, 33, 1);
+  for (let i = 0; i < 9; i++){
+    const x = bx - 16 + i * 4 + (i >= 4 ? 1 : 0), shamash = i === 4, top = shamash ? by - 21 : by - 17;
+    pctx.fillStyle = gold; pctx.fillRect(x, by - 13, 1, 1);
+    // candles fill from the right, like on a real menorah; the shamash is always lit
+    const slot = i < 4 ? i : i - 1, isLit = shamash || slot >= 8 - lit;
+    if (!shamash && !isLit) continue;
+    pctx.fillStyle = shamash ? "#FFFFFF" : (slot % 2 ? "#5B8CFF" : "#FFFFFF");
+    pctx.fillRect(x, top, 1, (shamash ? by - 13 : by - 13) - top);
+    const flick = Math.sin(panoT * 9 + i * 1.7) > 0;
+    pctx.fillStyle = flick ? "#FFD93B" : "#FF9A2E"; pctx.fillRect(x, top - 2, 1, 2);
+    pctx.fillStyle = "rgba(255,217,59,.35)"; pctx.fillRect(x - 1, top - 3, 3, 3);
+  }
+}
 function drawRainbow(W){
   const cx = W * 0.7, cy = PH * 0.8, cols = ["#FF4B4B","#FF9A3B","#FFE14D","#55D255","#4B9BFF","#8B5BFF"];
   pctx.globalAlpha = 0.45; pctx.lineWidth = 3;
@@ -811,6 +833,7 @@ function drawPano(){
       pctx.globalAlpha = 1;
     }
   });
+  if (world === "overworld"){ const n = hanukkahCandles(); if (n) drawMenorah(W, n); }
   drawWeather(W);
   pctx.restore();
 }
@@ -1507,6 +1530,22 @@ function easterDate(y){
   const month = Math.floor((hh + l - 7*m + 114)/31), day = ((hh + l - 7*m + 114) % 31) + 1;
   return [month - 1, day];
 }
+// Hanukkah: 8 nights from the evening of 24 Kislev, using the browser's Hebrew calendar
+function hebrewParts(d){
+  try {
+    const parts = Object.fromEntries(new Intl.DateTimeFormat("en-u-ca-hebrew", {month:"long", day:"numeric"}).formatToParts(d).map(p => [p.type, p.value]));
+    return {month: parts.month, day: Number(parts.day)};
+  } catch(e){ return {month:"", day:0}; }
+}
+function hanukkahCandles(){
+  const now = new Date();
+  for (let back = 0; back <= 9; back++){
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - back, 12);
+    const hp = hebrewParts(d);
+    if (hp.month === "Kislev" && hp.day === 24){ const n = back + (now.getHours() >= 17 ? 1 : 0); return n >= 1 && n <= 8 ? n : 0; }
+  }
+  return 0;
+}
 function holidayNow(){
   if (themeMode && themeMode !== "auto") return themeMode === "none" ? null : themeMode;
   const d = new Date(), y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
@@ -1521,6 +1560,7 @@ function holidayNow(){
   if (m === 9 && day === 31) return "halloween";
   if (m === 10 && day === nthWeekday(10, 4, 4)) return "thanksgiving";
   if (m === 11 && (day === 24 || day === 25)) return "christmas";
+  if (hanukkahCandles() > 0) return "hanukkah";
   return null;
 }
 function specialDayWeather(){
@@ -1715,12 +1755,26 @@ const PUMPKIN = pixSvg(["...gg...","..oggo..","oooooooo","oyooooyo","oooooooo","
 const WEB = `<svg width="56" height="56" viewBox="0 0 28 28" fill="none" stroke="rgba(235,235,245,.75)" stroke-width=".6" shape-rendering="crispEdges"><path d="M0 0L28 28M0 0L28 10M0 0L10 28M0 0L28 0M0 0L0 28"/><path d="M0 7Q4 4 7 0M0 14Q8 8 14 0M0 21Q12 12 21 0M0 27Q16 16 27 0"/></svg>`;
 const SPIDER = pixSvg(["k.k.k.k",".kkkkk.","kkrkrkk",".kkkkk.","k.k.k.k"], {k:"#151018", r:"#E03030"}, 3);
 const PRESENT = (c1, c2) => pixSvg(["..yy.yy..",".y..y..y.","ccccyyccc","ccccyyccc","ddddyyddd","ccccyyccc","ccccyyccc"], {c:c1, d:c2, y:"#FFE14D"}, 3);
+const DREIDEL = pixSvg(["...h...","..bbb..","bbbbbbb","bwbbbwb","bbbbbbb",".bbbbb.","..bbb..","...b..."], {h:"#C9CED8", b:"#2F5BD3", w:"#E8EEFF"}, 3);
+const GELT = pixSvg([".yyyy.","yyddyy","ydyydy","yyddyy",".yyyy."], {y:"#E8B23A", d:"#B8861E"}, 3);
+function menorahSvg(lit){
+  let r = `<rect x="11" y="21" width="12" height="2" fill="#A8781E"/><rect x="14" y="19" width="6" height="2" fill="#E8B23A"/><rect x="16" y="8" width="2" height="11" fill="#E8B23A"/><rect x="1" y="9" width="32" height="1" fill="#E8B23A"/>`;
+  for (let i = 0; i < 9; i++){
+    const x = 1 + i * 4 - (i === 4 ? 0 : 0), sh = i === 4, slot = i < 4 ? i : i - 1;
+    const on = sh || slot >= 8 - lit, top = sh ? 1 : 4;
+    r += `<rect x="${x}" y="8" width="2" height="1" fill="#E8B23A"/>`;
+    if (!on) continue;
+    r += `<rect x="${x}" y="${top}" width="2" height="${8 - top}" fill="${sh ? "#FFFFFF" : (slot % 2 ? "#5B8CFF" : "#FFFFFF")}"/>`;
+    r += `<rect class="flame" style="animation-delay:${(i * 0.23).toFixed(2)}s" x="${x}" y="${top - 2}" width="2" height="2" fill="#FFD93B"/>`;
+  }
+  return `<svg width="105" height="72" viewBox="0 0 35 24" shape-rendering="crispEdges">${r}</svg>`;
+}
 let decorLayer = null;
 function placeDecor(){
   let hol = null; try { hol = holidayNow(); } catch(e){}
   if (!decorLayer){ decorLayer = document.createElement("div"); decorLayer.id = "decor"; decorLayer.setAttribute("aria-hidden", "true"); document.body.appendChild(decorLayer); }
   decorLayer.innerHTML = "";
-  if (hol !== "halloween" && hol !== "christmas") return;
+  if (hol !== "halloween" && hol !== "christmas" && hol !== "hanukkah") return;
   const sy = scrollY, sx = scrollX;
   const box = el => { const r = el.getBoundingClientRect(); return {l: r.left + sx, t: r.top + sy, w: r.width, h: r.height}; };
   const add = (html, l, t, cls) => { const d = document.createElement("div"); d.className = "dc " + (cls || ""); d.style.left = l + "px"; d.style.top = t + "px"; d.innerHTML = html; decorLayer.appendChild(d); return d; };
@@ -1735,6 +1789,23 @@ function placeDecor(){
     });
     const title = document.querySelector("header.top h1");
     if (title){ const b = box(title); const sp = add(`<span class="thread"></span>${SPIDER}`, b.l + Math.min(b.w - 30, 260), 0, "spider"); sp.style.height = (b.t + 6) + "px"; }
+  } else if (hol === "hanukkah"){
+    const cols = ["#3B6BFF", "#FFFFFF", "#9EC8FF", "#FFD93B"];
+    targets.forEach((el, i) => {
+      const b = box(el);
+      const n = Math.max(3, Math.floor(b.w / 26));
+      let bulbs = "";
+      for (let k = 0; k < n; k++) bulbs += `<i style="left:${(k + 0.5) * (b.w / n)}px;background:${cols[(k + i) % cols.length]};color:${cols[(k + i) % cols.length]};animation-delay:${((k * 37) % 17) / 10}s"></i>`;
+      add(`<svg width="${b.w}" height="12" preserveAspectRatio="none" viewBox="0 0 ${n*10} 12"><path d="${Array.from({length:n}, (_, k) => `M${k*10} 2Q${k*10+5} 9 ${k*10+10} 2`).join("")}" stroke="#2A2F4A" stroke-width="1.2" fill="none"/></svg>${bulbs}`, b.l, b.t - 2, "lights").style.width = b.w + "px";
+      add(DREIDEL, b.l + b.w * (i % 2 ? 0.8 : 0.1), b.t - 26, "spin");
+      if (i % 3 === 0) add(GELT, b.l + b.w * 0.45, b.t - 12, "bob slow");
+    });
+    const title = document.querySelector("header.top h1");
+    if (title){
+      const b = box(title), vw = document.documentElement.clientWidth;
+      const fits = b.l + b.w + 18 + 110 < vw;
+      add(menorahSvg(hanukkahCandles()), fits ? b.l + b.w + 18 : vw - 120, fits ? b.t - 26 : Math.max(4, b.t - 78), "menorah");
+    }
   } else {
     const cols = ["#FF3B3B", "#FFD93B", "#3BFF6B", "#3BA8FF", "#FF5BE6"];
     targets.forEach((el, i) => {
