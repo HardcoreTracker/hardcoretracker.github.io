@@ -165,6 +165,9 @@ header.top .sub{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-siz
 .ld-time{font-size:14px;color:var(--muted);flex:none}
 .ld-alive{flex:none;font-size:14px;font-weight:700;color:#FFFFFF;background:#3F7A2E;padding:3px 8px;border:2px solid var(--outline);box-shadow:inset 2px 2px 0 #6FB24E, inset -2px -2px 0 #1F3F15;text-shadow:1px 1px 0 #1F3F15;font-variant-numeric:tabular-nums}
 .ld-alive:empty{display:none}
+header.top{position:relative}
+.alive-top{position:absolute;left:50%;top:0;transform:translateX(-50%)}
+@media (max-width:760px){.alive-top{position:static;transform:none;order:-1;width:100%;display:flex;justify-content:center}}
 .tipbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:12px}
 .tipbar .tag{font-family:var(--f-label);font-weight:700;font-size:12px;letter-spacing:.08em;color:#FFFF55;background:#3F3F3F;padding:4px 8px;box-shadow:inset 2px 2px 0 #5E5E5E, inset -2px -2px 0 #1E1E1E;text-shadow:2px 2px 0 #3F3F15;flex:none}
 .tipbar .text{flex:1 1 240px;min-width:0;font-size:16px}
@@ -297,6 +300,7 @@ button:disabled{opacity:.5;cursor:default}
 
 <div class="wrap">
   <header class="top">
+    <div class="alive-top"><span class="ld-alive" id="ldAlive"></span></div>
     <div class="title">
       <span class="label sub">Shared-life hardcore · Wilderness Bound</span>
       <h1 class="mctitle">Hardcore Point Tracker</h1>
@@ -309,7 +313,6 @@ button:disabled{opacity:.5;cursor:default}
     <span class="ld-head slot"><canvas id="ldHead" data-kind="head" data-skin=""></canvas></span>
     <span class="ld-text" id="ldText"></span>
     <span class="ld-time" id="ldTime"></span>
-    <span class="ld-alive" id="ldAlive"></span>
   </section>
 
   <section class="panel tipbar" aria-label="Survival tip">
