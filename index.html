@@ -230,13 +230,17 @@ header.top{position:relative}
 .q-head h4 span{font-size:13px;color:var(--muted);font-weight:400;margin-left:6px}
 .lower{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
 .lower-left{display:flex;flex-direction:column;gap:28px;min-width:0}
-.lower-right{min-width:0;position:sticky;top:16px}
-.lower-right .quests{max-height:calc(100vh - 32px);overflow:hidden}
+.lower-right{min-width:0;position:sticky;top:16px;display:flex;flex-direction:column;gap:16px;max-height:calc(100vh - 32px)}
+.lower-right .quests{flex:1 1 auto;min-height:0;overflow:hidden}
+.versebar{flex:none;flex-direction:column;align-items:flex-start;gap:10px}
+.versebar .tag{color:#55FFFF;text-shadow:2px 2px 0 #153F3F}
+.versebar .vtext{font-size:16px;line-height:1.45;margin:0}
+.versebar .vref{font-size:13px;opacity:.75}
 .lower-right .quests > *{flex:none}
 .lower-right .quests > .q-list{flex:1 1 auto}
 .lower-right .q-list{overflow-y:auto;min-height:0;flex:1 1 auto;grid-template-columns:1fr;padding-right:4px}
 .lower .mid{grid-template-columns:1fr}
-@media (max-width:900px){.lower{grid-template-columns:1fr}.lower-right{position:static}.lower-right .quests{max-height:none}.lower-right .q-list{overflow:visible}}
+@media (max-width:900px){.lower{grid-template-columns:1fr}.lower-right{position:static;max-height:none}.lower-right .quests{max-height:none}.lower-right .q-list{overflow:visible}}
 .shamebar .tag{text-transform:uppercase}
 .shamebar .text{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .sh-head{width:22px;height:22px;image-rendering:pixelated;box-shadow:0 0 0 2px var(--outline);flex:none}
@@ -462,6 +466,11 @@ button:disabled{opacity:.5;cursor:default}
         <div class="q-tabs" id="qTabs" role="group" aria-label="Ages"></div>
         <div class="q-unlocks" id="qUnlocks"></div>
         <ol class="q-list" id="qList"></ol>
+      </section>
+      <section class="panel tipbar versebar" id="verseSec" aria-label="Verse of the day">
+        <span class="tag">VERSE OF THE DAY</span>
+        <p class="vtext" id="verseText"></p>
+        <span class="vref" id="verseRef"></span>
       </section>
     </aside>
   </div>
@@ -1294,6 +1303,135 @@ const TIPS = [
   const restart = () => { clearInterval(timer); timer = setInterval(() => { if (!document.hidden) advance(); }, 10000); };
   show(); restart();
   document.getElementById("tipNext").addEventListener("click", () => { advance(); restart(); });
+})();
+// ---------- verse of the day (World English Bible, public domain) ----------
+const VERSES = [
+["For God so loved the world, that he gave his one and only Son, that whoever believes in him should not perish, but have eternal life.", "John 3:16", "k"],
+["Haven’t I commanded you? Be strong and courageous. Don’t be afraid. Don’t be dismayed, for Yahweh your God is with you wherever you go.", "Joshua 1:9", "e"],
+["In all your ways acknowledge him, and he will make your paths straight.", "Proverbs 3:6", "w"],
+["In the beginning, God created the heavens and the earth.", "Genesis 1:1", "k"],
+["Don’t you be afraid, for I am with you. Don’t be dismayed, for I am your God. I will strengthen you. Yes, I will help you. Yes, I will uphold you with the right hand of my righteousness.", "Isaiah 41:10", "e"],
+["Keep your heart with all diligence, for out of it is the wellspring of life.", "Proverbs 4:23", "w"],
+["Yahweh is my shepherd: I shall lack nothing.", "Psalm 23:1", "k"],
+["But those who wait for Yahweh will renew their strength. They will mount up with wings like eagles. They will run, and not be weary. They will walk, and not faint.", "Isaiah 40:31", "e"],
+["The fear of Yahweh is the beginning of wisdom. The knowledge of the Holy One is understanding.", "Proverbs 9:10", "w"],
+["For I know the thoughts that I think toward you,” says Yahweh, “thoughts of peace, and not of evil, to give you hope and a future.", "Jeremiah 29:11", "k"],
+["I can do all things through Christ, who strengthens me.", "Philippians 4:13", "e"],
+["The way of a fool is right in his own eyes, but he who is wise listens to counsel.", "Proverbs 12:15", "w"],
+["Trust in Yahweh with all your heart, and don’t lean on your own understanding.", "Proverbs 3:5", "k"],
+["God is our refuge and strength, a very present help in trouble.", "Psalm 46:1", "e"],
+["A gentle answer turns away wrath, but a harsh word stirs up anger.", "Proverbs 15:1", "w"],
+["But seek first God’s Kingdom, and his righteousness; and all these things will be given to you as well.", "Matthew 6:33", "k"],
+["Even though I walk through the valley of the shadow of death, I will fear no evil, for you are with me. Your rod and your staff, they comfort me.", "Psalm 23:4", "e"],
+["Commit your deeds to Yahweh, and your plans shall succeed.", "Proverbs 16:3", "w"],
+["You are the light of the world. A city located on a hill can’t be hidden.", "Matthew 5:14", "k"],
+["We know that all things work together for good for those who love God, to those who are called according to his purpose.", "Romans 8:28", "e"],
+["A man’s heart plans his course, but Yahweh directs his steps.", "Proverbs 16:9", "w"],
+["Ask, and it will be given you. Seek, and you will find. Knock, and it will be opened for you.", "Matthew 7:7", "k"],
+["What then shall we say about these things? If God is for us, who can be against us?", "Romans 8:31", "e"],
+["Pride goes before destruction, and a haughty spirit before a fall.", "Proverbs 16:18", "w"],
+["A second likewise is this, ‘You shall love your neighbor as yourself.’", "Matthew 22:39", "k"],
+["He has said to me, “My grace is sufficient for you, for my power is made perfect in weakness.” Most gladly therefore I will rather glory in my weaknesses, that the power of Christ may rest on me.", "2 Corinthians 12:9", "e"],
+["A friend loves at all times; and a brother is born for adversity.", "Proverbs 17:17", "w"],
+["In the beginning was the Word, and the Word was with God, and the Word was God.", "John 1:1", "k"],
+["Be strong and courageous. Don’t be afraid or scared of them; for Yahweh your God himself is who goes with you. He will not fail you nor forsake you.", "Deuteronomy 31:6", "e"],
+["A cheerful heart makes good medicine, but a crushed spirit dries up the bones.", "Proverbs 17:22", "w"],
+["Jesus said to him, “I am the way, the truth, and the life. No one comes to the Father, except through me.”", "John 14:6", "k"],
+["Yahweh is my light and my salvation. Whom shall I fear? Yahweh is the strength of my life. Of whom shall I be afraid?", "Psalm 27:1", "e"],
+["Yahweh’s name is a strong tower: the righteous run to him, and are safe.", "Proverbs 18:10", "w"],
+["Don’t be conformed to this world, but be transformed by the renewing of your mind, so that you may prove what is the good, well-pleasing, and perfect will of God.", "Romans 12:2", "k"],
+["Yahweh is near to those who have a broken heart, and saves those who have a crushed spirit.", "Psalm 34:18", "e"],
+["There are many plans in a man’s heart, but Yahweh’s counsel will prevail.", "Proverbs 19:21", "w"],
+["Love is patient and is kind; love doesn’t envy. Love doesn’t brag, is not proud…", "1 Corinthians 13:4", "k"],
+["Come to me, all you who labor and are heavily burdened, and I will give you rest.", "Matthew 11:28", "e"],
+["Train up a child in the way he should go, and when he is old he will not depart from it.", "Proverbs 22:6", "w"],
+["But now faith, hope, and love remain—these three. The greatest of these is love.", "1 Corinthians 13:13", "k"],
+["I have told you these things, that in me you may have peace. In the world you have oppression; but cheer up! I have overcome the world.", "John 16:33", "e"],
+["Iron sharpens iron; so a man sharpens his friend’s countenance.", "Proverbs 27:17", "w"],
+["But the fruit of the Spirit is love, joy, peace, patience, kindness, goodness, faith…", "Galatians 5:22", "k"],
+["Now may the God of hope fill you with all joy and peace in believing, that you may abound in hope, in the power of the Holy Spirit.", "Romans 15:13", "e"],
+["The fear of Yahweh is the beginning of knowledge; but the foolish despise wisdom and instruction.", "Proverbs 1:7", "w"],
+["For by grace you have been saved through faith, and that not of yourselves; it is the gift of God…", "Ephesians 2:8", "k"],
+["For God didn’t give us a spirit of fear, but of power, love, and self-control.", "2 Timothy 1:7", "e"],
+["When pride comes, then comes shame, but with humility comes wisdom.", "Proverbs 11:2", "w"],
+["Now faith is assurance of things hoped for, proof of things not seen.", "Hebrews 11:1", "k"],
+["My help comes from Yahweh, who made heaven and earth.", "Psalm 121:2", "e"],
+["One who walks with wise men grows wise, but a companion of fools suffers harm.", "Proverbs 13:20", "w"],
+["He who doesn’t love doesn’t know God, for God is love.", "1 John 4:8", "k"],
+["When you pass through the waters, I will be with you; and through the rivers, they will not overflow you. When you walk through the fire, you will not be burned, and flame will not scorch you.", "Isaiah 43:2", "e"],
+["In all hard work there is profit, but the talk of the lips leads only to poverty.", "Proverbs 14:23", "w"],
+["He has shown you, O man, what is good. What does Yahweh require of you, but to act justly, to love mercy, and to walk humbly with your God?", "Micah 6:8", "k"],
+["It is because of Yahweh’s loving kindnesses that we are not consumed, because his compassion doesn’t fail.", "Lamentations 3:22", "e"],
+["The plans of the diligent surely lead to profit; and everyone who is hasty surely rushes to poverty.", "Proverbs 21:5", "w"],
+["Your word is a lamp to my feet, and a light for my path.", "Psalm 119:105", "k"],
+["Cast your burden on Yahweh, and he will sustain you. He will never allow the righteous to be moved.", "Psalm 55:22", "e"],
+["For a righteous man falls seven times, and rises up again; but the wicked are overthrown by calamity.", "Proverbs 24:16", "w"],
+["For to us a child is born. To us a son is given; and the government will be on his shoulders. His name will be called Wonderful, Counselor, Mighty God, Everlasting Father, Prince of Peace.", "Isaiah 9:6", "k"],
+["Yahweh is good, a stronghold in the day of trouble; and he knows those who take refuge in him.", "Nahum 1:7", "e"],
+["He who conceals his sins doesn’t prosper, but whoever confesses and renounces them finds mercy.", "Proverbs 28:13", "w"],
+["Teaching them to observe all things that I commanded you. Behold, I am with you always, even to the end of the age. Amen.", "Matthew 28:20", "k"],
+["Therefore let us also, seeing we are surrounded by so great a cloud of witnesses, lay aside every weight and the sin which so easily entangles us, and let us run with perseverance the race that is set before us…", "Hebrews 12:1", "e"],
+["He who walks blamelessly walks surely, but he who perverts his ways will be found out.", "Proverbs 10:9", "w"],
+["For nothing spoken by God is impossible.", "Luke 1:37", "k"],
+["Let us not be weary in doing good, for we will reap in due season, if we don’t give up.", "Galatians 6:9", "e"],
+["Anxiety in a man’s heart weighs it down, but a kind word makes it glad.", "Proverbs 12:25", "w"],
+["You shall love the Lord your God with all your heart, and with all your soul, and with all your mind, and with all your strength. This is the first commandment.", "Mark 12:30", "k"],
+["Blessed is the man who endures temptation, for when he has been approved, he will receive the crown of life, which the Lord promised to those who love him.", "James 1:12", "e"],
+["Where there is no counsel, plans fail; but in a multitude of counselors they are established.", "Proverbs 15:22", "w"],
+["And whatever you do, work heartily, as for the Lord, and not for men…", "Colossians 3:23", "k"],
+["Watch! Stand firm in the faith! Be courageous! Be strong!", "1 Corinthians 16:13", "e"],
+["For everything there is a season, and a time for every purpose under heaven…", "Ecclesiastes 3:1", "w"],
+["“Be still, and know that I am God. I will be exalted among the nations. I will be exalted in the earth.”", "Psalm 46:10", "k"],
+["This is the day that Yahweh has made. We will rejoice and be glad in it!", "Psalm 118:24", "e"],
+["Two are better than one, because they have a good reward for their labor.", "Ecclesiastes 4:9", "w"],
+["Therefore if anyone is in Christ, he is a new creation. The old things have passed away. Behold, all things have become new.", "2 Corinthians 5:17", "k"],
+["Yahweh, your God, is among you, a mighty one who will save. He will rejoice over you with joy. He will calm you in his love. He will rejoice over you with singing.", "Zephaniah 3:17", "e"],
+["If a man prevails against one who is alone, two shall withstand him; and a threefold cord is not quickly broken.", "Ecclesiastes 4:12", "w"],
+["He will wipe away every tear from their eyes. Death will be no more; neither will there be mourning, nor crying, nor pain, any more. The first things have passed away.", "Revelation 21:4", "k"],
+["I have set Yahweh always before me. Because he is at my right hand, I shall not be moved.", "Psalm 16:8", "e"],
+["Whatever your hand finds to do, do it with your might; for there is no work, nor plan, nor knowledge, nor wisdom, in Sheol, where you are going.", "Ecclesiastes 9:10", "w"],
+["Blessed are the peacemakers, for they shall be called children of God.", "Matthew 5:9", "k"],
+["You will keep whoever’s mind is steadfast in perfect peace, because he trusts in you.", "Isaiah 26:3", "e"],
+["Better is the end of a thing than its beginning. The patient in spirit is better than the proud in spirit.", "Ecclesiastes 7:8", "w"],
+["Even so, let your light shine before men; that they may see your good works, and glorify your Father who is in heaven.", "Matthew 5:16", "k"],
+["Peace I leave with you. My peace I give to you; not as the world gives, give I to you. Don’t let your heart be troubled, neither let it be fearful.", "John 14:27", "e"],
+["But if any of you lacks wisdom, let him ask of God, who gives to all liberally and without reproach; and it will be given to him.", "James 1:5", "w"],
+["As you would like people to do to you, do exactly so to them.", "Luke 6:31", "k"],
+["Casting all your worries on him, because he cares for you.", "1 Peter 5:7", "e"],
+["So, then, my beloved brothers, let every man be swift to hear, slow to speak, and slow to anger…", "James 1:19", "w"],
+["But God commends his own love toward us, in that while we were yet sinners, Christ died for us.", "Romans 5:8", "k"],
+["My flesh and my heart fails, but God is the strength of my heart and my portion forever.", "Psalm 73:26", "e"],
+["But be doers of the word, and not only hearers, deluding your own selves.", "James 1:22", "w"],
+["And be kind to one another, tender hearted, forgiving each other, just as God also in Christ forgave you.", "Ephesians 4:32", "k"],
+["Yahweh will fight for you, and you shall be still.", "Exodus 14:14", "e"],
+["Whereas you don’t know what your life will be like tomorrow. For what is your life? For you are a vapor, that appears for a little time, and then vanishes away.", "James 4:14", "w"],
+["Finally, brothers, whatever things are true, whatever things are honorable, whatever things are just, whatever things are pure, whatever things are lovely, whatever things are of good report; if there is any virtue, and if there is any praise, think about these things.", "Philippians 4:8", "k"],
+["Be strong, and let your heart take courage, all you who hope in Yahweh.", "Psalm 31:24", "e"],
+["But the wisdom that is from above is first pure, then peaceful, gentle, reasonable, full of mercy and good fruits, without partiality, and without hypocrisy.", "James 3:17", "w"],
+["I will give thanks to you, for I am fearfully and wonderfully made. Your works are wonderful. My soul knows that very well.", "Psalm 139:14", "k"],
+["Rejoicing in hope; enduring in troubles; continuing steadfastly in prayer…", "Romans 12:12", "e"],
+["If it seems evil to you to serve Yahweh, choose today whom you will serve; whether the gods which your fathers served that were beyond the River, or the gods of the Amorites, in whose land you dwell; but as for me and my house, we will serve Yahweh.", "Joshua 24:15", "k"],
+["So that with good courage we say, “The Lord is my helper. I will not fear. What can man do to me?”", "Hebrews 13:6", "e"],
+["Also delight yourself in Yahweh, and he will give you the desires of your heart.", "Psalm 37:4", "k"],
+["Don’t rejoice against me, my enemy. When I fall, I will arise. When I sit in darkness, Yahweh will be a light to me.", "Micah 7:8", "e"],
+["Therefore we don’t faint, but though our outward man is decaying, yet our inward man is renewed day by day.", "2 Corinthians 4:16", "e"],
+["Yahweh is my rock, my fortress, and my deliverer; my God, my rock, in whom I take refuge; my shield, and the horn of my salvation, my high tower.", "Psalm 18:2", "e"]
+];
+(function(){
+  // Same verse all day for everyone: picked from the viewer's local date.
+  let shown = -1;
+  const show = () => {
+    const d = new Date();
+    const day = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+    const i = ((day * 37) % VERSES.length + VERSES.length) % VERSES.length;
+    if (i === shown) return;
+    shown = i;
+    const [text, ref] = VERSES[i];
+    document.getElementById("verseText").textContent = text;
+    document.getElementById("verseRef").textContent = ref + " (WEB)";
+  };
+  show();
+  setInterval(show, 60000);
 })();
 // ---------- quests ----------
 const AGE_POINTS = [1,1,2,3,3,4,4,5,5];
