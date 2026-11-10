@@ -117,10 +117,10 @@ header.top .sub{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-siz
 .cp-text{font-size:19px;font-weight:700;line-height:1.25;overflow-wrap:anywhere}
 .spot-head{font-size:17px;line-height:1.2}
 .spot-head b{color:var(--accent);font-size:24px}
-.spot-list{display:flex;flex-direction:column;gap:10px}
-.spot-row{display:flex;gap:12px;align-items:center;min-width:0}
+.spot-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px 14px}
+.spot-row{display:flex;gap:10px;align-items:center;min-width:0}
 .spot-row .slot{padding:5px;flex:none}
-.spot-row canvas{width:40px;height:40px;image-rendering:pixelated;display:block}
+.spot-row canvas{width:34px;height:34px;image-rendering:pixelated;display:block}
 .spot-row .spot-txt .name{font-size:17px}
 .spot-row .which{font-size:13px;color:var(--muted)}
 .spot-row .meter svg{width:16px;height:14px}
@@ -580,22 +580,21 @@ function render(){
   }
 
   // spotlight
-  const cand = pl.filter(p => (t[p.id]||0) > 0).map(p => {
-    const pts = t[p.id]; return {p, pts, toNext: PER_PUNISH - pts % PER_PUNISH, next: Math.floor(pts/PER_PUNISH) + 1};
-  }).sort((a,b) => a.toNext - b.toNext || b.pts - a.pts);
+  const cost = (typeof AGE_POINTS !== "undefined" && progress ? (AGE_POINTS[(progress.age||1) - 1] || 1) + (progress.totemFarm ? 1 : 0) : 1);
+  const cand = pl.map(p => {
+    const pts = t[p.id] || 0; return {p, pts, toNext: PER_PUNISH - pts % PER_PUNISH, next: Math.floor(pts/PER_PUNISH) + 1};
+  }).filter(c => c.toNext <= cost).sort((a,b) => a.toNext - b.toNext || b.pts - a.pts);
   const sb = $("spotBody");
   if (!cand.length){
-    sb.innerHTML = `<div class="spot-txt"><span class="name">Nobody yet</span><span class="away">Whoever dies first takes this spot.</span></div>`;
+    sb.innerHTML = `<div class="spot-head">A death right now costs <b>+${cost}</b></div><div class="spot-txt"><span class="away">Nobody would hit a punishment from one death in this age.</span></div>`;
   } else {
-    const away = cand[0].toNext, group = cand.filter(c => c.toNext === away);
-    const prog = PER_PUNISH - away;
-    sb.innerHTML = `<div class="spot-head"><b>${away}</b> pt${away===1?"":"s"} from their next punishment</div>
-    <div class="spot-list">${group.map(c => `<div class="spot-row">
+    sb.innerHTML = `<div class="spot-head">A death right now costs <b>+${cost}</b>. These ${cand.length === 1 ? "player" : cand.length + " players"} would be punished:</div>
+    <div class="spot-list">${cand.map(c => `<div class="spot-row">
       <div class="slot"><canvas data-skin="${esc(c.p.skin||"")}" data-kind="head" aria-label="${esc(c.p.name)}"></canvas></div>
       <div class="spot-txt">
         <span class="name">${esc(c.p.name)}${nickHtml(c.p)}</span>
-        <span class="which">Punishment #${c.next} next · ${c.pts} pts total</span>
-        <div class="meter" title="${PER_PUNISH - prog} of ${PER_PUNISH} hearts left before the next punishment">${Array.from({length:PER_PUNISH},(_,k)=>HEART(k < PER_PUNISH - prog)).join("")}</div>
+        <span class="which" title="Punishment #${c.next} next">${c.toNext} away · ${c.pts} pts</span>
+        <div class="meter" title="${c.toNext} of ${PER_PUNISH} hearts left before the next punishment">${Array.from({length:PER_PUNISH},(_,k)=>HEART(k < c.toNext)).join("")}</div>
       </div>
     </div>`).join("")}</div>`;
   }
