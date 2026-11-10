@@ -140,7 +140,9 @@ header.top .sub{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-siz
 .tipbar .text{flex:1 1 240px;min-width:0;font-size:16px}
 .tipbar button{flex:none}
 .quests{display:flex;flex-direction:column;gap:14px}
-.q-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.q-top{display:flex;flex-wrap:nowrap;justify-content:space-between;align-items:flex-start;gap:12px}
+.q-top > div:first-child{flex:1 1 auto;min-width:0}
+.q-cost{flex:none;max-width:45%}
 .q-top h3{font-size:24px;margin:2px 0 0}
 .q-top .label{color:var(--muted)}
 .q-sub{font-size:14px;color:var(--muted)}
