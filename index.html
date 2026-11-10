@@ -97,6 +97,7 @@ header.top .sub{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-siz
 .p2 .step{height:68px;background:var(--iron-step)}
 .p3 .step{height:46px;background:var(--copper-step)}
 .pod-meter{justify-content:center}
+.pod-pun{font-weight:700;font-size:26px;line-height:1;color:var(--accent-bright);text-shadow:2px 2px 0 #3F0000}
 .pod-meter svg{width:16px;height:14px}
 .pod.ghost{visibility:hidden}
 
@@ -561,6 +562,7 @@ function render(){
     const slots = [pl[1], pl[0], pl[2]]; const cls = ["p2","p1","p3"]; const rk = [2,1,3];
     podEl.innerHTML = `<div class="podium">${slots.map((p,i) => p ? `
       <div class="pod ${cls[i]}">
+        ${(() => { const pun = Math.floor((t[p.id]||0) / PER_PUNISH); return `<div class="pod-pun" title="${pun} punishment${pun===1?"":"s"}">${pun}</div>`; })()}
         ${(() => { const left = PER_PUNISH - ((t[p.id]||0) % PER_PUNISH); return `<div class="meter pod-meter" title="${left} of ${PER_PUNISH} hearts left before the next punishment">${Array.from({length:PER_PUNISH},(_,k)=>HEART(k < left)).join("")}</div>`; })()}
         <canvas class="figure" data-skin="${esc(p.skin||"")}" data-kind="fig" aria-label="${esc(p.name)}'s skin"></canvas>
         <div class="name">${esc(p.name)}${nickHtml(p)}</div>
