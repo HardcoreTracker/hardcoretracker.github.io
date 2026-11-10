@@ -1304,16 +1304,40 @@ document.addEventListener("keydown", e => {
 
 // ---------- weather, seasons, celebrations ----------
 function dayHash(){ const d = new Date(); const s = d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate(); let x = (s * 2654435761) >>> 0; x ^= x >>> 13; x = Math.imul(x, 1274126177) >>> 0; return (x % 10000) / 10000; }
+// Special days, by the viewer's local date
+function specialDayWeather(){
+  const d = new Date(), y = d.getFullYear(), m = d.getMonth(), day = d.getDate(), dow = d.getDay();
+  const nthWeekday = (month, weekday, n) => { const first = new Date(y, month, 1).getDay(); return 1 + ((weekday - first + 7) % 7) + (n - 1) * 7; };
+  if ((m === 11 && day === 31) || (m === 0 && day === 1)) return "clear";            // New Year: clear skies for the fireworks
+  if (m === 11 && (day === 24 || day === 25)) return "snow";                         // Christmas
+  if (m === 11 && (day === 1 || day === 21)) return "snow";                          // First snow and the first day of winter
+  if (m === 10 && day === nthWeekday(10, 4, 4)) return "leaves";                     // Thanksgiving
+  if (m === 9 && day === 31) return "storm";                                         // Halloween
+  if (day === 13 && dow === 5) return "storm";                                       // Friday the 13th
+  if (m === 8 && day === 22) return "leaves";                                        // First day of fall
+  if (m === 2 && day === 20) return "rain";                                          // First day of spring
+  return null;
+}
+// The server's current age sets the mood once it gets far enough
+function questWeather(){
+  const age = progress && progress.age ? progress.age : 1;
+  if (age === 7) return "ash";   // Nether Age
+  if (age === 8) return "end";   // End Age
+  return null;
+}
 function pickWeather(){
   if (weatherMode && weatherMode !== "auto") return weatherMode;
+  const special = specialDayWeather(); if (special) return special;
+  const quest = questWeather(); if (quest) return quest;
   const m = new Date().getMonth(), r = dayHash();
+  if (m === 9 || m === 10){ if (r > 0.75) return "leaves"; }
   if (m === 11 || m <= 1) return r < 0.45 ? "snow" : r < 0.55 ? "rain" : "clear";
   if (m === 9) return r < 0.25 ? "rain" : r < 0.38 ? "storm" : "clear";
   return r < 0.2 ? "rain" : r < 0.26 ? "storm" : "clear";
 }
 function setWeather(){
   weatherNow = pickWeather();
-  const n = weatherNow === "snow" ? 90 : weatherNow === "clear" ? 0 : 140;
+  const n = weatherNow === "clear" ? 0 : weatherNow === "snow" ? 90 : weatherNow === "leaves" ? 26 : weatherNow === "ash" ? 70 : weatherNow === "end" ? 60 : 140;
   let s = 7; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
   flakes = Array.from({length: n}, () => ({x: rnd(), y: rnd(), v: 0.6 + rnd()*0.8, w: rnd()}));
 }
@@ -1333,6 +1357,30 @@ function drawWeather(W){
       if (now > nextFlash){ flashUntil = now + 140; nextFlash = now + 6000 + Math.random()*10000; }
       if (now < flashUntil){ pctx.fillStyle = "rgba(230,235,255,.55)"; pctx.fillRect(0, 0, W, PH); }
     }
+  } else if (weatherNow === "leaves"){
+    const cols = ["#C8611E", "#E0952B", "#A8401C", "#D9B23A"];
+    flakes.forEach((f, i) => {
+      const y = ((f.y * PH) + panoT * 10 * f.v) % (PH + 4) - 2;
+      const x = ((f.x * W) + panoT * 12 * f.v + Math.sin(panoT * 1.3 + f.w * 9) * 6 + W * 2) % W;
+      pctx.fillStyle = cols[i % cols.length];
+      pctx.fillRect(Math.floor(x), Math.floor(y), 2, 1); pctx.fillRect(Math.floor(x) + (Math.sin(panoT*2 + i) > 0 ? 1 : 0), Math.floor(y) + 1, 1, 1);
+    });
+  } else if (weatherNow === "ash"){
+    pctx.fillStyle = "rgba(60,10,0,.22)"; pctx.fillRect(0, 0, W, PH);
+    flakes.forEach((f, i) => {
+      const y = ((f.y * PH) + panoT * 8 * f.v) % (PH + 4) - 2;
+      const x = ((f.x * W) + Math.sin(panoT * 0.6 + f.w * 7) * 4 + W) % W;
+      pctx.fillStyle = i % 5 === 0 ? "#FF7A2A" : "#5A5050";
+      pctx.fillRect(Math.floor(x), Math.floor(y), 1, 1);
+    });
+  } else if (weatherNow === "end"){
+    pctx.fillStyle = "rgba(25,5,40,.30)"; pctx.fillRect(0, 0, W, PH);
+    flakes.forEach((f, i) => {
+      const y = PH - (((f.y * PH) + panoT * 6 * f.v) % (PH + 4)) + 2;
+      const x = ((f.x * W) + Math.sin(panoT * 0.5 + f.w * 5) * 3 + W) % W;
+      pctx.fillStyle = i % 3 === 0 ? "#E07BFF" : "#9B4DCA";
+      pctx.fillRect(Math.floor(x), Math.floor(y), 1, 1);
+    });
   } else if (weatherNow === "snow"){
     pctx.fillStyle = "rgba(20,26,40,.12)"; pctx.fillRect(0, 0, W, PH);
     pctx.fillStyle = "#FFFFFF";
