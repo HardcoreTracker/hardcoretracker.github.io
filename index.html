@@ -643,6 +643,9 @@ function buildClouds(seed, color){
 }
 // Seasons by the viewer's date; snow stays from Dec 1 until spring
 function landSeason(){
+  // Valentine's and St. Patrick's fall in winter, but get green spring scenery instead of snow
+  let hol = null; try { hol = holidayNow(); } catch(e){}
+  if (hol === "valentines" || hol === "stpatricks") return "spring";
   const d = new Date(), m = d.getMonth(), day = d.getDate(), md = m * 100 + day;
   if (md >= 1101 || md < 220) return "winter";   // Dec 1 - Mar 19 (months are 0-based)
   if (md < 520) return "spring";                  // Mar 20 - Jun 20
