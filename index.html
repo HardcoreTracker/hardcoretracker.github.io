@@ -284,8 +284,8 @@ body.ov-open{overflow:hidden}
  linear-gradient(#1A0A00,#1A0A00) 6px 12px/8px 2px no-repeat,
  linear-gradient(#E87A1A,#E87A1A) 0 4px/20px 14px no-repeat;box-shadow:none}
 .season-halloween .tipbar .tag{color:#FF9A2E}
-.season-winter .panel{background-image:repeating-linear-gradient(90deg,#FFFFFF 0 10px,#EEF3FF 10px 16px,#FFFFFF 16px 22px);background-size:100% 5px;background-repeat:no-repeat;background-position:0 0}
-.season-winter .slot.panel,.season-winter .award{background-image:none}
+.land-winter .panel{background-image:repeating-linear-gradient(90deg,#FFFFFF 0 10px,#EEF3FF 10px 16px,#FFFFFF 16px 22px);background-size:100% 5px;background-repeat:no-repeat;background-position:0 0}
+.land-winter .slot.panel,.land-winter .award{background-image:none}
 .agechip{display:inline-flex;align-items:center;gap:7px;font-weight:600;white-space:nowrap}
 .agechip::before{content:"";width:10px;height:10px;background:var(--c);box-shadow:0 0 0 2px var(--outline);flex:none}
 
@@ -495,7 +495,9 @@ function isDark(){
 }
 function rng(seed){ let s = seed; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
 function shade(hex, f){
-  const n = parseInt(hex.slice(1),16); let r=n>>16, g=(n>>8)&255, b=n&255;
+  let r, g, b;
+  if (hex.startsWith("rgb")){ [r, g, b] = hex.match(/\d+/g).map(Number); }
+  else { const n = parseInt(hex.slice(1),16); r=n>>16; g=(n>>8)&255; b=n&255; }
   r=Math.max(0,Math.min(255,Math.round(r*f))); g=Math.max(0,Math.min(255,Math.round(g*f))); b=Math.max(0,Math.min(255,Math.round(b*f)));
   return "rgb("+r+","+g+","+b+")";
 }
@@ -514,25 +516,68 @@ function buildLayer(seed, o){
   const c = document.createElement("canvas"); c.width = PW; c.height = PH;
   const x = c.getContext("2d"), r = rng(seed + 7), cols = PW/PB, rows = PH/PB;
   const hs = heights(seed, cols, o.min, o.max);
+  const px = (cx, cy, w, h2, color) => { x.fillStyle = color; for (const off of [0, -PW, PW]) x.fillRect(cx + off, cy, w, h2); };
+  const pick = list => list[Math.floor(r() * list.length)];
+  let lastTree = -9;
   hs.forEach((hgt, col) => {
     const top = rows - hgt;
+    if (o.lava && hgt < o.lava){
+      for (let row = rows - o.lava; row < top; row++){ x.fillStyle = shade(row === rows - o.lava ? "#FFB347" : "#FF6A10", 0.9 + r()*0.2); blk(x, col, row); }
+    }
     for (let row = top; row < rows; row++){
       const depth = row - top;
       let base = depth === 0 ? o.top : depth < 4 ? o.dirt : o.stone;
-      if (o.snow && depth === 0 && hgt >= o.max - 2) base = o.snow;
+      if (depth === 0 && (o.snowAll || (o.snowPeaks && hgt >= o.max - 2))) base = o.snow;
       x.fillStyle = shade(base, 0.9 + r()*0.2);
       blk(x, col, row);
     }
-    if (o.trees && r() < o.trees && col % 1 === 0){
-      const th = 3 + Math.floor(r()*2);
+    if (o.pillars && r() < o.pillars && col - lastTree > 4){
+      const ph = 6 + Math.floor(r() * 8); lastTree = col;
+      for (let i = 1; i <= ph; i++){ x.fillStyle = shade(i === ph ? "#3A2A55" : "#15101F", 0.9 + r()*0.2); blk(x, col, top - i); blk(x, (col + 1) % cols, top - i); }
+      return;
+    }
+    const sx = col * PB, sy = top * PB;
+    if (o.trees && r() < o.trees && col - lastTree > 3 && !(o.lava && hgt < o.lava)){
+      lastTree = col;
+      const kind = o.tree || "oak";
+      if (kind === "chorus"){
+        const th = 3 + Math.floor(r()*3);
+        for (let i = 1; i <= th; i++){ x.fillStyle = shade(o.trunk, 0.85 + r()*0.3); blk(x, col, top - i); }
+        if (th > 3){ x.fillStyle = shade(o.trunk, 1); blk(x, (col + 1) % cols, top - th + 1); blk(x, (col + 1) % cols, top - th); }
+        x.fillStyle = o.flower; blk(x, col, top - th - 1); if (th > 3) blk(x, (col + 1) % cols, top - th - 1);
+        return;
+      }
+      const th = kind === "fungus" ? 4 + Math.floor(r()*2) : 3 + Math.floor(r()*2);
       x.fillStyle = o.trunk;
       for (let i = 1; i <= th; i++) blk(x, col, top - i);
-      for (let dy = -1; dy <= 1; dy++) for (let dx = -2; dx <= 2; dx++){
-        if (dy === -1 && Math.abs(dx) === 2) continue;
-        x.fillStyle = shade(o.leaves, 0.88 + r()*0.24);
+      const leafColor = pick(o.leaves);
+      const shape = kind === "fungus" ? [[-2,0],[-1,0],[0,0],[1,0],[2,0],[-2,-1],[-1,-1],[0,-1],[1,-1],[2,-1],[-1,-2],[0,-2],[1,-2]]
+                  : kind === "spruce" ? [[-2,1],[-1,1],[0,1],[1,1],[2,1],[-1,0],[0,0],[1,0],[-1,-1],[0,-1],[1,-1],[0,-2],[0,-3]]
+                  : [[-2,1],[-1,1],[0,1],[1,1],[2,1],[-2,0],[-1,0],[0,0],[1,0],[2,0],[-1,-1],[0,-1],[1,-1],[0,-2]];
+      const leafTop = Math.min(...shape.map(s => s[1]));
+      shape.forEach(([dx, dy]) => {
+        const lc = (o.snowLeaves && (dy === leafTop || (dy === leafTop + 1 && Math.abs(dx) >= 1 && r() < .6))) ? o.snow : leafColor;
+        x.fillStyle = shade(lc, 0.88 + r()*0.24);
         blk(x, (col + dx + cols) % cols, top - th - 1 + dy);
+      });
+      if (o.glow && kind === "fungus"){ x.fillStyle = o.glow; blk(x, (col + 1) % cols, top - th); }
+      if (o.lights){
+        const lc = ["#FF3B3B", "#FFD93B", "#3BFF6B", "#3BA8FF", "#FF5BE6"];
+        for (let i = 0; i < 6; i++){
+          const [dx, dy] = shape[Math.floor(r() * shape.length)];
+          px(((col + dx + cols) % cols) * PB + 1 + Math.floor(r() * 3), (top - th - 1 + dy) * PB + 1 + Math.floor(r() * 3), 2, 2, lc[i % lc.length]);
+        }
       }
-      x.fillStyle = shade(o.leaves, 1); blk(x, col, top - th - 3);
+      return;
+    }
+    if (o.pumpkins && r() < o.pumpkins){
+      px(sx, sy - PB, PB, PB, "#E87A1A"); px(sx + 2, sy - PB - 1, 2, 1, "#3F7A2E");
+      px(sx + 1, sy - PB + 2, 1, 1, "#FFE14D"); px(sx + 4, sy - PB + 2, 1, 1, "#FFE14D"); px(sx + 1, sy - PB + 4, 4, 1, "#FFE14D");
+    } else if (o.eggs && r() < o.eggs){
+      const ec = pick(["#FF8FB8", "#8FD3FF", "#FFE36B", "#B79BFF", "#9BEFA0"]);
+      px(sx + 2, sy - 4, 3, 4, ec); px(sx + 2, sy - 3, 3, 1, "#FFFFFF");
+    } else if (o.flowers && r() < o.flowers){
+      px(sx + 2, sy - 3, 1, 3, "#3F7D2B"); px(sx + 1, sy - 4, 3, 2, pick(o.flowerColors));
     }
   });
   return c;
@@ -547,23 +592,61 @@ function buildClouds(seed, color){
   }
   return c;
 }
-function buildScene(dark){
-  const C = dark ? {
-    sky:["#0B1026","#26345E"], body:"#E8E8F0", far:{top:"#4A5270",dirt:"#3D4461",stone:"#353B55",snow:"#9AA1BC"},
-    mid:{top:"#2F5A32",dirt:"#4A3626",stone:"#3B3B44",leaves:"#1F4422",trunk:"#3E2E1A"},
-    near:{top:"#26492A",dirt:"#3A2B1F",stone:"#2F2F37",leaves:"#1A3A1D",trunk:"#33261A"}, cloud:"rgba(150,160,195,.30)"
-  } : {
-    sky:["#6E9EF7","#BFD6FF"], body:"#FFF6A8", far:{top:"#9AA4B8",dirt:"#8A93A6",stone:"#7D8698",snow:"#F2F5FA"},
-    mid:{top:"#5FA33B",dirt:"#866043",stone:"#7A7A7A",leaves:"#3F7D2B",trunk:"#6B4F2A"},
-    near:{top:"#4C8A2E",dirt:"#6F4F34",stone:"#666666",leaves:"#346B24",trunk:"#5A4122"}, cloud:"rgba(255,255,255,.92)"
+// Seasons by the viewer's date; snow stays from Dec 1 until spring
+function landSeason(){
+  const d = new Date(), m = d.getMonth(), day = d.getDate(), md = m * 100 + day;
+  if (md >= 1101 || md < 220) return "winter";   // Dec 1 - Mar 19 (months are 0-based)
+  if (md < 520) return "spring";                  // Mar 20 - Jun 20
+  if (md < 822) return "summer";                  // Jun 21 - Sep 21
+  return "fall";                                  // Sep 22 - Nov 30
+}
+function worldNow(){ let a = 1; try { a = progress && progress.age ? progress.age : 1; } catch(e){} return a === 7 ? "nether" : a === 8 ? "end" : "overworld"; }
+function nightify(color){ return color.startsWith("#") ? mixHex(color, "#1B2547", 0.5) : color; }
+function palette(key, night){
+  const [world, season, holiday] = key.split("|");
+  const N = c => night ? nightify(c) : c;
+  if (world === "nether") return {
+    cloud: null,
+    far:  {top:"#4A1414", dirt:"#3C1010", stone:"#2E0C0C", min:13, max:22},
+    mid:  {top:"#7A2626", dirt:"#6B2121", stone:"#5A1C1C", min:7, max:13, trees:.08, tree:"fungus", trunk:"#7B2E3A", leaves:["#A5161C","#8E1218"], glow:"#FFB04A", lava:9},
+    near: {top:"#4B3A2A", dirt:"#3E3024", stone:"#2A2020", min:2, max:6, trees:.05, tree:"fungus", trunk:"#5E2A44", leaves:["#B0202A","#8A1A20"], glow:"#FFB04A", lava:4}
   };
-  const sr = rng(99), stars = dark ? Array.from({length:70}, () => [sr()*PW, sr()*PH*0.5]) : [];
-  return { C, stars, layers:[
-    {img: buildClouds(11, C.cloud), speed: 4},
-    {img: buildLayer(21, {...C.far, min:13, max:22, snow: C.far.snow}), speed: 2.5},
-    {img: buildLayer(37, {...C.mid, min:7, max:13, trees: .09}), speed: 6},
-    {img: buildLayer(53, {...C.near, min:2, max:6, trees: .06}), speed: 12},
-  ]};
+  if (world === "end") return {
+    cloud: null,
+    far:  {top:"#1E1830", dirt:"#171226", stone:"#120E1E", min:10, max:16, pillars:.05},
+    mid:  {top:"#E6E3A8", dirt:"#D6D29A", stone:"#C9C48C", min:6, max:12, trees:.07, tree:"chorus", trunk:"#8C5A9E", flower:"#E3B9F0"},
+    near: {top:"#DCD89C", dirt:"#CBC78E", stone:"#BDB880", min:2, max:6, trees:.05, tree:"chorus", trunk:"#7A4B8C", flower:"#F0C8FA"}
+  };
+  const grass = season === "spring" ? ["#74C043","#63B23A"] : season === "fall" ? ["#8C9A3A","#7A8A30"] : season === "winter" ? ["#F4F7FB","#EEF2F8"] : ["#5FA33B","#4C8A2E"];
+  const leaves = season === "spring" ? [["#4E9A33","#4E9A33","#F2A7C3"],["#45902E","#F0B3CD","#45902E"]]
+              : season === "fall" ? [["#D9621E","#C2361E","#E8A41F","#9B2B1A","#6E8A2A"],["#C8501A","#A8301C","#E09A20","#7E2216"]]
+              : season === "winter" ? [["#2F5A32"],["#274E2B"]] : [["#3F7D2B"],["#346B24"]];
+  const flowers = holiday === "easter" ? .3 : season === "spring" ? .25 : season === "summer" ? .06 : 0;
+  const deco = {
+    flowers, flowerColors:["#FF6B9A","#FFE14D","#FFFFFF","#B38BFF","#FF9A3B"],
+    pumpkins: holiday === "halloween" ? .07 : season === "fall" ? .015 : 0,
+    eggs: holiday === "easter" ? .08 : 0,
+    lights: holiday === "christmas" || (season === "winter" && new Date().getMonth() === 11)
+  };
+  const snowAll = season === "winter", tree = season === "winter" ? "spruce" : "oak";
+  const P = {
+    cloud: night ? "rgba(150,160,195,.30)" : (holiday === "stpatricks" ? "rgba(255,255,255,.95)" : "rgba(255,255,255,.92)"),
+    far:  {top: N(snowAll ? "#F2F5FA" : "#9AA4B8"), dirt: N("#8A93A6"), stone: N("#7D8698"), snow: N("#F2F5FA"), snowPeaks: true, min:13, max:22},
+    mid:  {top: N(grass[0]), dirt: N("#866043"), stone: N("#7A7A7A"), snow: N("#F4F7FB"), snowAll, snowLeaves: snowAll, min:7, max:13, trees:.09, tree, trunk: N("#6B4F2A"), leaves: leaves[0].map(N), ...deco},
+    near: {top: N(grass[1]), dirt: N("#6F4F34"), stone: N("#666666"), snow: N("#EEF2F8"), snowAll, snowLeaves: snowAll, min:2, max:6, trees:.06, tree, trunk: N("#5A4122"), leaves: leaves[1].map(N), ...deco}
+  };
+  if (night){ P.mid.flowerColors = P.mid.flowerColors.map(N); P.near.flowerColors = P.near.flowerColors.map(N); }
+  return P;
+}
+function buildScene(key, night){
+  const P = palette(key, night);
+  const sr = rng(99), stars = Array.from({length:70}, () => [sr()*PW, sr()*PH*0.5]);
+  const layers = [];
+  if (P.cloud) layers.push({img: buildClouds(11, P.cloud), speed: 4, cloud: true});
+  layers.push({img: buildLayer(21, P.far), speed: 2.5});
+  layers.push({img: buildLayer(37, P.mid), speed: 6});
+  layers.push({img: buildLayer(53, P.near), speed: 12});
+  return {stars, layers};
 }
 function sizePano(){
   const w = Math.max(1, Math.ceil(PH * innerWidth / Math.max(1, innerHeight)));
@@ -596,39 +679,76 @@ function darknessAt(hr){
   if (hr < 7.5) return 1 - (hr - 5) / 2.5;
   return (hr - 17) / 3.5;
 }
-let dayScene = null, nightScene = null;
+let dayScene = null, nightScene = null, sceneKey = "";
+function currentSceneKey(){ return worldNow() + "|" + landSeason() + "|" + (holidayNow() || ""); }
+function ensureScene(){
+  const key = currentSceneKey();
+  if (key === sceneKey && dayScene) return;
+  sceneKey = key; dayScene = buildScene(key, false); nightScene = buildScene(key, true);
+}
+// Small fireworks behind the hills (4th of July and New Year's nights)
+let panoRockets = [], panoSparks = [];
+function drawPanoFireworks(W, colors){
+  if (!reduceMotion && Math.random() < 0.05) panoRockets.push({x: W*(0.1 + Math.random()*0.8), y: PH*0.7, vy: -(1.2 + Math.random()*0.6), top: PH*(0.12 + Math.random()*0.25), col: colors[Math.floor(Math.random()*colors.length)]});
+  panoRockets = panoRockets.filter(r => { r.y += r.vy; pctx.fillStyle = "#FFF3C0"; pctx.fillRect(Math.floor(r.x), Math.floor(r.y), 1, 2);
+    if (r.y <= r.top){ for (let i = 0; i < 26; i++){ const a = Math.random()*Math.PI*2, s = 0.4 + Math.random()*0.9; panoSparks.push({x:r.x, y:r.y, vx:Math.cos(a)*s, vy:Math.sin(a)*s, life:40 + Math.random()*20, col:r.col}); } return false; } return true; });
+  panoSparks = panoSparks.filter(p => { p.x += p.vx; p.y += p.vy; p.vy += 0.02; p.life--; pctx.globalAlpha = Math.max(0, Math.min(1, p.life/25)); pctx.fillStyle = p.col; pctx.fillRect(Math.floor(p.x), Math.floor(p.y), 1, 1); return p.life > 0; });
+  pctx.globalAlpha = 1;
+}
+function drawRainbow(W){
+  const cx = W * 0.7, cy = PH * 0.8, cols = ["#FF4B4B","#FF9A3B","#FFE14D","#55D255","#4B9BFF","#8B5BFF"];
+  pctx.globalAlpha = 0.45; pctx.lineWidth = 3;
+  cols.forEach((c, i) => { pctx.strokeStyle = c; pctx.beginPath(); pctx.arc(cx, cy, 78 - i*3, Math.PI, 2*Math.PI); pctx.stroke(); });
+  pctx.globalAlpha = 1;
+}
 function drawPano(){
+  ensureScene();
   if (!dayScene || !nightScene) return;
-  const W = pano.width, hr = localHour(), dark = darknessAt(hr), [top, bottom] = skyAt(hr);
+  const W = pano.width, world = worldNow(), holiday = holidayNow();
+  const hr = localHour(), dark = world === "overworld" ? darknessAt(hr) : 0;
+  pctx.save();
+  if (holiday === "aprilfools"){ pctx.translate(0, PH); pctx.scale(1, -1); }
   pctx.imageSmoothingEnabled = false;
   pctx.globalAlpha = 1;
+  let top, bottom;
+  if (world === "nether"){ top = "#2A0505"; bottom = "#6E1E0E"; }
+  else if (world === "end"){ top = "#07000F"; bottom = "#1D0B33"; }
+  else [top, bottom] = skyAt(hr);
   const g = pctx.createLinearGradient(0,0,0,PH); g.addColorStop(0, top); g.addColorStop(1, bottom);
   pctx.fillStyle = g; pctx.fillRect(0,0,W,PH);
-  if (dark > 0){
-    pctx.globalAlpha = dark; pctx.fillStyle = "#FFFFFF";
+  const starAlpha = world === "end" ? 0.5 : world === "nether" ? 0 : dark;
+  if (starAlpha > 0){
+    pctx.globalAlpha = starAlpha; pctx.fillStyle = "#FFFFFF";
     nightScene.stars.forEach(([sx,sy]) => { const xx = (sx - panoT*1) % PW; for (let x0 = xx < 0 ? xx+PW : xx; x0 < W; x0 += PW) pctx.fillRect(Math.floor(x0), Math.floor(sy), 1, 1); });
     pctx.globalAlpha = 1;
   }
-  // Sun from 5:30 to 18:30, moon the rest of the time, both arcing across the sky
-  const sunUp = hr >= 5.5 && hr <= 18.5;
-  const prog = sunUp ? (hr - 5.5) / 13 : ((hr >= 18.5 ? hr - 18.5 : hr + 5.5) / 11);
-  const bx = Math.floor(W * (0.06 + 0.86 * prog)), by = Math.floor(PH * 0.62 - Math.sin(Math.PI * prog) * PH * 0.5);
-  pctx.fillStyle = sunUp ? (hr < 7 || hr > 17 ? "#FFB45A" : "#FFF6A8") : "#E8E8F0";
-  pctx.fillRect(bx, by, 18, 18);
-  if (!sunUp){ pctx.fillStyle = "rgba(160,165,190,.6)"; pctx.fillRect(bx + 4, by + 4, 4, 4); pctx.fillRect(bx + 11, by + 10, 3, 3); }
+  if (world === "overworld"){
+    // Sun from 5:30 to 18:30, moon the rest of the time, both arcing across the sky
+    const sunUp = hr >= 5.5 && hr <= 18.5;
+    const prog = sunUp ? (hr - 5.5) / 13 : ((hr >= 18.5 ? hr - 18.5 : hr + 5.5) / 11);
+    const bx = Math.floor(W * (0.06 + 0.86 * prog)), by = Math.floor(PH * 0.62 - Math.sin(Math.PI * prog) * PH * 0.5);
+    pctx.fillStyle = sunUp ? (hr < 7 || hr > 17 ? "#FFB45A" : "#FFF6A8") : "#E8E8F0";
+    pctx.fillRect(bx, by, 18, 18);
+    if (!sunUp){ pctx.fillStyle = "rgba(160,165,190,.6)"; pctx.fillRect(bx + 4, by + 4, 4, 4); pctx.fillRect(bx + 11, by + 10, 3, 3); }
+    if (holiday === "stpatricks" && dark < 0.5) drawRainbow(W);
+    if ((holiday === "july4" || holiday === "newyear") && dark > 0.3) drawPanoFireworks(W, holiday === "july4" ? ["#FF3B3B","#FFFFFF","#3B6BFF"] : ["#FF5555","#FFAA00","#FFFF55","#55FF55","#55FFFF","#FF55FF","#FFFFFF"]);
+  }
   dayScene.layers.forEach((L, i) => {
     const o = (panoT * L.speed) % PW;
+    if (L.cloud) pctx.globalAlpha = 1 - dark;
     for (let x0 = -o; x0 < W; x0 += PW) pctx.drawImage(L.img, Math.floor(x0), 0);
+    pctx.globalAlpha = 1;
     if (dark > 0){
       pctx.globalAlpha = dark;
-      const N = nightScene.layers[i];
-      for (let x0 = -o; x0 < W; x0 += PW) pctx.drawImage(N.img, Math.floor(x0), 0);
+      const Nl = nightScene.layers[i];
+      for (let x0 = -o; x0 < W; x0 += PW) pctx.drawImage(Nl.img, Math.floor(x0), 0);
       pctx.globalAlpha = 1;
     }
   });
   drawWeather(W);
+  pctx.restore();
 }
-function paintStone(){ try { if (!flakes.length && weatherNow === "clear") setWeather(); sizePano(); if (!dayScene){ dayScene = buildScene(false); nightScene = buildScene(true); } drawPano(); } catch(e){} }
+function paintStone(){ try { if (!flakes.length && weatherNow === "clear") setWeather(); sizePano(); drawPano(); } catch(e){ console.error(e); } }
 paintStone();
 addEventListener("resize", () => { sizePano(); drawPano(); });
 if (reduceMotion) setInterval(drawPano, 60000);
@@ -1304,23 +1424,46 @@ document.addEventListener("keydown", e => {
 
 // ---------- weather, seasons, celebrations ----------
 function dayHash(){ const d = new Date(); const s = d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate(); let x = (s * 2654435761) >>> 0; x ^= x >>> 13; x = Math.imul(x, 1274126177) >>> 0; return (x % 10000) / 10000; }
-// Special days, by the viewer's local date
-function specialDayWeather(){
-  const d = new Date(), y = d.getFullYear(), m = d.getMonth(), day = d.getDate(), dow = d.getDay();
+// Holidays by the viewer's local date
+function easterDate(y){
+  const a = y % 19, b = Math.floor(y/100), c = y % 100, d = Math.floor(b/4), e = b % 4, f = Math.floor((b+8)/25), g = Math.floor((b-f+1)/3);
+  const hh = (19*a + b - d - g + 15) % 30, i = Math.floor(c/4), k = c % 4, l = (32 + 2*e + 2*i - hh - k) % 7, m = Math.floor((a + 11*hh + 22*l)/451);
+  const month = Math.floor((hh + l - 7*m + 114)/31), day = ((hh + l - 7*m + 114) % 31) + 1;
+  return [month - 1, day];
+}
+function holidayNow(){
+  if (themeMode && themeMode !== "auto") return themeMode === "none" ? null : themeMode;
+  const d = new Date(), y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
   const nthWeekday = (month, weekday, n) => { const first = new Date(y, month, 1).getDay(); return 1 + ((weekday - first + 7) % 7) + (n - 1) * 7; };
-  if ((m === 11 && day === 31) || (m === 0 && day === 1)) return "clear";            // New Year: clear skies for the fireworks
-  if (m === 11 && (day === 24 || day === 25)) return "snow";                         // Christmas
-  if (m === 11 && (day === 1 || day === 21)) return "snow";                          // First snow and the first day of winter
-  if (m === 10 && day === nthWeekday(10, 4, 4)) return "leaves";                     // Thanksgiving
-  if (m === 9 && day === 31) return "storm";                                         // Halloween
-  if (day === 13 && dow === 5) return "storm";                                       // Friday the 13th
-  if (m === 8 && day === 22) return "leaves";                                        // First day of fall
-  if (m === 2 && day === 20) return "rain";                                          // First day of spring
+  const [em, ed] = easterDate(y);
+  if ((m === 11 && day === 31) || (m === 0 && day === 1)) return "newyear";
+  if (m === 1 && day === 14) return "valentines";
+  if (m === 2 && day === 17) return "stpatricks";
+  if (m === 3 && day === 1) return "aprilfools";
+  if (m === em && day === ed) return "easter";
+  if (m === 6 && day === 4) return "july4";
+  if (m === 9 && day >= 15) return "halloween";
+  if (m === 10 && day === nthWeekday(10, 4, 4)) return "thanksgiving";
+  if (m === 11 && (day === 24 || day === 25)) return "christmas";
+  return null;
+}
+function specialDayWeather(){
+  const d = new Date(), m = d.getMonth(), day = d.getDate(), dow = d.getDay(), hol = holidayNow();
+  if (hol === "newyear" || hol === "july4" || hol === "easter" || hol === "aprilfools") return "clear";
+  if (hol === "valentines") return "hearts";
+  if (hol === "stpatricks") return "clovers";
+  if (hol === "christmas") return "snow";
+  if (hol === "thanksgiving") return "leaves";
+  if (m === 9 && day === 31) return "storm";                 // Halloween night
+  if (m === 11 && (day === 1 || day === 21)) return "snow";  // First snow and the first day of winter
+  if (day === 13 && dow === 5) return "storm";               // Friday the 13th
+  if (m === 8 && day === 22) return "leaves";                // First day of fall
+  if (m === 2 && day === 20) return "rain";                  // First day of spring
   return null;
 }
 // The server's current age sets the mood once it gets far enough
 function questWeather(){
-  const age = progress && progress.age ? progress.age : 1;
+  let age = 1; try { age = progress && progress.age ? progress.age : 1; } catch(e){}
   if (age === 7) return "ash";   // Nether Age
   if (age === 8) return "end";   // End Age
   return null;
@@ -1337,7 +1480,7 @@ function pickWeather(){
 }
 function setWeather(){
   weatherNow = pickWeather();
-  const n = weatherNow === "clear" ? 0 : weatherNow === "snow" ? 90 : weatherNow === "leaves" ? 26 : weatherNow === "ash" ? 70 : weatherNow === "end" ? 60 : 140;
+  const n = weatherNow === "clear" ? 0 : weatherNow === "hearts" ? 24 : weatherNow === "clovers" ? 30 : weatherNow === "snow" ? 90 : weatherNow === "leaves" ? 26 : weatherNow === "ash" ? 70 : weatherNow === "end" ? 60 : 140;
   let s = 7; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
   flakes = Array.from({length: n}, () => ({x: rnd(), y: rnd(), v: 0.6 + rnd()*0.8, w: rnd()}));
 }
@@ -1357,6 +1500,20 @@ function drawWeather(W){
       if (now > nextFlash){ flashUntil = now + 140; nextFlash = now + 6000 + Math.random()*10000; }
       if (now < flashUntil){ pctx.fillStyle = "rgba(230,235,255,.55)"; pctx.fillRect(0, 0, W, PH); }
     }
+  } else if (weatherNow === "hearts"){
+    flakes.forEach((f, i) => {
+      const y = PH - (((f.y * PH) + panoT * 9 * f.v) % (PH + 6)) + 3;
+      const x = Math.floor(((f.x * W) + Math.sin(panoT * 0.9 + f.w * 8) * 5 + W) % W);
+      pctx.fillStyle = i % 2 ? "#FF5C8A" : "#FF2E4D";
+      pctx.fillRect(x, Math.floor(y), 1, 1); pctx.fillRect(x + 2, Math.floor(y), 1, 1); pctx.fillRect(x, Math.floor(y) + 1, 3, 1); pctx.fillRect(x + 1, Math.floor(y) + 2, 1, 1);
+    });
+  } else if (weatherNow === "clovers"){
+    flakes.forEach((f, i) => {
+      const y = ((f.y * PH) + panoT * 11 * f.v) % (PH + 4) - 2;
+      const x = Math.floor(((f.x * W) + Math.sin(panoT * 1.1 + f.w * 7) * 5 + W) % W);
+      pctx.fillStyle = i % 3 ? "#3FBF4A" : "#7FE07A";
+      pctx.fillRect(x + 1, Math.floor(y), 1, 1); pctx.fillRect(x, Math.floor(y) + 1, 3, 1); pctx.fillRect(x + 1, Math.floor(y) + 2, 1, 1);
+    });
   } else if (weatherNow === "leaves"){
     const cols = ["#C8611E", "#E0952B", "#A8401C", "#D9B23A"];
     flakes.forEach((f, i) => {
@@ -1393,19 +1550,21 @@ function drawWeather(W){
   }
 }
 
-function seasonNow(){
-  if (themeMode && themeMode !== "auto") return themeMode;
-  const d = new Date(), m = d.getMonth(), day = d.getDate();
-  if ((m === 11 && day === 31) || (m === 0 && day === 1)) return "newyear";
-  if (m === 9 && day >= 15) return "halloween";
-  if (m === 11) return "winter";
-  return "none";
-}
+function seasonNow(){ return holidayNow() || "none"; }
+let skinsSwapped = false;
 function applySeason(){
-  const s = seasonNow();
-  document.body.classList.remove("season-halloween", "season-winter", "season-newyear");
-  if (s !== "none") document.body.classList.add("season-" + s);
-  if (s === "newyear") setTimeout(() => launchFireworks(9000), 1200);
+  const hol = holidayNow(), land = landSeason();
+  document.body.className = document.body.className.split(" ").filter(c => !c.startsWith("season-") && !c.startsWith("land-")).join(" ");
+  if (hol) document.body.classList.add("season-" + hol);
+  document.body.classList.add("land-" + land);
+  if (hol === "newyear") setTimeout(() => launchFireworks(9000), 1200);
+  if (hol === "aprilfools" && !skinsSwapped && players.length > 1){
+    skinsSwapped = true;
+    const skins = players.map(p => p.skin); skins.push(skins.shift());
+    players.forEach((p, i) => p.skin = skins[i]);
+    render();
+  }
+  sceneKey = ""; ensureScene();
 }
 
 // Fireworks drawn on their own layer above the page
