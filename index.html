@@ -238,6 +238,39 @@ header.top{position:relative}
 .shamebar .tag{text-transform:uppercase}
 .shamebar .text{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .sh-head{width:22px;height:22px;image-rendering:pixelated;box-shadow:0 0 0 2px var(--outline);flex:none}
+.clickable{cursor:pointer}
+.pcard.clickable:hover,.pod.clickable:hover .name,.spot-row.clickable:hover .name{text-decoration:underline}
+.pcard.clickable:focus-visible,.pod.clickable:focus-visible,.spot-row.clickable:focus-visible{outline:2px solid #FFFFFF;outline-offset:2px}
+.badges{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
+.badge{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;background:#2B2B2B;box-shadow:inset 2px 2px 0 #4A4A4A, inset -2px -2px 0 #141414;border:1px solid #000000}
+.badge svg{width:16px;height:16px;shape-rendering:crispEdges}
+.rules-btn{font-family:var(--f-pixel);font-size:15px;color:#FFFFFF;text-decoration:none;background:var(--btn);border:2px solid var(--outline);padding:5px 14px;box-shadow:inset 2px 2px 0 var(--btn-hi), inset -2px -3px 0 var(--btn-lo);text-shadow:2px 2px 0 var(--btn-lo);align-self:flex-end}
+.rules-btn:hover{border-color:var(--btn-hover)}
+.overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:max(24px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) 24px max(12px, env(safe-area-inset-left, 0px));overflow-y:auto}
+.ov-back{position:fixed;inset:0;background:rgba(0,0,0,.6)}
+.ov-panel{position:relative;width:min(760px,100%);display:flex;flex-direction:column;gap:16px}
+.ov-close{position:absolute;top:10px;right:10px;font-size:14px;padding:3px 9px}
+.pp-top{display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding-right:36px}
+.pp-top .figure{width:72px;height:144px}
+.pp-top h2{font-size:26px;color:var(--fg);text-shadow:none}
+.pp-top .nick{display:inline;font-size:16px;margin-left:6px}
+.pp-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.pp-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pp-stats .stat{min-height:70px}
+.pp-sec h3{font-size:17px;margin:0 0 8px}
+.pp-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.pp-list li{padding:8px 12px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.pp-list .when{font-size:13px;opacity:.75;white-space:nowrap}
+.pp-award{display:flex;gap:10px;align-items:center}
+.pp-award .badge{flex:none}
+.pp-empty{opacity:.7;font-size:14px}
+.rules-body h2{font-size:26px;color:var(--fg);text-shadow:none;padding-right:36px}
+.rules-body p,.rules-body li{font-size:15px;line-height:1.5}
+.rules-body ul{margin:0;padding-left:20px}
+.rules-body table{border-collapse:collapse;width:100%;max-width:420px}
+.rules-body td{padding:5px 0;border-bottom:1px solid var(--lo)}
+.rules-body td:last-child{text-align:right;font-weight:700;color:var(--accent)}
+body.ov-open{overflow:hidden}
 .agechip{display:inline-flex;align-items:center;gap:7px;font-weight:600;white-space:nowrap}
 .agechip::before{content:"";width:10px;height:10px;background:var(--c);box-shadow:0 0 0 2px var(--outline);flex:none}
 
@@ -327,6 +360,7 @@ button:disabled{opacity:.5;cursor:default}
       <span class="label sub">Shared-life hardcore · Wilderness Bound</span>
       <h1 class="mctitle">Hardcore Point Tracker</h1>
     </div>
+    <a class="rules-btn" href="#rules">Rules</a>
     <div class="status" id="status">Loading the server's record…</div>
   </header>
 
@@ -639,12 +673,13 @@ function render(){
   } else {
     const slots = [pl[1], pl[0], pl[2]]; const cls = ["p2","p1","p3"]; const rk = [2,1,3];
     podEl.innerHTML = `<div class="podium">${slots.map((p,i) => p ? `
-      <div class="pod ${cls[i]}">
+      <div class="pod ${cls[i]} clickable" data-player="${esc(p.id)}" role="button" tabindex="0" aria-label="Open ${esc(p.name)}'s page">
         ${(() => { const pun = Math.floor((t[p.id]||0) / PER_PUNISH); return `<div class="pod-pun" title="${pun} punishment${pun===1?"":"s"}">${pun}</div>`; })()}
         ${(() => { const left = PER_PUNISH - ((t[p.id]||0) % PER_PUNISH); return `<div class="meter pod-meter" title="${left} of ${PER_PUNISH} hearts left before the next punishment">${Array.from({length:PER_PUNISH},(_,k)=>HEART(k < left)).join("")}</div>`; })()}
         <canvas class="figure" data-skin="${esc(p.skin||"")}" data-kind="fig" aria-label="${esc(p.name)}'s skin"></canvas>
         <div class="name">${esc(p.name)}${nickHtml(p)}</div>
         <div class="pts num">${t[p.id]||0}<small>pts</small></div>
+        ${badgesHtml(p.id)}
         ${editBtns(p)}
         <div class="step"><span>${rk[i]}</span></div>
       </div>` : `<div class="pod ${cls[i]} ghost"><div class="step"></div></div>`).join("")}</div>`;
@@ -660,7 +695,7 @@ function render(){
     sb.innerHTML = `<div class="spot-head">A death right now costs <b>+${cost}</b></div><div class="spot-txt"><span class="away">Nobody would hit a punishment from one death in this age.</span></div>`;
   } else {
     sb.innerHTML = `<div class="spot-head">A death right now costs <b>+${cost}</b>. These ${cand.length === 1 ? "player" : cand.length + " players"} could be punished:</div>
-    <div class="spot-list">${cand.map(c => `<div class="spot-row">
+    <div class="spot-list">${cand.map(c => `<div class="spot-row clickable" data-player="${esc(c.p.id)}" role="button" tabindex="0">
       <div class="slot"><canvas data-skin="${esc(c.p.skin||"")}" data-kind="head" aria-label="${esc(c.p.name)}"></canvas></div>
       <div class="spot-txt">
         <span class="name">${esc(c.p.name)}${nickHtml(c.p)}</span>
@@ -675,13 +710,14 @@ function render(){
   $("restSec").hidden = !rest.length;
   $("players").innerHTML = rest.map((p,i) => {
     const pts = t[p.id] || 0, pun = Math.floor(pts/PER_PUNISH), prog = pts % PER_PUNISH, toNext = PER_PUNISH - prog;
-    return `<article class="panel pcard">
+    return `<article class="panel pcard clickable" data-player="${esc(p.id)}" role="button" tabindex="0" aria-label="Open ${esc(p.name)}'s page">
       <span class="rank">#${i+4}</span>
       <canvas class="figure" data-skin="${esc(p.skin||"")}" data-kind="fig" aria-label="${esc(p.name)}'s skin"></canvas>
       <div class="name">${esc(p.name)}${nickHtml(p)}</div>
       <div class="pts num">${pts}<small>pts</small></div>
       <div class="meter" title="${toNext} of ${PER_PUNISH} hearts left before the next punishment">${Array.from({length:PER_PUNISH},(_,k)=>HEART(k < toNext)).join("")}</div>
       <div class="owed"><b>${pun}</b> punishment${pun===1?"":"s"} · ${toNext} to next</div>
+      ${badgesHtml(p.id)}
       ${editBtns(p)}
     </article>`;
   }).join("");
@@ -1023,13 +1059,13 @@ function renderShame(){
   const killer = c => { const m = /(?:by|fighting) ([A-Z][A-Za-z ]*?)$/.exec(c || ""); return m ? m[1] : null; };
   const count = arr => arr.reduce((m,k) => (k == null ? m : (m[k] = (m[k]||0) + 1, m)), {});
   const top = obj => { const e = Object.entries(obj).sort((a,b) => b[1]-a[1]); if (!e.length) return null; const best = e[0][1]; return {n: best, keys: e.filter(x => x[1] === best).map(x => x[0])}; };
-  let tieNote = "";
-  const names = ids => { if (ids.length > 2){ tieNote = ids.map(nm).join(", "); return ids.length + "-way tie"; } return ids.map(nm).join(" & "); };
+  let tieNote = "", lastKeys = null;
+  const names = ids => { lastKeys = ids; if (ids.length > 2){ tieNote = ids.map(nm).join(", "); return ids.length + "-way tie"; } return ids.map(nm).join(" & "); };
   const hours = ms => { const m = Math.round(ms/60000), d = Math.floor(m/1440), hh = Math.floor(m%1440/60), mm = m%60; return (d ? d+"d " : "") + (d||hh ? hh+"h " : "") + mm+"m"; };
   const dayOf = iso => { const t = new Date(iso); return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`; };
   const timed = sortedDeaths().filter(d => d.time && !d.reverted);
   const cards = [];
-  const card = (label, big, sub, headId) => { cards.push({label, big, sub: tieNote ? sub + " · " + tieNote : sub, headId: tieNote ? null : headId}); tieNote = ""; };
+  const card = (label, big, sub, headId) => { cards.push({label, big, sub: tieNote ? sub + " · " + tieNote : sub, headId: tieNote ? null : headId, holders: lastKeys || (headId ? [headId] : [])}); tieNote = ""; lastKeys = null; };
 
   const most = top(count(deaths.map(d => d.player)));
   if (most) card("Frequent Flyer", `${names(most.keys)}`, `Most deaths: ${most.n}`, most.keys[0]);
@@ -1078,6 +1114,8 @@ function renderShame(){
   const fewest = players.map(p => [p.id, counts[p.id] || 0]).sort((a,b) => a[1]-b[1]);
   if (fewest.length){ const n = fewest[0][1], ids = fewest.filter(x => x[1] === n).map(x => x[0]); card("Survivor", names(ids), n ? `Only ${n} death${n===1?"":"s"}. Suspicious.` : "Never died. Suspicious.", ids[0]); }
 
+  awardsBy = {};
+  cards.filter(c => c.holders.length <= 2).forEach(c => c.holders.forEach(id => { if (!byId[id]) return; (awardsBy[id] = awardsBy[id] || []).push({label: c.label, sub: c.sub}); }));
   shameCards = cards.map(c => ({...c, skin: c.headId ? (byId[c.headId]?.skin || "") : null}));
   if (shameIdx == null || shameIdx >= shameCards.length) shameIdx = Math.floor(Math.random() * shameCards.length);
   showShame();
@@ -1098,6 +1136,104 @@ function renderPunishments(list){
   $("punList").querySelectorAll("canvas[data-kind]").forEach(cv => { drawHead(cv, null); const id = cv.dataset.skin; if (id) loadImg(id).then(im => { if (im) drawHead(cv, im); }); });
   sec.hidden = false;
 }
+
+// ---------- badges, player pages, rules ----------
+let awardsBy = {}, punData = [];
+const ICONS = {
+  "Frequent Flyer":         ["#E0E0E0", "0111110.1111111.1001001.1001001.1111111.0110110.0101010"],
+  "Skeleton's Favorite":    ["#E8E4D0", "1100000.1110000.0111000.0011100.0001110.0000111.0000011"],
+  "Creeper Magnet":         ["#5DBB3A", "1111111.1001001.1001001.1110111.1100011.1100011.1101011"],
+  "Gravity Check":          ["#7FB0FF", "0011100.0011100.0011100.1111111.0111110.0011100.0001000"],
+  "Hot Tub Enthusiast":     ["#FF8A2A", "0001000.0011000.0011100.0111110.1111111.1111111.0111110"],
+  "Animal Control":         ["#C9A37A", "0100010.0100010.0000000.1010101.0011100.0111110.0111110"],
+  "Can't Stop, Won't Stop": ["#FF5555", "0110110.1111111.1111111.0111110.0011100.0001000.0000000"],
+  "Survivor":               ["#7EC8FF", "1111111.1111111.1111111.1111111.0111110.0011100.0001000"],
+  "Speedrun Any%":          ["#FFE14D", "0001110.0011100.0111000.1111111.0001110.0011100.0111000"],
+  "Golden Age":             ["#FFC83D", "1111111.0111110.0011100.0001000.0011100.0111110.1111111"],
+};
+function iconSvg(label){
+  const ic = ICONS[label]; if (!ic) return "";
+  const [color, rows] = ic; let r = "";
+  rows.split(".").forEach((row, y) => [...row].forEach((c, x) => { if (c === "1") r += `<rect x="${x}" y="${y}" width="1" height="1"/>`; }));
+  return `<svg viewBox="0 0 7 7" fill="${color}" aria-hidden="true">${r}</svg>`;
+}
+function badgesHtml(id){
+  const list = (awardsBy[id] || []).filter(a => ICONS[a.label]);
+  if (!list.length) return "";
+  return `<div class="badges">${list.map(a => `<span class="badge" title="${esc(a.label)}: ${esc(a.sub)}">${iconSvg(a.label)}</span>`).join("")}</div>`;
+}
+function openOverlay(html, focusSel){
+  $("ovBody").innerHTML = html;
+  $("overlay").hidden = false; document.body.classList.add("ov-open");
+  $("ovBody").querySelectorAll("canvas[data-kind]").forEach(cv => {
+    const draw = im => cv.dataset.kind === "fig" ? drawFigure(cv, im) : drawHead(cv, im);
+    draw(null); const id = cv.dataset.skin; if (id) loadImg(id).then(im => { if (im) draw(im); });
+  });
+  const c = $("overlay").querySelector(".ov-close"); if (c) c.focus();
+}
+function closeOverlay(){
+  $("overlay").hidden = true; document.body.classList.remove("ov-open");
+  if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+}
+function playerPageHtml(id){
+  const p = players.find(x => x.id === id); if (!p) return null;
+  const t = totals(), pts = t[id] || 0, pun = Math.floor(pts / PER_PUNISH), left = PER_PUNISH - pts % PER_PUNISH;
+  const rank = [...players].sort((a,b) => (t[b.id]||0) - (t[a.id]||0) || a.name.localeCompare(b.name)).findIndex(x => x.id === id) + 1;
+  const myDeaths = sortedDeaths().filter(d => d.player === id).reverse();
+  const myPun = [...punData].filter(x => x.player === id).sort((a,b) => Date.parse(b.time||0) - Date.parse(a.time||0));
+  const awards = awardsBy[id] || [];
+  return `<div class="pp-top">
+      <canvas class="figure" data-kind="fig" data-skin="${esc(p.skin||"")}"></canvas>
+      <div><h2 id="ovTitle">${esc(p.name)}${p.nick && p.nick !== p.name ? `<span class="nick">(${esc(p.nick)})</span>` : ""}</h2>
+      <div class="meter" title="${left} of ${PER_PUNISH} hearts left before the next punishment">${Array.from({length:PER_PUNISH},(_,k)=>HEART(k < left)).join("")}</div>
+      ${badgesHtml(id).replace('class="badges"','class="badges" style="justify-content:flex-start;margin-top:8px"')}</div>
+    </div>
+    <div class="pp-stats">
+      <div class="slot stat"><span class="label">Rank</span><span class="v shadowed num">#${rank}</span></div>
+      <div class="slot stat"><span class="label">Points</span><span class="v shadowed num">${pts}</span></div>
+      <div class="slot stat"><span class="label">Deaths</span><span class="v shadowed num">${myDeaths.length}</span></div>
+      <div class="slot stat"><span class="label">Punish&shy;ments</span><span class="v red shadowed num">${pun}</span></div>
+    </div>
+    <div class="pp-sec"><h3>Awards</h3>${awards.length ? `<ul class="pp-list">${awards.map(a => `<li class="slot"><span class="pp-award">${ICONS[a.label] ? `<span class="badge">${iconSvg(a.label)}</span>` : ""}<b>${esc(a.label)}</b></span><span class="when">${esc(a.sub)}</span></li>`).join("")}</ul>` : `<p class="pp-empty">No Hall of Shame awards. Yet.</p>`}</div>
+    <div class="pp-sec"><h3>Punishments</h3>${myPun.length ? `<ul class="pp-list">${myPun.map(x => `<li class="slot"><span>${esc(x.text)}</span><span class="when">${x.time ? esc(fmtWhen(x.time).replace(/ @ .*/,"")) : ""}</span></li>`).join("")}</ul>` : `<p class="pp-empty">No punishments so far.</p>`}</div>
+    <div class="pp-sec"><h3>Deaths</h3>${myDeaths.length ? `<ul class="pp-list">${myDeaths.map(d => `<li class="slot"><span>${esc(d.cause)}${d.reverted ? ' <span class="totem">REVERTED</span>' : ""}</span><span class="when">${d.time ? esc(fmtWhen(d.time)) : d.date ? esc(fmtDate(d.date)) : "Not tracked"}</span></li>`).join("")}</ul>` : `<p class="pp-empty">Hasn't died. Impressive.</p>`}</div>`;
+}
+function rulesHtml(){
+  const rows = AGES.map(a => `<tr><td>${ageChip(a.key)}</td><td>+${a.pts}</td></tr>`).join("");
+  return `<div class="rules-body">
+    <h2 id="ovTitle">Server rules</h2>
+    <div class="pp-sec"><h3>Shared life</h3><ul>
+      <li>This is a shared-life hardcore world. If anyone dies, the world resets for everyone.</li>
+      <li>Deaths that get rolled back are marked as reverted and don't end the world.</li>
+    </ul></div>
+    <div class="pp-sec"><h3>Points for dying</h3><p>How many points you get depends on the age the server is in when you die:</p>
+      <table>${rows}</table>
+      <p>If a totem farm has been built, every death costs <b>+1</b> extra.</p></div>
+    <div class="pp-sec"><h3>Punishments</h3><ul>
+      <li>Every <b>5 points</b> earns a punishment (at 5, 10, 15 and so on).</li>
+      <li>Whoever crosses the line does the current punishment. Right now that's: <b>${esc($("cpText").textContent)}</b>.</li>
+      <li>The hearts on each player show how many points they have left before their next punishment.</li>
+    </ul></div>
+    <div class="pp-sec"><h3>Progression</h3><p>The server plays Vanilla Progression: Wilderness Bound. The quest tracker on the main page shows the current age and quest.</p></div>
+  </div>`;
+}
+function route(){
+  const hsh = decodeURIComponent(location.hash.slice(1));
+  if (hsh === "rules") openOverlay(rulesHtml());
+  else if (hsh.startsWith("player-")){ const html = playerPageHtml(hsh.slice(7)); if (html) openOverlay(html); else closeOverlay(); }
+  else if (!$("overlay").hidden){ $("overlay").hidden = true; document.body.classList.remove("ov-open"); }
+}
+addEventListener("hashchange", route);
+document.addEventListener("click", e => {
+  if (e.target.closest("[data-close]")){ closeOverlay(); return; }
+  const c = e.target.closest("[data-player]");
+  if (c && !e.target.closest("button")) location.hash = "player-" + c.dataset.player;
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && !$("overlay").hidden) closeOverlay();
+  const c = e.target.closest && e.target.closest("[data-player]");
+  if (c && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); location.hash = "player-" + c.dataset.player; }
+});
 // ---------- data ----------
 function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
 function updatePreview(){}
@@ -1110,11 +1246,20 @@ fetch("data.json", {cache:"no-store"}).then(r => { if (!r.ok) throw 0; return r.
   if (d.progress){ progress = d.progress; viewAge = progress.age; renderQuests(); }
   renderLastDeath(d.lastDeath);
   renderShame();
+  punData = d.punishments || [];
   renderPunishments(d.punishments);
   render();
+  route();
   setStatus("Updated " + (d.updated || "recently"), "live");
 }).catch(() => setStatus("Couldn't load the standings. Refresh to try again.", "warn"));
 </script>
 
+<div class="overlay" id="overlay" hidden>
+  <div class="ov-back" data-close></div>
+  <div class="panel ov-panel" role="dialog" aria-modal="true" aria-labelledby="ovTitle">
+    <button type="button" class="ov-close" data-close aria-label="Close">✕</button>
+    <div id="ovBody"></div>
+  </div>
+</div>
 </body>
 </html>
