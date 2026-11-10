@@ -418,6 +418,23 @@ body.has-ticker{padding-top:36px}
 .cookie .ck{flex:none;display:block;line-height:0}
 .cookie .ck svg{display:block}
 .ck-burst{position:absolute;pointer-events:none;z-index:3}
+.tk-gold{color:#FFD23F;font-weight:700}
+.ck-mini{display:inline-block;vertical-align:middle;margin-left:8px;line-height:0;filter:drop-shadow(1px 1px 0 rgba(0,0,0,.25))}
+.ck-mini svg{display:block}
+.ck-mini.gold{animation:miniGlow 1.6s steps(2) infinite}
+@keyframes miniGlow{50%{filter:drop-shadow(0 0 3px #FFD23F) drop-shadow(1px 1px 0 rgba(0,0,0,.25))}}
+.pf-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.pf-list li{display:grid;grid-template-columns:auto 1fr auto auto;gap:6px 12px;align-items:center;padding:8px 10px;font-size:14px;color:#FFFFFF}
+.pf-list li.gold{box-shadow:inset 2px 2px 0 #373737, inset -2px -2px 0 #FFFFFF, 0 0 0 2px #FFD23F}
+.pf-d{font-size:12px;opacity:.85;white-space:nowrap}
+.pf-t{min-width:0}
+.pf-o{font-size:12px;color:#FFFF55;white-space:nowrap}
+.pf-v{font-size:12px;font-weight:700;white-space:nowrap;padding:2px 6px}
+.pf-v.dead{background:#B3261E;color:#FFFFFF}
+.pf-v.alive{background:#2E6B1F;color:#FFFFFF}
+@media (max-width:620px){.pf-list li{grid-template-columns:1fr auto}.pf-t{grid-column:1 / -1;order:3}.pf-o{order:2}.pf-d{order:1}.pf-v{order:4;justify-self:start}}
+@media (prefers-reduced-motion:reduce){.ck-mini.gold{animation:none}}
+
 .cookie .ck{position:relative}
 .cookie.golden{box-shadow:inset 2px 2px 0 #373737, inset -2px -2px 0 #FFFFFF, 0 0 0 2px #FFD23F}
 .cookie .slip.gold{background:#FFF8D6;box-shadow:3px 3px 0 #B07400}
@@ -1025,7 +1042,7 @@ function render(){
         ${(() => { const left = PER_PUNISH - ((t[p.id]||0) % PER_PUNISH); return `<div class="meter pod-meter" title="${left} of ${PER_PUNISH} hearts left before the next punishment">${Array.from({length:PER_PUNISH},(_,k)=>HEART(k < left)).join("")}</div>`; })()}
         <canvas class="figure" data-skin="${esc(p.skin||"")}" data-kind="fig" aria-label="${esc(p.name)}'s skin"></canvas>
         <div class="name">${esc(p.name)}${nickHtml(p)}</div>
-        <div class="pts num">${t[p.id]||0}<small>pts</small></div>
+        <div class="pts num">${t[p.id]||0}<small>pts</small>${miniCookie(p.id)}</div>
         ${badgesHtml(p.id)}
         ${editBtns(p)}
         <div class="step"><i class="pumpkin" aria-hidden="true"></i><span>${rk[i]}</span></div>
@@ -1061,7 +1078,7 @@ function render(){
       <span class="rank">#${i+4}</span>
       <canvas class="figure" data-skin="${esc(p.skin||"")}" data-kind="fig" aria-label="${esc(p.name)}'s skin"></canvas>
       <div class="name">${esc(p.name)}${nickHtml(p)}</div>
-      <div class="pts num">${pts}<small>pts</small></div>
+      <div class="pts num">${pts}<small>pts</small>${miniCookie(p.id)}</div>
       <div class="meter" title="${toNext} of ${PER_PUNISH} hearts left before the next punishment">${Array.from({length:PER_PUNISH},(_,k)=>HEART(k < toNext)).join("")}</div>
       <div class="owed"><b>${pun}</b> punishment${pun===1?"":"s"} · ${toNext} to next</div>
       ${badgesHtml(p.id)}
@@ -1781,6 +1798,7 @@ function playerPageHtml(id){
       <div class="slot stat"><span class="label">Punish&shy;ments</span><span class="v red shadowed num">${pun}</span></div>
     </div>
     ${cookieHtml(id)}
+    ${pastFortunesHtml(id)}
     <div class="pp-sec"><h3>Awards</h3>${awards.length ? `<ul class="pp-list">${awards.map(a => `<li class="slot"><span class="pp-award">${ICONS[a.label] ? `<span class="badge">${iconSvg(a.label)}</span>` : ""}<b>${esc(a.label)}</b></span><span class="when">${esc(a.sub)}</span></li>`).join("")}</ul>` : `<p class="pp-empty">No Hall of Shame awards. Yet.</p>`}</div>
     <div class="pp-sec"><h3>Punishments</h3>${myPun.length ? `<ul class="pp-list">${myPun.map(x => `<li class="slot"><span>${esc(x.text)}</span><span class="when">${x.time ? esc(fmtWhen(x.time).replace(/ @ .*/,"")) : ""}</span></li>`).join("")}</ul>` : `<p class="pp-empty">No punishments so far.</p>`}</div>
     <div class="pp-sec"><h3>Deaths</h3>${myDeaths.length ? `<ul class="pp-list">${myDeaths.map(d => `<li class="slot"><span>${esc(d.cause)}${d.reverted ? ' <span class="totem">REVERTED</span>' : ""}</span><span class="when">${d.time ? esc(fmtWhen(d.time)) : d.date ? esc(fmtDate(d.date)) : "Not tracked"}</span></li>`).join("")}</ul>` : `<p class="pp-empty">Hasn't died. Impressive.</p>`}</div>`;
@@ -2185,13 +2203,16 @@ function stockFor(id){
   return {price, change: prev ? (price - prev) / prev : 0};
 }
 // Chance of dying today: players who die more often get higher odds, plus a daily swing. Same for everyone.
-function deathOdds(id){
-  const all = realDeaths(), counts = {};
+// Uses only deaths from before the given day, so the odds stay the same all day.
+const dayStart = day => { const d = new Date(day || new Date()); d.setHours(0, 0, 0, 0); return d; };
+const deathsBefore = day => { const t = dayStart(day).getTime(); return realDeaths().filter(d => deathMs(d) && deathMs(d) < t); };
+function deathOdds(id, day){
+  const all = deathsBefore(day), counts = {}, start = dayStart(day).getTime();
   all.forEach(d => counts[d.player] = (counts[d.player] || 0) + 1);
   const max = Math.max(1, ...Object.values(counts));
   const lastMine = all.filter(d => d.player === id).map(deathMs).pop() || 0;
-  const recent = lastMine && Date.now() - lastMine < 3 * 86400000 ? 10 : 0;
-  const swing = (hashStr("odds|" + id + "|" + dateKey(new Date())) - 0.5) * 36;
+  const recent = lastMine && start - lastMine < 3 * 86400000 ? 10 : 0;
+  const swing = (hashStr("odds|" + id + "|" + dateKey(dayStart(day))) - 0.5) * 36;
   return Math.max(3, Math.min(97, Math.round(18 + 52 * (counts[id] || 0) / max + recent + swing)));
 }
 const FORTUNES = {
@@ -2279,9 +2300,9 @@ const FORTUNES = {
   ]
 };
 const LUCKY = ["Copper","Diamond","Emerald","Lapis","Redstone","Gold","Iron","Coal","Amethyst","Quartz","Netherite","Wheat","Bread","Torches","A water bucket","A golden apple","Your bed","Cobblestone","A shield","Totem vibes"];
-function fortuneFor(id){
-  const k = dateKey(new Date()), r = n => hashStr("fortune|" + n + "|" + id + "|" + k);
-  const killers = realDeaths().filter(d => d.player === id).map(d => killerOf(d.cause)).filter(Boolean);
+function fortuneFor(id, day){
+  const k = dateKey(dayStart(day)), r = n => hashStr("fortune|" + n + "|" + id + "|" + k);
+  const killers = deathsBefore(day).filter(d => d.player === id).map(d => killerOf(d.cause)).filter(Boolean);
   const tones = ["funny", "funny", "savage", "wholesome"];
   if (killers.length) tones.push("killer");
   const tone = tones[Math.floor(r("tone") * tones.length)];
@@ -2290,7 +2311,7 @@ function fortuneFor(id){
   if (tone === "killer"){
     const counts = {}; killers.forEach(x => counts[x] = (counts[x] || 0) + 1);
     const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
-    text = text.replace("{k}", "The " + top);
+    text = text.startsWith("{k}") ? text.replace("{k}", "The " + top) : text.replace("{k}", (/^[AEIOU]/i.test(top) ? "an " : "a ") + top);
   }
   return {text, lucky: LUCKY[Math.floor(r("lucky") * LUCKY.length)]};
 }
@@ -2322,6 +2343,7 @@ function renderTicker(){
     const p = players.find(x => x.id === last.player);
     news.push(`<span class="tk-it"><span class="tk-k">LATEST</span>${esc(shortName(p))} ${esc(causeText(last.cause))}${deathMs(last) ? ` <span class="tk-dim">· ${esc(agoText(deathMs(last)))}</span>` : ""}</span>`);
   }
+  players.filter(p => isGolden(p.id)).forEach(p => news.push(`<span class="tk-it"><span class="tk-gold">★ GOLDEN COOKIE</span>${esc(shortName(p))} got lucky today. Crack it on their page!</span>`));
   const odds = players.map(p => ({p, o: deathOdds(p.id)})).sort((a, b) => b.o - a.o)[0];
   if (odds) news.push(`<span class="tk-it"><span class="tk-k">FORECAST</span>Most likely to die today: ${esc(shortName(odds.p))} (${odds.o}%)</span>`);
   onThisDay().forEach(x => { const p = players.find(y => y.id === x.d.player); news.push(`<span class="tk-it"><span class="tk-k">${esc(x.label.toUpperCase())}</span>${esc(shortName(p))} ${esc(causeText(x.d.cause))}</span>`); });
@@ -2434,7 +2456,7 @@ function cookieCrumbs(host, golden){
   requestAnimationFrame(step);
 }
 // A golden cookie shows up for a player about 1 day in 50
-const isGolden = id => hashStr("golden|" + id + "|" + dateKey(new Date())) < 0.02;
+const isGolden = (id, day) => hashStr("golden|" + id + "|" + dateKey(dayStart(day))) < 0.02;
 const GOLDEN_FORTUNES = [
   "Golden cookie! The server gods smile on you today.",
   "Legendary luck: today, nothing can touch you. Probably.",
@@ -2447,12 +2469,35 @@ const GOLDEN_FORTUNES = [
 const CK_KEY = "hct-cookies";
 function crackedToday(){ try { const v = JSON.parse(localStorage.getItem(CK_KEY) || "{}"); return v.day === dateKey(new Date()) ? (v.ids || []) : []; } catch(e){ return []; } }
 function markCracked(id){ try { const ids = crackedToday(); if (!ids.includes(id)) ids.push(id); localStorage.setItem(CK_KEY, JSON.stringify({day: dateKey(new Date()), ids})); } catch(e){} }
+// The fortune, odds and lucky item for a player on a day (today if no day is given)
+function fortuneSlip(id, day){
+  const golden = isGolden(id, day), f = fortuneFor(id, day), real = deathOdds(id, day);
+  return {golden, odds: golden ? Math.max(1, Math.round(real / 4)) : real,
+    text: golden ? GOLDEN_FORTUNES[Math.floor(hashStr("gf|" + id + "|" + dateKey(dayStart(day))) * GOLDEN_FORTUNES.length)] : f.text,
+    lucky: golden ? "Literally everything" : f.lucky};
+}
 function cookieOpenInner(id){
-  const p = players.find(x => x.id === id), golden = isGolden(id);
-  const f = fortuneFor(id), real = deathOdds(id), odds = golden ? Math.max(1, Math.round(real / 4)) : real;
-  const text = golden ? GOLDEN_FORTUNES[Math.floor(hashStr("gf|" + id + "|" + dateKey(new Date())) * GOLDEN_FORTUNES.length)] : f.text;
+  const p = players.find(x => x.id === id), f = fortuneSlip(id), golden = f.golden;
   const day = new Date().toLocaleDateString(undefined, {month: "short", day: "numeric"}).toUpperCase();
-  return `<span class="ck">${COOKIE_OPEN_SVG(golden ? CK_GOLD : CK_PAL)}</span><div class="slip${golden ? " gold" : ""}" role="status"><b class="hd">${golden ? "★ GOLDEN COOKIE · " : ""}${esc(shortName(p).toUpperCase())} · ${esc(day)}</b>${esc(text)}<span class="odds">☠ ${odds}% chance of death today${golden ? " (golden luck)" : ""}</span><span class="lucky">Lucky item: ${esc(golden ? "Literally everything" : f.lucky)}</span></div>`;
+  return `<span class="ck">${COOKIE_OPEN_SVG(golden ? CK_GOLD : CK_PAL)}</span><div class="slip${golden ? " gold" : ""}" role="status"><b class="hd">${golden ? "★ GOLDEN COOKIE · " : ""}${esc(shortName(p).toUpperCase())} · ${esc(day)}</b>${esc(f.text)}<span class="odds">☠ ${f.odds}% chance of death today${golden ? " (golden luck)" : ""}</span><span class="lucky">Lucky item: ${esc(f.lucky)}</span></div>`;
+}
+// Last few days of fortunes, and whether they "came true" (the player died that day)
+function pastFortunesHtml(id){
+  const rows = [];
+  for (let n = 1; n <= 5; n++){
+    const day = new Date(); day.setDate(day.getDate() - n);
+    const k = dateKey(day), f = fortuneSlip(id, day);
+    const died = realDeaths().filter(d => d.player === id && deathDay(d) === k);
+    const verdict = died.length ? `<span class="pf-v dead">☠ Died: ${esc(died[died.length - 1].cause)}</span>` : `<span class="pf-v alive">Survived</span>`;
+    rows.push(`<li class="slot${f.golden ? " gold" : ""}"><span class="pf-d">${esc(day.toLocaleDateString(undefined, {weekday: "short", month: "short", day: "numeric"}))}${f.golden ? " ★" : ""}</span><span class="pf-t">${esc(f.text)}</span><span class="pf-o">${f.odds}% odds</span>${verdict}</li>`);
+  }
+  return `<div class="pp-sec"><h3>Past fortunes</h3><ul class="pf-list">${rows.join("")}</ul></div>`;
+}
+const MINI_CK = {};
+function miniCookie(id){
+  const golden = isGolden(id), key = golden ? "g" : "n";
+  if (!MINI_CK[key]) MINI_CK[key] = COOKIE_CLOSED_SVG(golden ? CK_GOLD : CK_PAL).replace(/style="[^"]*"/, 'style="width:30px;height:auto"');
+  return `<span class="ck-mini${golden ? " gold" : ""}" title="${golden ? "Golden cookie today! Open their page to crack it" : "Today's fortune cookie: open their page to crack it"}">${MINI_CK[key]}</span>`;
 }
 function cookieHtml(id){
   const golden = isGolden(id);
