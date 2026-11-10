@@ -583,7 +583,7 @@ function render(){
       <div class="spot-txt">
         <span class="name">${esc(c.p.name)}${nickHtml(c.p)}</span>
         <span class="which">Punishment #${c.next} next · ${c.pts} pts total</span>
-        <div class="meter">${Array.from({length:PER_PUNISH},(_,k)=>HEART(k<prog)).join("")}</div>
+        <div class="meter" title="${PER_PUNISH - prog} of ${PER_PUNISH} hearts left before the next punishment">${Array.from({length:PER_PUNISH},(_,k)=>HEART(k < PER_PUNISH - prog)).join("")}</div>
       </div>
     </div>`).join("")}</div>`;
   }
@@ -598,7 +598,7 @@ function render(){
       <canvas class="figure" data-skin="${esc(p.skin||"")}" data-kind="fig" aria-label="${esc(p.name)}'s skin"></canvas>
       <div class="name">${esc(p.name)}${nickHtml(p)}</div>
       <div class="pts num">${pts}<small>pts</small></div>
-      <div class="meter" title="${prog} of ${PER_PUNISH} toward the next punishment">${Array.from({length:PER_PUNISH},(_,k)=>HEART(k<prog)).join("")}</div>
+      <div class="meter" title="${toNext} of ${PER_PUNISH} hearts left before the next punishment">${Array.from({length:PER_PUNISH},(_,k)=>HEART(k < toNext)).join("")}</div>
       <div class="owed"><b>${pun}</b> punishment${pun===1?"":"s"} · ${toNext} to next</div>
       ${editBtns(p)}
     </article>`;
