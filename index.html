@@ -51,6 +51,7 @@
   --ok:#55FF55; --shade:rgba(0,0,0,.38); color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 #pano{position:fixed;inset:0;width:100%;height:100%;z-index:-2;image-rendering:pixelated;filter:blur(1.5px);transform:scale(1.04)}
 .pano-shade{position:fixed;inset:0;z-index:-1;background:var(--shade)}
 
@@ -141,6 +142,14 @@ header.top .sub{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-siz
 .rules .note{font-size:14px;color:var(--muted);margin-top:8px}
 .rules .note b{color:var(--accent)}
 
+.lastdeath{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:10px;background:var(--danger-panel)}
+.lastdeath .tag{font-family:var(--f-label);font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);flex:none}
+.ld-head{padding:4px;flex:none;display:inline-flex}
+.ld-head canvas{width:26px;height:26px;image-rendering:pixelated;display:block}
+.ld-text{font-size:16px;flex:1 1 220px;min-width:0}
+.ld-text b{font-weight:700}
+.ld-text .nick{display:inline;font-size:inherit;color:var(--muted);margin:0 2px}
+.ld-time{font-size:14px;color:var(--muted);flex:none}
 .tipbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:12px}
 .tipbar .tag{font-family:var(--f-label);font-weight:700;font-size:12px;letter-spacing:.08em;color:#FFFF55;background:#3F3F3F;padding:4px 8px;box-shadow:inset 2px 2px 0 #5E5E5E, inset -2px -2px 0 #1E1E1E;text-shadow:2px 2px 0 #3F3F15;flex:none}
 .tipbar .text{flex:1 1 240px;min-width:0;font-size:16px}
@@ -277,6 +286,13 @@ button:disabled{opacity:.5;cursor:default}
     </div>
     <div class="status" id="status">Loading the server's record…</div>
   </header>
+
+  <section class="panel lastdeath" id="lastDeath" hidden aria-label="Most recent death">
+    <span class="tag">Most recent death:</span>
+    <span class="ld-head slot"><canvas id="ldHead" data-kind="head" data-skin=""></canvas></span>
+    <span class="ld-text" id="ldText"></span>
+    <span class="ld-time" id="ldTime"></span>
+  </section>
 
   <section class="panel tipbar" aria-label="Survival tip">
     <span class="tag">TIP</span>
@@ -762,6 +778,25 @@ document.addEventListener("click", e => {
 });
 fetch("quests.json", {cache:"no-store"}).then(r => r.json()).then(q => { QUESTS = q; renderQuests(); }).catch(() => { $("qAge").textContent = "Couldn't load the quest list."; });
 
+
+function fmtWhen(iso){
+  const d = new Date(iso); if (isNaN(d)) return "";
+  try{
+    const parts = Object.fromEntries(new Intl.DateTimeFormat(undefined, {month:"short", day:"2-digit", year:"numeric", hour:"numeric", minute:"2-digit", timeZoneName:"short"}).formatToParts(d).map(x => [x.type, x.value]));
+    return `${parts.month} ${parts.day}. ${parts.year} @ ${parts.hour}:${parts.minute} ${(parts.dayPeriod||"").toLowerCase()} ${parts.timeZoneName||""}`.replace(/\s+/g," ").trim();
+  }catch(e){ return d.toLocaleString(); }
+}
+function renderLastDeath(ld){
+  const box = $("lastDeath");
+  if (!ld || !ld.player){ box.hidden = true; return; }
+  const p = players.find(x => x.id === ld.player);
+  const name = p ? p.name : ld.player;
+  $("ldText").innerHTML = `Most recent to die was <b>${esc(name)}</b>${p && p.nick && p.nick !== p.name ? nickHtml(p) : ""} by ${esc(ld.cause || "unknown causes")}`;
+  $("ldTime").textContent = ld.time ? "(" + fmtWhen(ld.time) + ")" : "";
+  const cv = $("ldHead"); drawHead(cv, null);
+  if (p && p.skin) loadImg(p.skin).then(im => { if (im) drawHead(cv, im); });
+  box.hidden = false;
+}
 // ---------- data ----------
 function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
 function updatePreview(){}
@@ -772,6 +807,7 @@ fetch("data.json", {cache:"no-store"}).then(r => { if (!r.ok) throw 0; return r.
   $("cpText").textContent = cp.text || "None right now";
   players = d.players || []; deaths = d.deaths || [];
   if (d.progress){ progress = d.progress; viewAge = progress.age; renderQuests(); }
+  renderLastDeath(d.lastDeath);
   render();
   setStatus("Updated " + (d.updated || "recently"), "live");
 }).catch(() => setStatus("Couldn't load the standings. Refresh to try again.", "warn"));

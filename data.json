@@ -88,5 +88,10 @@
   },
   "currentPunishment": {
     "text": "Apology video"
+  },
+  "lastDeath": {
+    "player": "subkiwi",
+    "cause": "Skeleton",
+    "time": "2026-11-09T18:00:00-08:00"
   }
 }
