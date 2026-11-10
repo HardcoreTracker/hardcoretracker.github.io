@@ -1679,7 +1679,13 @@ function applySeason(){
   if (hol === "newyear") setTimeout(() => launchFireworks(9000), 1200);
   if (hol === "aprilfools" && !skinsSwapped && players.length > 1){
     skinsSwapped = true;
-    const skins = players.map(p => p.skin); skins.push(skins.shift());
+    // Random shuffle on every page load, making sure nobody keeps their own skin
+    const orig = players.map(p => p.skin);
+    let skins;
+    do {
+      skins = [...orig];
+      for (let i = skins.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [skins[i], skins[j]] = [skins[j], skins[i]]; }
+    } while (skins.some((s, i) => s === orig[i]));
     players.forEach((p, i) => p.skin = skins[i]);
     render();
   }
