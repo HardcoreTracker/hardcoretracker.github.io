@@ -418,6 +418,15 @@ body.has-ticker{padding-top:36px}
 .cookie .ck{flex:none;display:block;line-height:0}
 .cookie .ck svg{display:block}
 .ck-burst{position:absolute;pointer-events:none;z-index:3}
+.cookie .ck{position:relative}
+.cookie.golden{box-shadow:inset 2px 2px 0 #373737, inset -2px -2px 0 #FFFFFF, 0 0 0 2px #FFD23F}
+.cookie .slip.gold{background:#FFF8D6;box-shadow:3px 3px 0 #B07400}
+.cookie .slip.gold b.hd{color:#B07400}
+.spk{position:absolute;width:6px;height:6px;background:#FFFFFF;box-shadow:0 0 0 2px #FFD23F;animation:spk 1.4s steps(2) infinite;pointer-events:none}
+.spk.s1{left:-4px;top:4px}.spk.s2{right:2px;top:-4px;animation-delay:.45s}.spk.s3{right:-6px;bottom:10px;animation-delay:.9s}
+@keyframes spk{0%,100%{opacity:0;transform:scale(.5)}50%{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.spk{animation:none;opacity:.8}}
+
 .cookie .ck-hint{font-size:15px;color:#FFFFFF;text-shadow:2px 2px 0 #3F3F3F}
 .cookie.wobble .ck{animation:ckWobble .5s steps(6) 1}
 @keyframes ckWobble{0%,100%{transform:rotate(0)}20%{transform:rotate(-8deg)}40%{transform:rotate(8deg)}60%{transform:rotate(-6deg)}80%{transform:rotate(5deg)}}
@@ -2355,43 +2364,47 @@ setInterval(() => { if (!document.hidden && players.length) renderTicker(); }, 3
 // Fortune cookie on player pages
 const PIX = (rows, pal) => { let r = ""; rows.forEach((row, y) => [...row].forEach((c, x) => { if (pal[c]) r += `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${pal[c]}"/>`; })); return r; };
 const CK_PAL = {"o": "#2B1606", "h": "#FFF4D6", "l": "#FFD58A", "b": "#F4A640", "s": "#D9822B", "d": "#A85A17", "p": "#FFFFFF", "g": "#D6D6D6", "r": "#D32F2F"};
-const COOKIE_CLOSED = `<svg viewBox="0 0 28 16" style="width:98px;height:56px" shape-rendering="crispEdges" aria-hidden="true">${PIX([
-  "........oo....oooooo........",
-  ".....ooolloooolllllboo......",
-  "....ollllllldshhllllbbo.....",
-  "...olhhlllloddlllllllbbo....",
-  "..ollllllloosllllllbbbbso...",
-  "..ollllllbosllllllbbbbbso...",
-  ".obllllbbbosllllbbbbbbsso...",
-  ".obllbbbboosllbbbbbbbsssdo..",
-  "..obbbbbbooslbbbbbbssssddo..",
-  "..osbbbsssodbbbbbssssssdooo.",
-  "...ossssssoodbbbsssssdddpppo",
-  "....oddddddodbssssssdddrrrpo",
-  ".....oooddoodsssssdddddgpppo",
-  "........oo.ooddddddddppgggpo",
-  ".............ooddddooppppppo",
-  "...............oooo..oooooo."], CK_PAL)}</svg>`;
-const COOKIE_OPEN = `<svg viewBox="0 0 36 17" style="width:126px;height:60px" shape-rendering="crispEdges" aria-hidden="true">${PIX([
-  ".....................oooooo.........",
-  "........oo..........olllllboo.......",
-  ".....ooolloooo......ohhllllbbo......",
-  "....ollllllldso......ollllllbbo.....",
-  "...olhhlllloddlo.....ollllbbbbso....",
-  "..ollllllloosllo....ollllbbbbbso....",
-  "..ollllllbosllo.....ollbbbbbbsso....",
-  ".obllllbbbosllo......obbbbbbsssdo...",
-  ".obllbbbboosllbo......obbbssssddo...",
-  "..obbbbbbooslbbbo.....obssssssdo....",
-  "..osbbbsssodbbbbo....obsssssdddo....",
-  "...ossssssoodbbo.....osssssdddo.....",
-  "....oddddddodbso......ossdddddo.....",
-  ".....oooddoodssso.....odddddoo......",
-  "........oo.oodddo.....odddoo........",
-  ".............oodo......ooo..........",
-  "...............o...................."], CK_PAL)}</svg>`;
+const CK_GOLD = {"o": "#3A2600", "h": "#FFFFFF", "l": "#FFF3A0", "b": "#FFD23F", "s": "#E8A317", "d": "#B07400", "p": "#FFFFFF", "g": "#D6D6D6", "r": "#D32F2F"};
+const COOKIE_CLOSED_SVG = pal => `<svg viewBox="0 0 33 19" style="width:106px;height:61px" shape-rendering="crispEdges" aria-hidden="true">${PIX([
+  "...........oooooooooo............",
+  ".........oolllldhhhhhoo..........",
+  ".......oolllllldhhllllloo........",
+  "......obbbbbbbbddhlllllllo.......",
+  ".....obbbbbbbbbddhllllllllo......",
+  "....osbbbbbbbbbbdhlllllbbbbo.....",
+  "...ossssssssbbbbdhbbbbbbbbbbo....",
+  "..osssssssssssssdlbbbbbbbbbbbo...",
+  "..oddsssssssssssdlbbbbbbbbbsso...",
+  ".odddddddddsssssdlbbbssssssssso..",
+  ".odddddddddddddddssssssssssssso..",
+  "odddddddddddddddddssssssssssdddo.",
+  "oddddooooooodddddddsoooooooddddo.",
+  "oddoo.......odddddppppppo..ooddo.",
+  "odo.........odddppdrrrrpo....odo.",
+  ".o...........oddddpggpggpo....o..",
+  "..............ooopppppppo........",
+  "................oppooooo.........",
+  ".................oo.............."], pal)}</svg>`;
+const COOKIE_OPEN_SVG = pal => `<svg viewBox="0 0 43 17" style="width:138px;height:54px" shape-rendering="crispEdges" aria-hidden="true">${PIX([
+  "...........ooooo.........ooooo.............",
+  ".........oolllldo.......olhhhhoo...........",
+  ".......oollllllo.......odhhllllloo.........",
+  "......obbbbbbblo.......oddhlllllllo........",
+  ".....obbbbbbbbbdo.......odhllllllllo.......",
+  "....osbbbbbbbbbbdo.......ollllllbbbbo......",
+  "...ossssssssbbbbdo.......olbbbbbbbbbbo.....",
+  "..osssssssssssslo.......odlbbbbbbbbbbbo....",
+  "..oddssssssssslo.......oldlbbbbbbbbbsso....",
+  ".odddddddddssslo.......oldlbbbssssssssso...",
+  ".oddddddddddddddo.......odssssssssssssso...",
+  "oddddddddddddddddo.......odssssssssssdddo..",
+  "oddddooooooodddddo.......oddsoooooooddddo..",
+  "oddoo.......odddo.......oddoo.......ooddo..",
+  "odo.........oddo.......odoodo.........odo..",
+  ".o...........odo.......odddo...........o...",
+  "..............o.........ooo................"], pal)}</svg>`;
 // Crumbs burst out when the cookie breaks
-function cookieCrumbs(host){
+function cookieCrumbs(host, golden){
   if (reduceMotion) return;
   const hr = host.getBoundingClientRect(), ckEl = host.querySelector(".ck"), kr = ckEl ? ckEl.getBoundingClientRect() : hr, cv = document.createElement("canvas");
   const cx = kr.left - hr.left + kr.width / 2, cy = kr.top - hr.top + kr.height / 2;
@@ -2400,8 +2413,8 @@ function cookieCrumbs(host){
   cv.style.cssText = `width:${W}px;height:${H}px;left:${cx - W / 2}px;top:${cy - H / 2}px`;
   host.appendChild(cv);
   const ctx = cv.getContext("2d"); ctx.scale(dpr, dpr);
-  const cols = ["#F4A640","#FFD58A","#D9822B","#A85A17","#FFF4D6","#F4A640","#D9822B"];
-  const parts = Array.from({length: 44}, (_, k) => {
+  const cols = golden ? ["#FFD23F","#FFF3A0","#E8A317","#FFFFFF","#FFE680","#FFD23F","#B07400"] : ["#F4A640","#FFD58A","#D9822B","#A85A17","#FFF4D6","#F4A640","#D9822B"];
+  const parts = Array.from({length: golden ? 70 : 44}, (_, k) => {
     const paper = k < 6, a = Math.random() * Math.PI * 2, sp = 2 + Math.random() * 4.5;
     return {x: W / 2 + (Math.random() - .5) * 20, y: H / 2 + (Math.random() - .5) * 10, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 3,
       s: paper ? 4 : 3 + Math.floor(Math.random() * 4), c: paper ? "#FFFFFF" : cols[k % cols.length], life: 45 + Math.random() * 30, t: 0};
@@ -2420,19 +2433,66 @@ function cookieCrumbs(host){
   };
   requestAnimationFrame(step);
 }
+// A golden cookie shows up for a player about 1 day in 50
+const isGolden = id => hashStr("golden|" + id + "|" + dateKey(new Date())) < 0.02;
+const GOLDEN_FORTUNES = [
+  "Golden cookie! The server gods smile on you today.",
+  "Legendary luck: today, nothing can touch you. Probably.",
+  "A golden day. Go do the dangerous thing you've been putting off.",
+  "Your luck is maxed out. Mine some diamonds before it wears off.",
+  "Even creepers are rooting for you today.",
+  "You found the golden cookie. That's already the best thing that'll happen today."
+];
+// Remember which cookies this visitor already cracked today (only on their own device)
+const CK_KEY = "hct-cookies";
+function crackedToday(){ try { const v = JSON.parse(localStorage.getItem(CK_KEY) || "{}"); return v.day === dateKey(new Date()) ? (v.ids || []) : []; } catch(e){ return []; } }
+function markCracked(id){ try { const ids = crackedToday(); if (!ids.includes(id)) ids.push(id); localStorage.setItem(CK_KEY, JSON.stringify({day: dateKey(new Date()), ids})); } catch(e){} }
+function cookieOpenInner(id){
+  const p = players.find(x => x.id === id), golden = isGolden(id);
+  const f = fortuneFor(id), real = deathOdds(id), odds = golden ? Math.max(1, Math.round(real / 4)) : real;
+  const text = golden ? GOLDEN_FORTUNES[Math.floor(hashStr("gf|" + id + "|" + dateKey(new Date())) * GOLDEN_FORTUNES.length)] : f.text;
+  const day = new Date().toLocaleDateString(undefined, {month: "short", day: "numeric"}).toUpperCase();
+  return `<span class="ck">${COOKIE_OPEN_SVG(golden ? CK_GOLD : CK_PAL)}</span><div class="slip${golden ? " gold" : ""}" role="status"><b class="hd">${golden ? "★ GOLDEN COOKIE · " : ""}${esc(shortName(p).toUpperCase())} · ${esc(day)}</b>${esc(text)}<span class="odds">☠ ${odds}% chance of death today${golden ? " (golden luck)" : ""}</span><span class="lucky">Lucky item: ${esc(golden ? "Literally everything" : f.lucky)}</span></div>`;
+}
 function cookieHtml(id){
-  return `<div class="pp-sec"><h3>Today's fortune</h3><div class="slot cookie" role="button" tabindex="0" data-cookie="${esc(id)}" aria-label="Crack open today's fortune">
-    <span class="ck">${COOKIE_CLOSED}</span><span class="ck-hint">Click to crack open today's fortune cookie</span></div></div>`;
+  const golden = isGolden(id);
+  if (crackedToday().includes(id)) return `<div class="pp-sec"><h3>Today's fortune</h3><div class="slot cookie open${golden ? " golden" : ""}">${cookieOpenInner(id)}</div></div>`;
+  return `<div class="pp-sec"><h3>Today's fortune</h3><div class="slot cookie${golden ? " golden" : ""}" role="button" tabindex="0" data-cookie="${esc(id)}" aria-label="Crack open today's fortune">
+    <span class="ck">${COOKIE_CLOSED_SVG(golden ? CK_GOLD : CK_PAL)}${golden ? '<i class="spk s1"></i><i class="spk s2"></i><i class="spk s3"></i>' : ""}</span><span class="ck-hint">${golden ? "A golden cookie! Click to crack it open" : "Click to crack open today's fortune cookie"}</span></div></div>`;
+}
+// Original crunch sound, made on the spot with Web Audio (no sound files)
+let ckAudio = null;
+function crunchSound(golden){
+  try {
+    ckAudio = ckAudio || new (window.AudioContext || window.webkitAudioContext)();
+    const ac = ckAudio, t0 = ac.currentTime + 0.01;
+    const len = Math.floor(ac.sampleRate * 0.12), buf = ac.createBuffer(1, len, ac.sampleRate), ch = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.5);
+    [0, 0.055, 0.12, 0.16].forEach((dt, k) => {
+      const src = ac.createBufferSource(); src.buffer = buf; src.playbackRate.value = 0.8 + Math.random() * 0.6;
+      const bp = ac.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 1400 + Math.random() * 1800; bp.Q.value = 0.9;
+      const gn = ac.createGain(); gn.gain.value = k === 0 ? 0.55 : 0.32;
+      src.connect(bp).connect(gn).connect(ac.destination); src.start(t0 + dt);
+    });
+    if (golden){
+      [1318.5, 1760, 2093].forEach((f, k) => {
+        const o = ac.createOscillator(), gn = ac.createGain(); o.type = "square"; o.frequency.value = f;
+        const st = t0 + 0.22 + k * 0.09; gn.gain.setValueAtTime(0.0001, st); gn.gain.exponentialRampToValueAtTime(0.06, st + 0.01); gn.gain.exponentialRampToValueAtTime(0.0001, st + 0.18);
+        o.connect(gn).connect(ac.destination); o.start(st); o.stop(st + 0.2);
+      });
+    }
+  } catch(e){}
 }
 function crackCookie(el){
   if (el.classList.contains("open") || el.classList.contains("wobble")) return;
-  const id = el.dataset.cookie, p = players.find(x => x.id === id); if (!p) return;
-  const f = fortuneFor(id), odds = deathOdds(id);
-  const day = new Date().toLocaleDateString(undefined, {month: "short", day: "numeric"}).toUpperCase();
+  const id = el.dataset.cookie; if (!players.find(x => x.id === id)) return;
+  const golden = isGolden(id);
   const open = () => {
-    el.classList.remove("wobble"); cookieCrumbs(el); const burst = el.querySelector(".ck-burst"); el.classList.add("open"); el.removeAttribute("role"); el.removeAttribute("tabindex"); el.removeAttribute("aria-label");
-    el.innerHTML = `<span class="ck">${COOKIE_OPEN}</span><div class="slip" role="status"><b class="hd">${esc(shortName(p).toUpperCase())} · ${esc(day)}</b>${esc(f.text)}<span class="odds">☠ ${odds}% chance of death today</span><span class="lucky">Lucky item: ${esc(f.lucky)}</span></div>`;
+    el.classList.remove("wobble"); crunchSound(golden); cookieCrumbs(el, golden); const burst = el.querySelector(".ck-burst");
+    el.classList.add("open"); el.removeAttribute("role"); el.removeAttribute("tabindex"); el.removeAttribute("aria-label");
+    el.innerHTML = cookieOpenInner(id);
     if (burst) el.appendChild(burst);
+    markCracked(id);
   };
   if (reduceMotion) return open();
   el.classList.add("wobble"); setTimeout(open, 520);
