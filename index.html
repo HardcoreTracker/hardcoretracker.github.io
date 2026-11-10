@@ -271,6 +271,21 @@ header.top{position:relative}
 .rules-body td{padding:5px 0;border-bottom:1px solid var(--lo)}
 .rules-body td:last-child{text-align:right;font-weight:700;color:var(--accent)}
 body.ov-open{overflow:hidden}
+.fw-canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+.milestone{position:fixed;left:50%;top:max(80px, env(safe-area-inset-top, 0px));transform:translateX(-50%);z-index:61;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;width:min(420px, calc(100% - 32px));padding:18px}
+.milestone .tag{font-family:var(--f-label);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#FFFF55;background:#3F3F3F;padding:3px 8px;box-shadow:inset 2px 2px 0 #5E5E5E, inset -2px -2px 0 #1E1E1E}
+.milestone strong{font-size:28px;color:#FFFF55}
+.pumpkin{display:none}
+.season-halloween .step{position:relative}
+.season-halloween .pumpkin{display:block;position:absolute;width:20px;height:18px;top:-18px;right:8px;image-rendering:pixelated;background:
+ linear-gradient(#3F7A2E,#3F7A2E) 8px 0/4px 4px no-repeat,
+ linear-gradient(#1A0A00,#1A0A00) 4px 7px/3px 3px no-repeat,
+ linear-gradient(#1A0A00,#1A0A00) 13px 7px/3px 3px no-repeat,
+ linear-gradient(#1A0A00,#1A0A00) 6px 12px/8px 2px no-repeat,
+ linear-gradient(#E87A1A,#E87A1A) 0 4px/20px 14px no-repeat;box-shadow:none}
+.season-halloween .tipbar .tag{color:#FF9A2E}
+.season-winter .panel{background-image:repeating-linear-gradient(90deg,#FFFFFF 0 10px,#EEF3FF 10px 16px,#FFFFFF 16px 22px);background-size:100% 5px;background-repeat:no-repeat;background-position:0 0}
+.season-winter .slot.panel,.season-winter .award{background-image:none}
 .agechip{display:inline-flex;align-items:center;gap:7px;font-weight:600;white-space:nowrap}
 .agechip::before{content:"";width:10px;height:10px;background:var(--c);box-shadow:0 0 0 2px var(--outline);flex:none}
 
@@ -554,6 +569,7 @@ function sizePano(){
   const w = Math.max(1, Math.ceil(PH * innerWidth / Math.max(1, innerHeight)));
   if (pano.width !== w){ pano.width = w; pano.height = PH; }
 }
+let weatherMode = "auto", themeMode = "auto", weatherNow = "clear", flakes = [], flashUntil = 0, nextFlash = 0;
 // Sky colors through the viewer's local day: [hour, top, bottom]
 const SKY_KEYS = [
   [0, "#0B1026", "#1B2547"], [5, "#0B1026", "#26345E"], [6, "#3A4A8C", "#F29E6B"], [7, "#6E9EF7", "#F7C79A"],
@@ -610,8 +626,9 @@ function drawPano(){
       pctx.globalAlpha = 1;
     }
   });
+  drawWeather(W);
 }
-function paintStone(){ try { sizePano(); if (!dayScene){ dayScene = buildScene(false); nightScene = buildScene(true); } drawPano(); } catch(e){} }
+function paintStone(){ try { if (!flakes.length && weatherNow === "clear") setWeather(); sizePano(); if (!dayScene){ dayScene = buildScene(false); nightScene = buildScene(true); } drawPano(); } catch(e){} }
 paintStone();
 addEventListener("resize", () => { sizePano(); drawPano(); });
 if (reduceMotion) setInterval(drawPano, 60000);
@@ -725,7 +742,7 @@ function render(){
         <div class="pts num">${t[p.id]||0}<small>pts</small></div>
         ${badgesHtml(p.id)}
         ${editBtns(p)}
-        <div class="step"><span>${rk[i]}</span></div>
+        <div class="step"><i class="pumpkin" aria-hidden="true"></i><span>${rk[i]}</span></div>
       </div>` : `<div class="pod ${cls[i]} ghost"><div class="step"></div></div>`).join("")}</div>`;
   }
 
@@ -1284,6 +1301,124 @@ document.addEventListener("keydown", e => {
   const c = e.target.closest && e.target.closest("[data-player]");
   if (c && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); location.hash = "player-" + c.dataset.player; }
 });
+
+// ---------- weather, seasons, celebrations ----------
+function dayHash(){ const d = new Date(); const s = d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate(); let x = (s * 2654435761) >>> 0; x ^= x >>> 13; x = Math.imul(x, 1274126177) >>> 0; return (x % 10000) / 10000; }
+function pickWeather(){
+  if (weatherMode && weatherMode !== "auto") return weatherMode;
+  const m = new Date().getMonth(), r = dayHash();
+  if (m === 11 || m <= 1) return r < 0.45 ? "snow" : r < 0.55 ? "rain" : "clear";
+  if (m === 9) return r < 0.25 ? "rain" : r < 0.38 ? "storm" : "clear";
+  return r < 0.2 ? "rain" : r < 0.26 ? "storm" : "clear";
+}
+function setWeather(){
+  weatherNow = pickWeather();
+  const n = weatherNow === "snow" ? 90 : weatherNow === "clear" ? 0 : 140;
+  let s = 7; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  flakes = Array.from({length: n}, () => ({x: rnd(), y: rnd(), v: 0.6 + rnd()*0.8, w: rnd()}));
+}
+function drawWeather(W){
+  if (weatherNow === "clear") return;
+  if (weatherNow === "rain" || weatherNow === "storm"){
+    pctx.fillStyle = "rgba(30,38,58," + (weatherNow === "storm" ? .38 : .24) + ")"; pctx.fillRect(0, 0, W, PH);
+    pctx.fillStyle = "rgba(170,190,235,.75)";
+    flakes.forEach(f => {
+      const y = ((f.y * PH) + panoT * 160 * f.v) % (PH + 8) - 4, x = ((f.x * W) - panoT * 35 * f.v) % W;
+      const xx = x < 0 ? x + W : x;
+      pctx.fillRect(Math.floor(xx), Math.floor(y), 1, 3);
+    });
+    if (weatherNow === "storm" && !reduceMotion){
+      const now = performance.now();
+      if (!nextFlash) nextFlash = now + 4000 + Math.random()*8000;
+      if (now > nextFlash){ flashUntil = now + 140; nextFlash = now + 6000 + Math.random()*10000; }
+      if (now < flashUntil){ pctx.fillStyle = "rgba(230,235,255,.55)"; pctx.fillRect(0, 0, W, PH); }
+    }
+  } else if (weatherNow === "snow"){
+    pctx.fillStyle = "rgba(20,26,40,.12)"; pctx.fillRect(0, 0, W, PH);
+    pctx.fillStyle = "#FFFFFF";
+    flakes.forEach(f => {
+      const y = ((f.y * PH) + panoT * 14 * f.v) % (PH + 4) - 2;
+      const x = ((f.x * W) + Math.sin(panoT * 0.8 + f.w * 6) * 3 + W) % W;
+      const sz = f.w > 0.7 ? 2 : 1;
+      pctx.fillRect(Math.floor(x), Math.floor(y), sz, sz);
+    });
+  }
+}
+
+function seasonNow(){
+  if (themeMode && themeMode !== "auto") return themeMode;
+  const d = new Date(), m = d.getMonth(), day = d.getDate();
+  if ((m === 11 && day === 31) || (m === 0 && day === 1)) return "newyear";
+  if (m === 9 && day >= 15) return "halloween";
+  if (m === 11) return "winter";
+  return "none";
+}
+function applySeason(){
+  const s = seasonNow();
+  document.body.classList.remove("season-halloween", "season-winter", "season-newyear");
+  if (s !== "none") document.body.classList.add("season-" + s);
+  if (s === "newyear") setTimeout(() => launchFireworks(9000), 1200);
+}
+
+// Fireworks drawn on their own layer above the page
+const fwCanvas = document.createElement("canvas");
+fwCanvas.className = "fw-canvas"; fwCanvas.setAttribute("aria-hidden", "true");
+let fwParts = [], fwRockets = [], fwUntil = 0, fwRunning = false;
+const FW_COLORS = ["#FF5555", "#FFAA00", "#FFFF55", "#55FF55", "#55FFFF", "#5555FF", "#FF55FF", "#FFFFFF"];
+function launchFireworks(ms){
+  if (reduceMotion) return;
+  if (!fwCanvas.isConnected) document.body.appendChild(fwCanvas);
+  fwCanvas.width = innerWidth; fwCanvas.height = innerHeight;
+  fwUntil = performance.now() + ms;
+  if (!fwRunning){ fwRunning = true; requestAnimationFrame(fwFrame); }
+}
+function fwFrame(now){
+  const c = fwCanvas.getContext("2d"), W = fwCanvas.width, H = fwCanvas.height;
+  c.clearRect(0, 0, W, H);
+  if (now < fwUntil && Math.random() < 0.06) fwRockets.push({x: W * (0.15 + Math.random()*0.7), y: H, vy: -(H/90) * (0.8 + Math.random()*0.4), top: H * (0.15 + Math.random()*0.35), col: FW_COLORS[Math.floor(Math.random()*FW_COLORS.length)]});
+  fwRockets = fwRockets.filter(r => {
+    r.y += r.vy; c.fillStyle = "#FFF3C0"; c.fillRect(Math.round(r.x/3)*3, Math.round(r.y/3)*3, 3, 6);
+    if (r.y <= r.top){
+      for (let i = 0; i < 40; i++){ const a = Math.random()*Math.PI*2, sp = 1.5 + Math.random()*3.5; fwParts.push({x: r.x, y: r.y, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp, life: 60 + Math.random()*30, col: Math.random() < .2 ? "#FFFFFF" : r.col}); }
+      return false;
+    }
+    return true;
+  });
+  fwParts = fwParts.filter(p => {
+    p.x += p.vx; p.y += p.vy; p.vy += 0.06; p.vx *= 0.985; p.life--;
+    c.globalAlpha = Math.max(0, Math.min(1, p.life / 40)); c.fillStyle = p.col;
+    c.fillRect(Math.round(p.x/3)*3, Math.round(p.y/3)*3, 3, 3);
+    return p.life > 0;
+  });
+  c.globalAlpha = 1;
+  if (now < fwUntil || fwRockets.length || fwParts.length) requestAnimationFrame(fwFrame);
+  else { fwRunning = false; fwCanvas.remove(); }
+}
+
+// Milestones: celebrated once per browser, the first visit after they happen. Kept only in this browser.
+const AGE_NAMES = ["Wood","Stone","Copper","Iron","Exploration","Diamond","Nether","End","Post-End"];
+function checkMilestones(d){
+  const total = (d.deaths || []).length + (Number(d.priorDeaths) || 0);
+  const age = d.progress && d.progress.age ? d.progress.age : 1;
+  const current = [];
+  for (let n = 50; n <= total; n += 50) current.push({key: "deaths-" + n, title: n + " deaths!", sub: "The server just hit " + n + " total deaths. Impressive, in a bad way."});
+  for (let a = 2; a <= age; a++) current.push({key: "age-" + a, title: a === 8 ? "The End!" : "The " + AGE_NAMES[a-1] + " Age!", sub: a === 8 ? "The server made it to the End. The dragon is waiting." : "The server reached Age " + a + ". Deaths now cost more."});
+  let seen = null;
+  try { seen = JSON.parse(localStorage.getItem("hct-milestones") || "null"); } catch(e) { return; }
+  const keys = current.map(m => m.key);
+  if (!Array.isArray(seen)){ try { localStorage.setItem("hct-milestones", JSON.stringify(keys)); } catch(e){} return; }
+  const fresh = current.filter(m => !seen.includes(m.key));
+  try { localStorage.setItem("hct-milestones", JSON.stringify(keys)); } catch(e){}
+  if (!fresh.length) return;
+  const m = fresh[fresh.length - 1];
+  const box = document.createElement("div");
+  box.className = "milestone panel"; box.setAttribute("role", "status");
+  box.innerHTML = `<span class="tag">Milestone</span><strong class="mctitle">${esc(m.title)}</strong><span>${esc(m.sub)}</span><button type="button">Nice</button>`;
+  box.querySelector("button").addEventListener("click", () => box.remove());
+  document.body.appendChild(box);
+  setTimeout(() => box.remove(), 9000);
+  launchFireworks(6000);
+}
 // ---------- data ----------
 function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
 function updatePreview(){}
@@ -1298,6 +1433,8 @@ fetch("data.json", {cache:"no-store"}).then(r => { if (!r.ok) throw 0; return r.
   renderShame();
   punData = d.punishments || [];
   renderPunishments(d.punishments);
+  weatherMode = d.weather || "auto"; themeMode = d.theme || "auto"; setWeather(); applySeason(); drawPano();
+  checkMilestones(d);
   render();
   route();
   setStatus("Updated " + (d.updated || "recently"), "live");

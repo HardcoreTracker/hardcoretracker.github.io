@@ -550,5 +550,7 @@
       "player": "subkiwi",
       "text": "Drink a glass of milk"
     }
-  ]
+  ],
+  "weather": "auto",
+  "theme": "auto"
 }
