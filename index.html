@@ -169,6 +169,9 @@ header.top .sub{color:var(--title);text-shadow:2px 2px 0 var(--tshadow);font-siz
 .q-list .qt{font-weight:700;font-size:14px}
 .q-list .qd{font-size:13px;opacity:.85}
 .q-list li > div{min-width:0}
+.q-list li.q-head{grid-column:1/-1;padding:10px 0 2px}
+.q-head h4{margin:0;font-size:18px;color:var(--fg);text-shadow:none}
+.q-head h4 span{font-size:13px;color:var(--muted);font-weight:400;margin-left:6px}
 .agechip{display:inline-flex;align-items:center;gap:7px;font-weight:600;white-space:nowrap}
 .agechip::before{content:"";width:10px;height:10px;background:var(--c);box-shadow:0 0 0 2px var(--outline);flex:none}
 
@@ -711,13 +714,19 @@ function renderQuests(){
   $("qTabs").innerHTML = ages.map(a => {
     const st = a.n < progress.age ? "done" : a.n === progress.age ? "cur" : "";
     return `<button type="button" class="${st}" data-age="${a.n}" aria-pressed="${a.n===viewAge}">${a.n}. ${esc(a.name.replace(" Age",""))}</button>`;
-  }).join("");
-  const V = ages[viewAge - 1];
-  $("qUnlocks").textContent = V.unlocks;
-  $("qList").innerHTML = V.quests.map((q, k) => {
+  }).join("") + `<button type="button" data-age="0" aria-pressed="${viewAge===0}">All quests</button>`;
+  const item = (V, q, k) => {
     const st = questState(V.n, k + 1);
     return `<li class="slot ${st}"><span class="mark">${st==="done"?"✓":st==="cur"?"!":""}</span><div><div class="qt">${k+1}. ${esc(q.t)}</div><div class="qd">${esc(q.d)}</div></div></li>`;
-  }).join("");
+  };
+  if (viewAge === 0){
+    $("qUnlocks").textContent = "Every quest in all nine ages.";
+    $("qList").innerHTML = ages.map(V => `<li class="q-head"><h4 class="mctitle">Age ${V.n} · ${esc(V.name)} <span>${V.quests.length} quests</span></h4></li>` + V.quests.map((q,k) => item(V,q,k)).join("")).join("");
+  } else {
+    const V = ages[viewAge - 1];
+    $("qUnlocks").textContent = V.unlocks;
+    $("qList").innerHTML = V.quests.map((q, k) => item(V, q, k)).join("");
+  }
 }
 document.addEventListener("click", e => {
   const b = e.target.closest("#qTabs button[data-age]"); if (!b) return;
