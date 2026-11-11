@@ -1901,7 +1901,9 @@ function renderShame(){
   if (drw) card("Fish Food", names(drw.keys), `Dragged under by drowned ${drw.n} time${drw.n===1?"":"s"}`, drw.keys[0]);
   const ender = top(count(deaths.filter(d => /enderman/i.test(d.cause)).map(d => d.player)));
   if (ender) card("Lost a Staring Contest", names(ender.keys), "Killed by an enderman", ender.keys[0]);
-  if (timed.length) card("First Blood", nm(timed[0].player), "First death on record", timed[0].player);
+  // First death of all, including the early untracked ones that have no date
+  const firstDeath = sortedDeaths().filter(d => !d.reverted)[0];
+  if (firstDeath) card("First Blood", nm(firstDeath.player), "First death on record", firstDeath.player);
   const byPlayer = {};
   timed.forEach(d => (byPlayer[d.player] = byPlayer[d.player] || []).push(Date.parse(d.time)));
   let quick = null, late = null;
