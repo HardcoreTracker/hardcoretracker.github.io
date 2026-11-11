@@ -3007,27 +3007,25 @@ function crackCookie(el){
 }
 document.addEventListener("click", e => { const c = e.target.closest("[data-cookie]"); if (c) crackCookie(c); });
 document.addEventListener("keydown", e => { const c = e.target.closest && e.target.closest("[data-cookie]"); if (c && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); crackCookie(c); } });
-// ---------- tetris: stop button (other sites' sound can't be turned down from here, so stopping unloads the game) ----------
+// ---------- tetris: starts stopped; the game (and play.tetris.com) only loads when someone presses Start ----------
 (function(){
   const btn = document.getElementById("gameStop"), box = document.getElementById("gameFrame");
   if (!btn || !box) return;
   const frameHtml = box.innerHTML;
-  const loadGame = () => { const f = box.querySelector("iframe[data-src]"); if (f && !f.getAttribute("src")) f.src = f.dataset.src; };
-  if ("IntersectionObserver" in window){
-    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)){ loadGame(); io.disconnect(); } }, {rootMargin: "300px"});
-    io.observe(box);
-  } else loadGame();
+  const stopScreen = (title, note, label) => {
+    box.innerHTML = `<div class="game-off"><strong>${title}</strong><p>${note}</p><button type="button" class="primary" id="gameRestart">${label}</button></div>`;
+    btn.textContent = "▶ Start game"; btn.setAttribute("aria-pressed", "true");
+    document.getElementById("gameRestart").addEventListener("click", () => btn.click());
+  };
   btn.addEventListener("click", () => {
-    const stopped = btn.getAttribute("aria-pressed") === "true";
-    if (stopped){
-      box.innerHTML = frameHtml; loadGame();
+    if (btn.getAttribute("aria-pressed") === "true"){
+      box.innerHTML = frameHtml;
+      const f = box.querySelector("iframe[data-src]"); if (f) f.src = f.dataset.src;
       btn.textContent = "■ Stop game"; btn.setAttribute("aria-pressed", "false");
-    } else {
-      box.innerHTML = '<div class="game-off"><strong>Game stopped</strong><p>Stopping ends the game you were playing.</p><button type="button" class="primary" id="gameRestart">▶ Start again</button></div>';
-      btn.textContent = "▶ Start game"; btn.setAttribute("aria-pressed", "true");
-      document.getElementById("gameRestart").addEventListener("click", () => btn.click());
-    }
+      setTimeout(() => { try { f && f.focus(); } catch(e){} }, 500);
+    } else stopScreen("Game stopped", "Stopping ends the game you were playing.", "▶ Start again");
   });
+  stopScreen("Ready to play?", "Press Start to load the game from play.tetris.com.", "▶ Start game");
 })();
 // ---------- data ----------
 function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
