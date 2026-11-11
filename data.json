@@ -134,8 +134,7 @@
       "cause": "Fell off some vines",
       "legacy": true,
       "date": "2026-10-12",
-      "time": "2026-10-12T14:09:00-07:00",
-      "reverted": true
+      "time": "2026-10-12T14:09:00-07:00"
     },
     {
       "id": "d7",
@@ -497,9 +496,9 @@
     "text": "Active participation for 30 minutes in a Kick streamer with under 10 viewers"
   },
   "lastDeath": {
-    "player": "shrinppy",
-    "cause": "Drowned",
-    "time": "2026-11-11T16:06:35Z"
+    "player": "subkiwi",
+    "cause": "Blown up by Creeper",
+    "time": "2026-11-11T04:19:47Z"
   },
   "punishments": [
     {
