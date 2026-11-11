@@ -457,7 +457,7 @@
       "player": "subkiwi",
       "age": "iron",
       "totem": false,
-      "cause": "Died",
+      "cause": "Blown up by Creeper",
       "reason": "",
       "date": "2026-11-11",
       "time": "2026-11-11T04:19:47Z",
@@ -474,7 +474,7 @@
   },
   "lastDeath": {
     "player": "subkiwi",
-    "cause": "Died",
+    "cause": "Blown up by Creeper",
     "time": "2026-11-11T04:19:47Z"
   },
   "punishments": [

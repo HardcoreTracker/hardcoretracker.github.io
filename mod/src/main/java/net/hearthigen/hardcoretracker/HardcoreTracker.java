@@ -102,24 +102,31 @@ public final class HardcoreTracker implements ModInitializer {
 
 	/** Turns "SubKiwi was shot by Skeleton" into "Shot by Skeleton", matching the website's death log. */
 	static String cause(ServerPlayer player, DamageSource source, String name) {
-		String text = null;
+		// By the time this runs the combat tracker may already be cleared (it then just says "died"),
+		// so ask the damage source first; it still knows who or what did it.
+		String best = null;
 		try {
-			Component msg = player.getCombatTracker().getDeathMessage();
-			if (msg != null) text = msg.getString();
+			best = clean(source.getLocalizedDeathMessage(player).getString(), name);
 		} catch (Throwable ignored) {
 		}
-		if (text == null || text.isBlank()) {
+		if (best == null || best.equalsIgnoreCase("died")) {
 			try {
-				text = source.getLocalizedDeathMessage(player).getString();
+				Component msg = player.getCombatTracker().getDeathMessage();
+				String tracked = msg != null ? clean(msg.getString(), name) : null;
+				if (tracked != null && (best == null || !tracked.equalsIgnoreCase("died"))) best = tracked;
 			} catch (Throwable ignored) {
 			}
 		}
-		if (text == null || text.isBlank()) return "Died";
+		if (best == null || best.isEmpty()) return "Died";
+		return Character.toUpperCase(best.charAt(0)) + best.substring(1);
+	}
+
+	private static String clean(String text, String name) {
+		if (text == null) return null;
 		text = text.trim();
 		if (text.startsWith(name)) text = text.substring(name.length()).trim();
 		if (text.startsWith("was ")) text = text.substring(4);
-		if (text.isEmpty()) return "Died";
-		return Character.toUpperCase(text.charAt(0)) + text.substring(1);
+		return text.isEmpty() ? null : text;
 	}
 
 }
