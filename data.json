@@ -473,6 +473,17 @@
       "date": "2026-11-11",
       "time": "2026-11-11T04:36:42Z",
       "source": "mod"
+    },
+    {
+      "id": "m1794413195000",
+      "player": "shrinppy",
+      "age": "wood",
+      "totem": false,
+      "cause": "Drowned",
+      "reason": "",
+      "date": "2026-11-11",
+      "time": "2026-11-11T16:06:35Z",
+      "source": "mod"
     }
   ],
   "progress": {
@@ -484,9 +495,9 @@
     "text": "Active participation for 30 minutes in a Kick streamer with under 10 viewers"
   },
   "lastDeath": {
-    "player": "deim0s_v1",
-    "cause": "Blown up by Creeper",
-    "time": "2026-11-11T04:36:42Z"
+    "player": "shrinppy",
+    "cause": "Drowned",
+    "time": "2026-11-11T16:06:35Z"
   },
   "punishments": [
     {
