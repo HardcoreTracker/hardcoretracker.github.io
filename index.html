@@ -361,6 +361,10 @@ body.season-aprilfools .wrap .panel:nth-child(2n){animation-delay:-2.5s}
 .rank{position:absolute;top:6px;left:8px;font-size:14px;font-weight:700;color:var(--muted)}
 .pcard .figure{width:56px;height:112px}
 .figure{image-rendering:pixelated;display:block;max-width:100%}
+.figure.hat{aspect-ratio:16/36}
+.pod .figure.hat{aspect-ratio:16/36}
+.pcard .figure.hat{height:126px}
+.pp-top .figure.hat{height:162px}
 .pcard .name{font-weight:700;font-size:16px;max-width:100%;overflow-wrap:anywhere;text-align:center;line-height:1.15}
 .pcard .pts{font-weight:700;font-size:20px;color:var(--accent);line-height:1}
 .pcard .pts small{font-size:12px;color:var(--muted);margin-left:3px}
@@ -1062,9 +1066,11 @@ function part(ctx, im, sx, sy, w, h, dx, dy, mirror){
   else ctx.drawImage(im,sx,sy,w,h,dx,dy,w,h);
 }
 function drawFigure(canvas, im){
-  canvas.width = 16; canvas.height = 32;
-  const ctx = canvas.getContext("2d"); ctx.imageSmoothingEnabled = false; ctx.clearRect(0,0,16,32);
+  const hat = im ? hatNow() : null, H = hat ? 4 : 0;
+  canvas.width = 16; canvas.height = 32 + H; canvas.classList.toggle("hat", !!hat);
+  const ctx = canvas.getContext("2d"); ctx.imageSmoothingEnabled = false; ctx.clearRect(0,0,16,32 + H);
   if (!im){ drawStandIn(ctx, false); return; }
+  if (hat){ drawHat(ctx, hat, 3, 0); ctx.translate(0, H); }
   const legacy = im.height < 64, slim = isSlim(im), aw = slim ? 3 : 4;
   part(ctx, im, 8,8,8,8, 4,0);
   part(ctx, im, 20,20,8,12, 4,8);
@@ -1080,35 +1086,26 @@ function drawFigure(canvas, im){
     part(ctx, im, 4,36,4,12, 4,20);
     part(ctx, im, 4,52,4,12, 8,20);
   }
-  santaHat(ctx, 4, 0);
 }
-// Pixel Santa hat drawn over the top of the head on Christmas
-// Holiday hats drawn over the top of each player's head
-function santaHat(ctx, ox, oy){
-  let hol = null; try { hol = holidayNow(); } catch(e){}
-  const f = (c, x, y, w, h) => { ctx.fillStyle = c; ctx.fillRect(ox + x, oy + y, w, h); };
-  if (hol === "christmas"){
-    f("#C8102E", 1, 0, 5, 1); f("#C8102E", 0, 1, 8, 1); f("#9E0B22", 5, 0, 1, 1); f("#F4F4F4", 0, 2, 8, 1); f("#F4F4F4", 6, 0, 2, 1);
-  } else if (hol === "stpatricks"){
-    f("#1F7A34", 2, 0, 4, 1); f("#111111", 2, 1, 4, 1); f("#E8B23A", 3, 1, 2, 1); f("#1F7A34", 0, 2, 8, 1);
-  } else if (hol === "thanksgiving"){
-    f("#1A1A1A", 2, 0, 4, 1); f("#1A1A1A", 2, 1, 4, 1); f("#E8B23A", 3, 1, 2, 1); f("#1A1A1A", 0, 2, 8, 1);
-  } else if (hol === "newyear"){
-    f("#FFFFFF", 3, 0, 1, 1); f("#FF3B8B", 4, 0, 1, 1); f("#3BA8FF", 2, 1, 4, 1); f("#FFD93B", 1, 2, 6, 1);
-  } else if (hol === "easter"){
-    f("#F4F4F4", 1, 0, 2, 2); f("#F4F4F4", 5, 0, 2, 2); f("#FFB3C8", 2, 0, 1, 2); f("#FFB3C8", 5, 0, 1, 2);
-  } else if (hol === "valentines"){
-    f("#FF2E4D", 5, 0, 1, 1); f("#FF2E4D", 7, 0, 1, 1); f("#FF2E4D", 5, 1, 3, 1); f("#FF2E4D", 6, 2, 1, 1);
-  } else if (hol === "july4"){
-    f("#2F4FBF", 2, 0, 4, 1); f("#FFFFFF", 3, 0, 1, 1); f("#D02B2B", 2, 1, 4, 1); f("#F4F4F4", 0, 2, 8, 1);
-  }
+// Holiday hats sit on top of each player's head (4 pixel rows above it)
+const HATS = {
+  christmas:   {rows: [".......ww.", "....rrrrw.", "..rrrrrr..", ".wwwwwwww."], c: {r:"#C8102E", w:"#F4F4F4"}},
+  stpatricks:  {rows: ["..gggggg..", "..gGgggg..", "..kkyykk..", "gggggggggg"], c: {g:"#1F7A34", G:"#3FA858", k:"#111111", y:"#E8B23A"}},
+  thanksgiving:{rows: ["..kkkkkk..", "..kKkkkk..", "..kyyyyk..", "kkkkkkkkkk"], c: {k:"#1A1A1A", K:"#3A3A3A", y:"#E8B23A"}},
+  newyear:     {rows: ["....ww....", "....pp....", "...yyyy...", "..pppppp.."], c: {w:"#FFFFFF", p:"#FF3B8B", y:"#FFD93B"}},
+  easter:      {rows: ["..w....w..", "..wp..pw..", "..wp..pw..", "..ww..ww.."], c: {w:"#F4F4F4", p:"#FFB3C8"}},
+  valentines:  {rows: ["..rr.rr...", ".rrrrrrr..", "..rrrrr...", "...rrr...."], c: {r:"#FF2E4D"}},
+  july4:       {rows: ["..bbbbbb..", "..bwbbwb..", "..rrrrrr..", "wwwwwwwwww"], c: {b:"#2F4FBF", w:"#F4F4F4", r:"#D02B2B"}}
+};
+function hatNow(){ let hol = null; try { hol = holidayNow(); } catch(e){} return HATS[hol] || null; }
+function drawHat(ctx, hat, ox, oy){
+  hat.rows.forEach((row, y) => [...row].forEach((ch, x) => { if (hat.c[ch]){ ctx.fillStyle = hat.c[ch]; ctx.fillRect(ox + x, oy + y, 1, 1); } }));
 }
 function drawHead(canvas, im){
   canvas.width = 8; canvas.height = 8;
   const ctx = canvas.getContext("2d"); ctx.imageSmoothingEnabled = false;
   if (!im){ drawStandIn(ctx, true); return; }
   part(ctx, im, 8,8,8,8, 0,0); part(ctx, im, 40,8,8,8, 0,0);
-  santaHat(ctx, 0, 0);
 }
 function drawStandIn(ctx, headOnly){
   const cs = getComputedStyle(document.documentElement);
