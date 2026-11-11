@@ -464,6 +464,10 @@ body.has-ticker{padding-top:36px}
 .game-tip{color:var(--muted)}
 .game-link{color:var(--fg);font-weight:700}
 @media (max-width:620px){.game-frame{aspect-ratio:3/4}}
+.game-top{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;align-items:center;font-size:13px}
+.game-vol{color:var(--fg)}
+.game-off{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#FFFFFF;text-align:center;padding:20px}
+.game-off p{margin:0;opacity:.75;font-size:14px}
 </style>
 </head>
 <body>
@@ -573,6 +577,10 @@ body.has-ticker{padding-top:36px}
   <section id="gameSec" aria-label="Tetris">
     <div class="sect-head"><h2 class="mctitle">Tetris break</h2><span class="hint">Something to do while you wait for the next reset</span></div>
     <div class="panel game-panel">
+      <div class="game-top">
+        <span class="game-vol">🔊 Too loud? Pause the game, open <b>Options</b> and turn down the music and sound effects.</span>
+        <button type="button" class="small" id="gameStop" aria-pressed="false">■ Stop game</button>
+      </div>
       <div class="game-frame" id="gameFrame">
         <iframe src="https://play.tetris.com/" title="Tetris" loading="lazy" allow="fullscreen; autoplay" referrerpolicy="no-referrer"></iframe>
       </div>
@@ -2774,6 +2782,23 @@ function crackCookie(el){
 }
 document.addEventListener("click", e => { const c = e.target.closest("[data-cookie]"); if (c) crackCookie(c); });
 document.addEventListener("keydown", e => { const c = e.target.closest && e.target.closest("[data-cookie]"); if (c && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); crackCookie(c); } });
+// ---------- tetris: stop button (other sites' sound can't be turned down from here, so stopping unloads the game) ----------
+(function(){
+  const btn = document.getElementById("gameStop"), box = document.getElementById("gameFrame");
+  if (!btn || !box) return;
+  const frameHtml = box.innerHTML;
+  btn.addEventListener("click", () => {
+    const stopped = btn.getAttribute("aria-pressed") === "true";
+    if (stopped){
+      box.innerHTML = frameHtml.replace('loading="lazy"', 'loading="eager"');
+      btn.textContent = "■ Stop game"; btn.setAttribute("aria-pressed", "false");
+    } else {
+      box.innerHTML = '<div class="game-off"><strong>Game stopped</strong><p>Stopping ends the game you were playing.</p><button type="button" class="primary" id="gameRestart">▶ Start again</button></div>';
+      btn.textContent = "▶ Start game"; btn.setAttribute("aria-pressed", "true");
+      document.getElementById("gameRestart").addEventListener("click", () => btn.click());
+    }
+  });
+})();
 // ---------- data ----------
 function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
 function updatePreview(){}
