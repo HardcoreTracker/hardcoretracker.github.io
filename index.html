@@ -292,46 +292,46 @@ body.ov-open{overflow:hidden}
 .season-halloween .tipbar .tag{color:#FF9A2E}
 .land-winter .panel{background-image:repeating-linear-gradient(90deg,#FFFFFF 0 10px,#EEF3FF 10px 16px,#FFFFFF 16px 22px);background-size:100% 5px;background-repeat:no-repeat;background-position:0 0}
 .land-winter .slot.panel,.land-winter .award{background-image:none}
-#decor{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;z-index:20}
-#decor .dc{position:absolute;line-height:0}
-#decor .dc.flip svg{transform:scaleX(-1)}
-#decor .dc.bob{animation:dc-bob 2.4s ease-in-out infinite}
-#decor .dc.bob.slow{animation-duration:3.3s}
+#decor,.decor-sticky{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;z-index:20}
+.decor-layer .dc{position:absolute;line-height:0}
+.decor-layer .dc.flip svg{transform:scaleX(-1)}
+.decor-layer .dc.bob{animation:dc-bob 2.4s ease-in-out infinite}
+.decor-layer .dc.bob.slow{animation-duration:3.3s}
 @keyframes dc-bob{50%{transform:translateY(-2px)}}
-#decor .spider{display:flex;flex-direction:column;align-items:center;animation:dc-spider 3.2s ease-in-out infinite;transform-origin:top center}
-#decor .spider .thread{flex:1;width:1px;background:rgba(235,235,245,.7)}
+.decor-layer .spider{display:flex;flex-direction:column;align-items:center;animation:dc-spider 3.2s ease-in-out infinite;transform-origin:top center}
+.decor-layer .spider .thread{flex:1;width:1px;background:rgba(235,235,245,.7)}
 @keyframes dc-spider{50%{transform:translateY(14px)}}
-#decor .menorah .flame{animation:dc-flame .5s steps(2,end) infinite}
+.decor-layer .menorah .flame{animation:dc-flame .5s steps(2,end) infinite}
 @keyframes dc-flame{50%{fill:#FF9A2E}}
-#decor .spin{animation:dc-spin 1.6s ease-in-out infinite}
+.decor-layer .spin{animation:dc-spin 1.6s ease-in-out infinite}
 @keyframes dc-spin{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
-#decor .snowcap{height:10px;background:#F4F7FB;clip-path:polygon(0 100%,0 40%,4% 20%,9% 45%,15% 10%,22% 40%,30% 15%,37% 45%,45% 5%,53% 40%,60% 15%,68% 45%,75% 10%,83% 40%,90% 20%,96% 45%,100% 30%,100% 100%)}
-#decor .lights{height:14px}
-#decor .lights svg{position:absolute;left:0;top:0;width:100%;height:12px}
-#decor .lights i{position:absolute;top:5px;width:6px;height:8px;margin-left:-3px;border:1px solid rgba(0,0,0,.5);box-shadow:0 0 6px currentColor;animation:dc-twinkle 1.7s steps(2,end) infinite}
+.decor-layer .snowcap{height:10px;background:#F4F7FB;clip-path:polygon(0 100%,0 40%,4% 20%,9% 45%,15% 10%,22% 40%,30% 15%,37% 45%,45% 5%,53% 40%,60% 15%,68% 45%,75% 10%,83% 40%,90% 20%,96% 45%,100% 30%,100% 100%)}
+.decor-layer .lights{height:14px}
+.decor-layer .lights svg{position:absolute;left:0;top:0;width:100%;height:12px}
+.decor-layer .lights i{position:absolute;top:5px;width:6px;height:8px;margin-left:-3px;border:1px solid rgba(0,0,0,.5);box-shadow:0 0 6px currentColor;animation:dc-twinkle 1.7s steps(2,end) infinite}
 @keyframes dc-twinkle{50%{opacity:.35;box-shadow:none}}
-#decor .icicles{height:16px}
-#decor .icicles i{position:absolute;top:0;width:5px;background:linear-gradient(#FFFFFF,#BFE3FF);clip-path:polygon(0 0,100% 0,50% 100%)}
-#decor .garland{height:26px}
-#decor .garland > svg{position:absolute;left:0;top:0;width:100%;height:12px}
-#decor .garland .gi svg{display:block}
-#decor .garland .gi{position:absolute;top:5px;transform-origin:top center;animation:dc-sway 3s ease-in-out infinite}
+.decor-layer .icicles{height:16px}
+.decor-layer .icicles i{position:absolute;top:0;width:5px;background:linear-gradient(#FFFFFF,#BFE3FF);clip-path:polygon(0 0,100% 0,50% 100%)}
+.decor-layer .garland{height:26px}
+.decor-layer .garland > svg{position:absolute;left:0;top:0;width:100%;height:12px}
+.decor-layer .garland .gi svg{display:block}
+.decor-layer .garland .gi{position:absolute;top:5px;transform-origin:top center;animation:dc-sway 3s ease-in-out infinite}
 @keyframes dc-sway{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
-#decor .spider.love .thread{background:rgba(255,200,215,.8)}
-#decor .tilt{transform:rotate(-14deg)}
-#decor .hop{animation:dc-hop 1.8s steps(3,end) infinite}
+.decor-layer .spider.love .thread{background:rgba(255,200,215,.8)}
+.decor-layer .tilt{transform:rotate(-14deg)}
+.decor-layer .hop{animation:dc-hop 1.8s steps(3,end) infinite}
 @keyframes dc-hop{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
-#decor .wave{animation:dc-wave 1.4s steps(2,end) infinite;transform-origin:bottom left}
+.decor-layer .wave{animation:dc-wave 1.4s steps(2,end) infinite;transform-origin:bottom left}
 @keyframes dc-wave{50%{transform:skewY(-4deg)}}
-#decor .float{animation:dc-float 4s ease-in-out infinite}
-#decor .float.slow{animation-duration:5.5s}
+.decor-layer .float{animation:dc-float 4s ease-in-out infinite}
+.decor-layer .float.slow{animation-duration:5.5s}
 @keyframes dc-float{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
-#decor .peek{animation:dc-peek 6s ease-in-out infinite}
+.decor-layer .peek{animation:dc-peek 6s ease-in-out infinite}
 @keyframes dc-peek{0%,30%,100%{transform:translateY(16px);opacity:0}40%,85%{transform:translateY(0);opacity:1}}
-#decor .walk{animation:dc-walk 16s linear infinite}
+.decor-layer .walk{animation:dc-walk 16s linear infinite}
 @keyframes dc-walk{0%{transform:translateX(0) scaleX(-1)}46%{transform:translateX(var(--dist)) scaleX(-1)}50%{transform:translateX(var(--dist)) scaleX(1)}96%{transform:translateX(0) scaleX(1)}100%{transform:translateX(0) scaleX(-1)}}
-#decor .cracks{opacity:.8}
-#decor .cracks svg{display:block;width:100%;height:100%}
+.decor-layer .cracks{opacity:.8}
+.decor-layer .cracks svg{display:block;width:100%;height:100%}
 body.season-valentines header.top h1{color:#FFE3EC;text-shadow:3px 3px 0 #B3264F}
 body.season-stpatricks header.top h1{color:#E6FFE0;text-shadow:3px 3px 0 #1F6B2E}
 body.season-july4 header.top h1{color:#FFFFFF;text-shadow:3px 3px 0 #B3261E, 6px 6px 0 #2F4FBF}
@@ -348,8 +348,8 @@ body.season-aprilfools .wrap .panel:nth-child(2n){animation-delay:-2.5s}
 .nybar .text b{color:var(--accent);font-size:26px}
 .nybar.soon .text b{animation:nyPulse .5s steps(2,end) infinite}
 @keyframes nyPulse{50%{opacity:.4}}
-@media (prefers-reduced-motion: reduce){#decor .garland .gi,#decor .hop,#decor .wave,#decor .float,#decor .peek,#decor .walk{animation:none}#decor .peek{opacity:1;transform:none}body.season-aprilfools .wrap .panel,body.season-fri13 header.top h1,.nybar.soon .text b{animation:none}}
-@media (prefers-reduced-motion: reduce){#decor .menorah .flame,#decor .spin,#decor .dc,#decor .spider,#decor .lights i{animation:none}}
+@media (prefers-reduced-motion: reduce){.decor-layer .garland .gi,.decor-layer .hop,.decor-layer .wave,.decor-layer .float,.decor-layer .peek,.decor-layer .walk{animation:none}.decor-layer .peek{opacity:1;transform:none}body.season-aprilfools .wrap .panel,body.season-fri13 header.top h1,.nybar.soon .text b{animation:none}}
+@media (prefers-reduced-motion: reduce){.decor-layer .menorah .flame,.decor-layer .spin,.decor-layer .dc,.decor-layer .spider,.decor-layer .lights i{animation:none}}
 .agechip{display:inline-flex;align-items:center;gap:7px;font-weight:600;white-space:nowrap}
 .agechip::before{content:"";width:10px;height:10px;background:var(--c);box-shadow:0 0 0 2px var(--outline);flex:none}
 
@@ -433,6 +433,8 @@ button:disabled{opacity:.5;cursor:default}
 
 /* ---------- news ticker ---------- */
 body.has-ticker{padding-top:36px}
+body.has-ticker .lower-right{top:52px;max-height:calc(100vh - 68px)}
+@media (max-width:900px){body.has-ticker .lower-right{top:auto;max-height:none}}
 .ticker{position:fixed;top:0;left:0;right:0;height:36px;z-index:40;display:flex;background:#1E1E1E;color:#FFFFFF;font-size:14px;box-shadow:inset 0 -2px 0 #000000, 0 2px 0 rgba(0,0,0,.3)}
 .ticker[hidden]{display:none}
 .tk-lab{flex:none;display:flex;align-items:center;padding:0 12px;background:#B3261E;font-family:var(--f-label);font-weight:700;letter-spacing:.06em;font-size:12px;box-shadow:inset 2px 2px 0 #E0473D, inset -2px -2px 0 #6E1712;text-shadow:1px 1px 0 #3F0A07}
@@ -2387,12 +2389,23 @@ const CRACKS = `<svg width="100%" height="100%" viewBox="0 0 100 60" preserveAsp
 let decorLayer = null;
 function placeDecor(){
   let hol = null; try { hol = holidayNow(); } catch(e){}
-  if (!decorLayer){ decorLayer = document.createElement("div"); decorLayer.id = "decor"; decorLayer.setAttribute("aria-hidden", "true"); document.body.appendChild(decorLayer); }
+  if (!decorLayer){ decorLayer = document.createElement("div"); decorLayer.id = "decor"; decorLayer.className = "decor-layer"; decorLayer.setAttribute("aria-hidden", "true"); document.body.appendChild(decorLayer); }
   decorLayer.innerHTML = "";
+  // The quest column sticks while you scroll, so its decorations live inside it and move with it
+  const stickyHost = document.querySelector(".lower-right");
+  const useSticky = !!stickyHost && getComputedStyle(stickyHost).position === "sticky";
+  let stickyLayer = stickyHost ? stickyHost.querySelector(":scope > .decor-sticky") : null;
+  if (stickyHost && !stickyLayer){ stickyLayer = document.createElement("div"); stickyLayer.className = "decor-sticky decor-layer"; stickyLayer.setAttribute("aria-hidden", "true"); stickyHost.appendChild(stickyLayer); }
+  if (stickyLayer) stickyLayer.innerHTML = "";
   if (!["halloween","christmas","hanukkah","valentines","stpatricks","easter","july4","thanksgiving","newyear","aprilfools","fri13"].includes(hol)) return;
   const sy = scrollY, sx = scrollX;
-  const box = el => { const r = el.getBoundingClientRect(); return {l: r.left + sx, t: r.top + sy, w: r.width, h: r.height}; };
-  const add = (html, l, t, cls) => { const d = document.createElement("div"); d.className = "dc " + (cls || ""); d.style.left = l + "px"; d.style.top = t + "px"; d.innerHTML = html; decorLayer.appendChild(d); return d; };
+  let curLayer = decorLayer;
+  const box = el => {
+    const r = el.getBoundingClientRect();
+    if (useSticky && stickyHost.contains(el)){ const h = stickyHost.getBoundingClientRect(); curLayer = stickyLayer; return {l: r.left - h.left, t: r.top - h.top, w: r.width, h: r.height}; }
+    curLayer = decorLayer; return {l: r.left + sx, t: r.top + sy, w: r.width, h: r.height};
+  };
+  const add = (html, l, t, cls) => { const d = document.createElement("div"); d.className = "dc " + (cls || ""); d.style.left = l + "px"; d.style.top = t + "px"; d.innerHTML = html; curLayer.appendChild(d); return d; };
   const targets = [...document.querySelectorAll(".lastdeath:not([hidden]), .tipbar:not([hidden]), .podium-panel, .spot, #questSec, .rules, #punSec .pun-panel")].filter(el => el.offsetParent);
   // A string along the top of a panel with little things hanging from it
   const garland = (b, i, item, itemW, strColor) => {
@@ -2401,14 +2414,14 @@ function placeDecor(){
     for (let k = 0; k < n; k++) items += `<span class="gi" style="left:${Math.round((k + 0.5) * (b.w / n) - itemW / 2)}px;animation-delay:-${((k * 37) % 23) / 10}s">${item(k)}</span>`;
     add(`<svg width="${b.w}" height="12" preserveAspectRatio="none" viewBox="0 0 ${n*10} 12"><path d="${Array.from({length:n}, (_, k) => `M${k*10} 2Q${k*10+5} 7 ${k*10+10} 2`).join("")}" stroke="${strColor}" stroke-width="1.2" fill="none"/></svg>${items}`, b.l, b.t - 3, "garland").style.width = b.w + "px";
   };
-  const title = document.querySelector("header.top h1"), tb = title ? box(title) : null;
+  const title = document.querySelector("header.top h1"); let tb = null;
   if (hol === "valentines"){
     targets.forEach((el, i) => {
       const b = box(el);
       garland(b, i, k => HEART_S(["#E8233F", "#FF6FA0", "#FFFFFF"][(k + i) % 3]), 10, "#B3264F");
       add(i % 2 ? HEART_P : HEART_R, b.l + b.w * (i % 2 ? 0.82 : 0.08), b.t - 22, "bob");
     });
-    if (tb){ const h = add(`<span class="thread"></span>${HEART_R}`, tb.l + Math.min(tb.w - 30, 300), 0, "spider love"); h.style.height = (tb.t + 10) + "px"; }
+    if (title && (tb = box(title))){ const h = add(`<span class="thread"></span>${HEART_R}`, tb.l + Math.min(tb.w - 30, 300), 0, "spider love"); h.style.height = (tb.t + 10) + "px"; }
   } else if (hol === "stpatricks"){
     targets.forEach((el, i) => {
       const b = box(el);
@@ -2417,7 +2430,7 @@ function placeDecor(){
     });
     const pod = document.querySelector(".podium-panel");
     if (pod){ const b = box(pod); add(POT_GOLD, b.l + 10, b.t + b.h - 26); add(GELT, b.l + 44, b.t + b.h - 18, "bob"); add(GELT, b.l + 58, b.t + b.h - 16, "bob slow"); }
-    if (tb) add(LEP_HAT, tb.l - 10, tb.t - 24, "tilt");
+    if (title && (tb = box(title))) add(LEP_HAT, tb.l - 10, tb.t - 24, "tilt");
   } else if (hol === "easter"){
     const pastel = ["#FF8FB8", "#8FD3FF", "#FFE36B", "#B79BFF", "#9BEFA0"];
     targets.forEach((el, i) => {
@@ -2453,7 +2466,7 @@ function placeDecor(){
       if (i % 2 === 0) add(BALLOON(bal[i % bal.length]), b.l + b.w * 0.9, b.t - 34, "float");
       if (i % 2 === 1) add(BALLOON(bal[(i + 2) % bal.length]), b.l + b.w * 0.04, b.t - 34, "float slow");
     });
-    if (tb) add(PARTY_HAT, tb.l - 8, tb.t - 22, "tilt");
+    if (title && (tb = box(title))) add(PARTY_HAT, tb.l - 8, tb.t - 22, "tilt");
   } else if (hol === "aprilfools"){
     targets.forEach((el, i) => {
       if (i % 2) return;
