@@ -256,8 +256,9 @@ header.top{position:relative}
 .fx-btn{cursor:pointer;line-height:inherit}
 .fx-btn:disabled{opacity:.6;cursor:default}
 html.fx-off *,html.fx-off *::before,html.fx-off *::after{animation:none !important;transition:none !important}
-html.fx-off .tk-run{overflow-x:auto;scrollbar-width:none}
-html.fx-off .tk-seg + .tk-seg{display:none}
+html.fx-off .ticker{display:none !important}
+html.fx-off body.has-ticker{padding-top:0}
+html.fx-off body.has-ticker .lower-right{top:16px;max-height:calc(100vh - 32px)}
 .overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:max(24px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) 24px max(12px, env(safe-area-inset-left, 0px));overflow-y:auto}
 .ov-back{position:fixed;inset:0;background:rgba(0,0,0,.6)}
 .ov-panel{position:relative;width:min(760px,100%);display:flex;flex-direction:column;gap:16px}
