@@ -462,20 +462,31 @@
       "date": "2026-11-11",
       "time": "2026-11-11T04:19:47Z",
       "source": "mod"
+    },
+    {
+      "id": "m1794371802000",
+      "player": "deim0s_v1",
+      "age": "wood",
+      "totem": false,
+      "cause": "Blown up by Creeper",
+      "reason": "",
+      "date": "2026-11-11",
+      "time": "2026-11-11T04:36:42Z",
+      "source": "mod"
     }
   ],
   "progress": {
     "age": 1,
-    "quest": 5,
+    "quest": 7,
     "totemFarm": false
   },
   "currentPunishment": {
     "text": "Apology video"
   },
   "lastDeath": {
-    "player": "subkiwi",
+    "player": "deim0s_v1",
     "cause": "Blown up by Creeper",
-    "time": "2026-11-11T04:19:47Z"
+    "time": "2026-11-11T04:36:42Z"
   },
   "punishments": [
     {
