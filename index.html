@@ -19,8 +19,8 @@
 <meta name="twitter:card" content="summary_large_image">
 
 <style>
-@font-face{font-family:"Monocraft";src:url("fonts/Monocraft-Regular.otf") format("opentype");font-weight:400 600;font-display:swap}
-@font-face{font-family:"Monocraft";src:url("fonts/Monocraft-Bold.otf") format("opentype");font-weight:700 900;font-display:swap}
+@font-face{font-family:"Monocraft";src:url("fonts/Monocraft-Regular.woff") format("woff"),url("fonts/Monocraft-Regular.otf") format("opentype");font-weight:400 600;font-display:swap}
+@font-face{font-family:"Monocraft";src:url("fonts/Monocraft-Bold.woff") format("woff"),url("fonts/Monocraft-Bold.otf") format("opentype");font-weight:700 900;font-display:swap}
 /* Layout: in-game menu panels on a stone wall. Podium + spotlight up top, rules and stats as inventory slots, death log as a chest panel. */
 :root{
   --bg:#7F7F7F; --bg2:#8C8C8C; --bg3:#717171;
@@ -622,7 +622,7 @@ body.has-ticker{padding-top:36px}
         <button type="button" class="small" id="gameStop" aria-pressed="false">■ Stop game</button>
       </div>
       <div class="game-frame" id="gameFrame">
-        <iframe src="https://play.tetris.com/" title="Tetris" loading="lazy" allow="fullscreen; autoplay" referrerpolicy="no-referrer"></iframe>
+        <iframe data-src="https://play.tetris.com/" title="Tetris" allow="fullscreen; autoplay" referrerpolicy="no-referrer"></iframe>
       </div>
       <div class="game-bar">
         <span class="game-tip">Click the game first so your keys control it. Arrow keys move, Space drops, C holds.</span>
@@ -2072,11 +2072,15 @@ function easterDate(y){
   return [month - 1, day];
 }
 // Hanukkah: 8 nights from the evening of 24 Kislev, using the browser's Hebrew calendar
+let hebFmt = null; const hebCache = {};
 function hebrewParts(d){
+  const k = d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
+  if (hebCache[k]) return hebCache[k];
   try {
-    const parts = Object.fromEntries(new Intl.DateTimeFormat("en-u-ca-hebrew", {month:"long", day:"numeric"}).formatToParts(d).map(p => [p.type, p.value]));
-    return {month: parts.month, day: Number(parts.day)};
-  } catch(e){ return {month:"", day:0}; }
+    hebFmt = hebFmt || new Intl.DateTimeFormat("en-u-ca-hebrew", {month:"long", day:"numeric"});
+    const parts = Object.fromEntries(hebFmt.formatToParts(d).map(p => [p.type, p.value]));
+    return (hebCache[k] = {month: parts.month, day: Number(parts.day)});
+  } catch(e){ return (hebCache[k] = {month:"", day:0}); }
 }
 function hanukkahCandles(){
   const now = new Date();
@@ -2087,7 +2091,13 @@ function hanukkahCandles(){
   }
   return 0;
 }
+let holCache = {key: "", val: null};
 function holidayNow(){
+  const d = new Date(), key = themeMode + "|" + d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate() + "-" + d.getHours() + "-" + d.getMinutes();
+  if (holCache.key !== key) holCache = {key, val: holidayCompute()};
+  return holCache.val;
+}
+function holidayCompute(){
   if (themeMode && themeMode !== "auto") return themeMode === "none" ? null : themeMode;
   const d = new Date(), y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
   const nthWeekday = (month, weekday, n) => { const first = new Date(y, month, 1).getDay(); return 1 + ((weekday - first + 7) % 7) + (n - 1) * 7; };
@@ -3002,10 +3012,15 @@ document.addEventListener("keydown", e => { const c = e.target.closest && e.targ
   const btn = document.getElementById("gameStop"), box = document.getElementById("gameFrame");
   if (!btn || !box) return;
   const frameHtml = box.innerHTML;
+  const loadGame = () => { const f = box.querySelector("iframe[data-src]"); if (f && !f.getAttribute("src")) f.src = f.dataset.src; };
+  if ("IntersectionObserver" in window){
+    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)){ loadGame(); io.disconnect(); } }, {rootMargin: "300px"});
+    io.observe(box);
+  } else loadGame();
   btn.addEventListener("click", () => {
     const stopped = btn.getAttribute("aria-pressed") === "true";
     if (stopped){
-      box.innerHTML = frameHtml.replace('loading="lazy"', 'loading="eager"');
+      box.innerHTML = frameHtml; loadGame();
       btn.textContent = "■ Stop game"; btn.setAttribute("aria-pressed", "false");
     } else {
       box.innerHTML = '<div class="game-off"><strong>Game stopped</strong><p>Stopping ends the game you were playing.</p><button type="button" class="primary" id="gameRestart">▶ Start again</button></div>';
