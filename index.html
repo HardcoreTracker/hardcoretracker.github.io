@@ -252,6 +252,12 @@ header.top{position:relative}
 .badge svg{width:16px;height:16px;shape-rendering:crispEdges}
 .rules-btn{font-family:var(--f-pixel);font-size:15px;color:#FFFFFF;text-decoration:none;background:var(--btn);border:2px solid var(--outline);padding:5px 14px;box-shadow:inset 2px 2px 0 var(--btn-hi), inset -2px -3px 0 var(--btn-lo);text-shadow:2px 2px 0 var(--btn-lo);align-self:flex-end}
 .rules-btn:hover{border-color:var(--btn-hover)}
+.top-btns{display:flex;gap:8px;align-self:flex-end;flex-wrap:wrap}
+.fx-btn{cursor:pointer;line-height:inherit}
+.fx-btn:disabled{opacity:.6;cursor:default}
+html.fx-off *,html.fx-off *::before,html.fx-off *::after{animation:none !important;transition:none !important}
+html.fx-off .tk-run{overflow-x:auto;scrollbar-width:none}
+html.fx-off .tk-seg + .tk-seg{display:none}
 .overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:max(24px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) 24px max(12px, env(safe-area-inset-left, 0px));overflow-y:auto}
 .ov-back{position:fixed;inset:0;background:rgba(0,0,0,.6)}
 .ov-panel{position:relative;width:min(760px,100%);display:flex;flex-direction:column;gap:16px}
@@ -527,7 +533,7 @@ body.has-ticker .lower-right{top:52px;max-height:calc(100vh - 68px)}
       <span class="label sub">Shared-life hardcore · Wilderness Bound</span>
       <h1 class="mctitle">Hardcore Point Tracker</h1>
     </div>
-    <a class="rules-btn" href="#rules">Rules</a>
+    <div class="top-btns"><button type="button" class="rules-btn fx-btn" id="fxBtn" aria-pressed="true">Effects: On</button><a class="rules-btn" href="#rules">Rules</a></div>
     <div class="status" id="status">Loading the server's record…</div>
   </header>
 
@@ -659,7 +665,11 @@ $("ruleTable").innerHTML = AGES.map(a => `<tr><td>${ageChip(a.key)}</td><td>+${a
 // ---------- panorama background ----------
 const pano = document.getElementById("pano");
 const pctx = pano.getContext("2d");
-const reduceMotion = (() => { try { return matchMedia("(prefers-reduced-motion: reduce)").matches; } catch(e){ return false; } })();
+const prefersReduced = (() => { try { return matchMedia("(prefers-reduced-motion: reduce)").matches; } catch(e){ return false; } })();
+// "Effects off" (saved on this device only) freezes the background and stops the scrolling and wiggling
+let fxOff = false; try { fxOff = localStorage.getItem("hct-effects") === "off"; } catch(e){}
+let reduceMotion = prefersReduced || fxOff;
+if (reduceMotion) document.documentElement.classList.add("fx-off");
 const PB = 6, PW = 1200, PH = 180;
 let scene = null, panoT = 0;
 function isDark(){
@@ -1032,16 +1042,36 @@ function drawPano(){
 function paintStone(){ try { if (!flakes.length && weatherNow === "clear") setWeather(); sizePano(); drawPano(); } catch(e){ console.error(e); } }
 paintStone();
 addEventListener("resize", () => { sizePano(); drawPano(); });
-if (reduceMotion) setInterval(drawPano, 60000);
-if (!reduceMotion){
+setInterval(() => { if (reduceMotion) drawPano(); }, 60000);
+let panoLoop = false;
+function startPano(){
+  if (panoLoop || reduceMotion) return;
+  panoLoop = true;
   let last = 0, lastDraw = 0;
   const frame = ts => {
+    if (reduceMotion){ panoLoop = false; drawPano(); return; }
     if (!last) last = ts;
     panoT += Math.min(0.1, (ts - last) / 1000); last = ts;
     if (ts - lastDraw > 40){ drawPano(); lastDraw = ts; }
     requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
+}
+startPano();
+function setEffects(on){
+  fxOff = !on;
+  try { localStorage.setItem("hct-effects", on ? "on" : "off"); } catch(e){}
+  reduceMotion = prefersReduced || fxOff;
+  document.documentElement.classList.toggle("fx-off", reduceMotion);
+  if (!reduceMotion) startPano(); else drawPano();
+  syncFxBtn();
+}
+function syncFxBtn(){
+  const b = document.getElementById("fxBtn"); if (!b) return;
+  b.textContent = reduceMotion ? "Effects: Off" : "Effects: On";
+  b.setAttribute("aria-pressed", reduceMotion ? "false" : "true");
+  if (prefersReduced){ b.disabled = true; b.title = "Your device is set to reduce motion, so effects stay off"; }
+  else b.title = reduceMotion ? "Turn the moving background and animations back on" : "Freeze the background and animations (good for slow phones or saving battery)";
 }
 try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { paintStone(); render(); }); }catch(e){}
 try{ new MutationObserver(() => { paintStone(); render(); }).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]}); }catch(e){}
@@ -3053,6 +3083,8 @@ document.addEventListener("keydown", e => { const c = e.target.closest && e.targ
   });
   stopScreen("Ready to play?", "Press Start to load the game from play.tetris.com.", "▶ Start game");
 })();
+document.getElementById("fxBtn").addEventListener("click", () => setEffects(reduceMotion));
+syncFxBtn();
 // ---------- data ----------
 function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
 function updatePreview(){}
