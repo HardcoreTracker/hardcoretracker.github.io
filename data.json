@@ -451,6 +451,17 @@
       "legacy": true,
       "date": "2026-11-09",
       "time": "2026-11-09T18:00:00-08:00"
+    },
+    {
+      "id": "m1794370787000",
+      "player": "subkiwi",
+      "age": "iron",
+      "totem": false,
+      "cause": "Died",
+      "reason": "",
+      "date": "2026-11-11",
+      "time": "2026-11-11T04:19:47Z",
+      "source": "mod"
     }
   ],
   "progress": {
@@ -463,8 +474,8 @@
   },
   "lastDeath": {
     "player": "subkiwi",
-    "cause": "Skeleton",
-    "time": "2026-11-09T18:00:00-08:00"
+    "cause": "Died",
+    "time": "2026-11-11T04:19:47Z"
   },
   "punishments": [
     {
