@@ -134,7 +134,8 @@
       "cause": "Fell off some vines",
       "legacy": true,
       "date": "2026-10-12",
-      "time": "2026-10-12T14:09:00-07:00"
+      "time": "2026-10-12T14:09:00-07:00",
+      "reverted": true
     },
     {
       "id": "d7",
@@ -483,7 +484,8 @@
       "reason": "",
       "date": "2026-11-11",
       "time": "2026-11-11T16:06:35Z",
-      "source": "mod"
+      "source": "mod",
+      "reverted": true
     }
   ],
   "progress": {
