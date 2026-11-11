@@ -77,7 +77,8 @@
       "name": "shrinppy",
       "nick": "Proper",
       "base": 3,
-      "skin": "skins/shrinppy.png"
+      "skin": "skins/shrinppy.png",
+      "inactive": true
     }
   ],
   "deaths": [

@@ -649,7 +649,7 @@ const nickHtml = p => p && p.nick ? ` <span class="nick">(${esc(p.nick)})</span>
 const deathPts = d => d.legacy ? 0 : (AGE[d.age]?.pts || 0) + (d.totem ? 1 : 0);
 
 let meta = {};
-let players = [], deaths = [], canEdit = false, db = null, assets = null;
+let players = [], allPlayers = [], deaths = [], canEdit = false, db = null, assets = null;
 let editingId = null;
 
 $("ruleTable").innerHTML = AGES.map(a => `<tr><td>${ageChip(a.key)}</td><td>+${a.pts}</td></tr>`).join("");
@@ -1203,13 +1203,13 @@ function render(){
   if (!deaths.length){
     lEl.innerHTML = `<div class="panel empty"><strong>No deaths logged</strong>${canEdit ? "Use “Log a death” above for past and future deaths. Points add up automatically." : "Deaths will show up here as they're logged."}</div>`;
   } else {
-    const run = Object.fromEntries(players.map(p => [p.id, Number(p.base) || 0])), rows = [];
+    const run = Object.fromEntries(allPlayers.map(p => [p.id, Number(p.base) || 0])), rows = [];
     sortedDeaths().forEach((d, idx) => {
       const before = run[d.player] || 0, gain = deathPts(d), after = before + gain;
       run[d.player] = after;
       rows.push({d, idx, gain, after, crossed: Math.floor(after/PER_PUNISH) - Math.floor(before/PER_PUNISH)});
     });
-    const byId = Object.fromEntries(players.map(p=>[p.id,p]));
+    const byId = Object.fromEntries(allPlayers.map(p=>[p.id,p]));
     lEl.innerHTML = `<div class="panel logwrap"><table class="log"><thead><tr>
       <th>Date</th><th>Player</th><th>Age</th><th>Cause</th><th class="r">Pts</th><th class="r">Total</th>${canEdit?"<th></th>":""}
     </tr></thead><tbody>${rows.reverse().map(({d,idx,gain,after,crossed}) => {
@@ -1774,7 +1774,7 @@ function fmtWhen(iso){
 function renderLastDeath(ld){
   const box = $("lastDeath");
   if (!ld || !ld.player){ box.hidden = true; return; }
-  const p = players.find(x => x.id === ld.player);
+  const p = allPlayers.find(x => x.id === ld.player);
   const name = p ? p.name : ld.player;
   $("ldText").innerHTML = `<b>${esc(name)}</b>${p && p.nick && p.nick !== p.name ? nickHtml(p) : ""} by ${esc(ld.cause || "unknown causes")}`;
   $("ldTime").textContent = ld.time ? "(" + fmtWhen(ld.time) + ")" : "";
@@ -1826,7 +1826,7 @@ document.addEventListener("click", e => {
 function renderShame(){
   const sec = $("shameSec"), box = $("shame");
   if (!deaths.length){ sec.hidden = true; return; }
-  const byId = Object.fromEntries(players.map(p => [p.id, p]));
+  const byId = Object.fromEntries(allPlayers.map(p => [p.id, p]));
   const nm = id => { const p = byId[id]; return p ? (p.nick || p.name) : id; };
   const killer = c => { const m = /(?:by|fighting) ([A-Z][A-Za-z ]*?)$/.exec(c || ""); return m ? m[1] : null; };
   const count = arr => arr.reduce((m,k) => (k == null ? m : (m[k] = (m[k]||0) + 1, m)), {});
@@ -1942,7 +1942,7 @@ function renderShame(){
 function renderPunishments(list){
   const sec = $("punSec");
   if (!list || !list.length){ sec.hidden = true; return; }
-  const byId = Object.fromEntries(players.map(p => [p.id, p]));
+  const byId = Object.fromEntries(allPlayers.map(p => [p.id, p]));
   const sorted = [...list].sort((a,b) => Date.parse(a.time||0) - Date.parse(b.time||0));
   $("punList").innerHTML = sorted.map((x, i) => {
     const p = byId[x.player];
@@ -2767,13 +2767,13 @@ function renderTicker(){
   const news = [];
   const live = realDeaths(), last = live[live.length - 1];
   if (last){
-    const p = players.find(x => x.id === last.player);
+    const p = allPlayers.find(x => x.id === last.player);
     news.push(`<span class="tk-it"><span class="tk-k">LATEST</span>${esc(shortName(p))} ${esc(causeText(last.cause))}${deathMs(last) ? ` <span class="tk-dim">· ${esc(agoText(deathMs(last)))}</span>` : ""}</span>`);
   }
   players.filter(p => isGolden(p.id)).forEach(p => news.push(`<span class="tk-it"><span class="tk-gold">★ GOLDEN COOKIE</span>${esc(shortName(p))} got lucky today. Crack it on their page!</span>`));
   const odds = players.map(p => ({p, o: deathOdds(p.id)})).sort((a, b) => b.o - a.o)[0];
   if (odds) news.push(`<span class="tk-it"><span class="tk-k">FORECAST</span>Most likely to die today: ${esc(shortName(odds.p))} (${odds.o}%)</span>`);
-  onThisDay().forEach(x => { const p = players.find(y => y.id === x.d.player); news.push(`<span class="tk-it"><span class="tk-k">${esc(x.label.toUpperCase())}</span>${esc(shortName(p))} ${esc(causeText(x.d.cause))}</span>`); });
+  onThisDay().forEach(x => { const p = allPlayers.find(y => y.id === x.d.player); news.push(`<span class="tk-it"><span class="tk-k">${esc(x.label.toUpperCase())}</span>${esc(shortName(p))} ${esc(causeText(x.d.cause))}</span>`); });
   if (progress && progress.age){
     const a = QUESTS && QUESTS.ages ? QUESTS.ages[progress.age - 1] : null;
     news.push(`<span class="tk-it"><span class="tk-k">QUEST</span>Age ${progress.age}${a ? " · " + esc(a.name) : ""} · quest ${progress.quest}${a ? " of " + a.quests.length : ""}</span>`);
@@ -2805,7 +2805,7 @@ function checkBreaking(){
   const el = $("tkBrk"), d = realDeaths().filter(x => x.time).pop();
   const since = d ? Date.now() - Date.parse(d.time) : Infinity;
   if (!d || since < -60000 || since > BREAKING_MS){ el.hidden = true; return; }
-  const p = players.find(x => x.id === d.player), pts = deathPts(d);
+  const p = allPlayers.find(x => x.id === d.player), pts = deathPts(d);
   el.innerHTML = `<span class="bt">BREAKING NEWS</span><span class="bx">${esc(shortName(p))} ${esc(causeText(d.cause))}.${pts ? ` Points +${pts}.` : ""}</span>`;
   el.hidden = false;
 }
@@ -3023,7 +3023,8 @@ function applyData(d){
   meta = {priorDeaths: d.priorDeaths || 0};
   const cp = d.currentPunishment || {};
   $("cpText").textContent = cp.text || "None right now";
-  players = d.players || []; deaths = d.deaths || [];
+  // Players marked inactive keep their old deaths in the log but get no card, points or awards
+  allPlayers = d.players || []; players = allPlayers.filter(p => !p.inactive); deaths = d.deaths || [];
   if (d.progress){ progress = d.progress; viewAge = progress.age; renderQuests(); }
   renderLastDeath(d.lastDeath);
   punData = d.punishments || [];
