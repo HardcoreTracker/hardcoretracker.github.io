@@ -3112,7 +3112,7 @@ function applyData(d){
 }
 // Load the data, then check for updates every minute so new deaths show up without refreshing.
 function loadData(first){
-  return fetch("data.json" + (first ? "" : "?t=" + Date.now()), {cache:"no-store"}).then(r => { if (!r.ok) throw 0; return r.text(); }).then(text => {
+  return fetch("data.json?t=" + Date.now(), {cache:"no-store"}).then(r => { if (!r.ok) throw 0; return r.text(); }).then(text => {
     if (text === lastDataText) return;
     lastDataText = text;
     applyData(JSON.parse(text));
