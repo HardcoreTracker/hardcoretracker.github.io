@@ -1038,7 +1038,7 @@ if (!reduceMotion){
   const frame = ts => {
     if (!last) last = ts;
     panoT += Math.min(0.1, (ts - last) / 1000); last = ts;
-    if (ts - lastDraw > 33){ drawPano(); lastDraw = ts; }
+    if (ts - lastDraw > 40){ drawPano(); lastDraw = ts; }
     requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
@@ -2343,10 +2343,23 @@ function checkMilestones(d){
 }
 
 // ---------- page decorations (Halloween and Christmas only) ----------
+// Pixel art as one SVG path per color (runs of pixels merged), instead of one <rect> per pixel
+function pixPaths(rows, colors){
+  const d = {};
+  rows.forEach((row, y) => {
+    let x = 0;
+    while (x < row.length){
+      const ch = row[x]; let w = 1;
+      while (x + w < row.length && row[x + w] === ch) w++;
+      if (colors[ch]) d[ch] = (d[ch] || "") + `M${x} ${y}h${w}v1h-${w}z`;
+      x += w;
+    }
+  });
+  return Object.keys(d).map(ch => `<path d="${d[ch]}" fill="${colors[ch]}"/>`).join("");
+}
 function pixSvg(rows, colors, scale){
-  const w = rows[0].length, hgt = rows.length; let r = "";
-  rows.forEach((row, y) => [...row].forEach((ch, x) => { if (colors[ch]) r += `<rect x="${x}" y="${y}" width="1" height="1" fill="${colors[ch]}"/>`; }));
-  return `<svg width="${w*scale}" height="${hgt*scale}" viewBox="0 0 ${w} ${hgt}" shape-rendering="crispEdges">${r}</svg>`;
+  const w = rows[0].length, hgt = rows.length;
+  return `<svg width="${w*scale}" height="${hgt*scale}" viewBox="0 0 ${w} ${hgt}" shape-rendering="crispEdges">${pixPaths(rows, colors)}</svg>`;
 }
 const PUMPKIN = pixSvg(["...gg...","..oggo..","oooooooo","oyooooyo","oooooooo","oyyyyyyo",".oooooo."], {g:"#3F7A2E", o:"#E87A1A", y:"#FFE14D"}, 3);
 const WEB = `<svg width="56" height="56" viewBox="0 0 28 28" fill="none" stroke="rgba(235,235,245,.75)" stroke-width=".6" shape-rendering="crispEdges"><path d="M0 0L28 28M0 0L28 10M0 0L10 28M0 0L28 0M0 0L0 28"/><path d="M0 7Q4 4 7 0M0 14Q8 8 14 0M0 21Q12 12 21 0M0 27Q16 16 27 0"/></svg>`;
@@ -2834,7 +2847,7 @@ function checkBreaking(){
 }
 setInterval(() => { if (!document.hidden && players.length) renderTicker(); }, 30000);
 // Fortune cookie on player pages
-const PIX = (rows, pal) => { let r = ""; rows.forEach((row, y) => [...row].forEach((c, x) => { if (pal[c]) r += `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${pal[c]}"/>`; })); return r; };
+const PIX = (rows, pal) => pixPaths(rows, pal);
 const CK_PAL = {"o": "#2B1606", "h": "#FFF4D6", "l": "#FFD58A", "b": "#F4A640", "s": "#D9822B", "d": "#A85A17", "p": "#FFFFFF", "g": "#D6D6D6", "r": "#D32F2F"};
 const CK_GOLD = {"o": "#3A2600", "h": "#FFFFFF", "l": "#FFF3A0", "b": "#FFD23F", "s": "#E8A317", "d": "#B07400", "p": "#FFFFFF", "g": "#D6D6D6", "r": "#D32F2F"};
 const COOKIE_CLOSED_SVG = pal => `<svg viewBox="0 0 33 19" style="width:106px;height:61px" shape-rendering="crispEdges" aria-hidden="true">${PIX([
