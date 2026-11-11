@@ -312,6 +312,43 @@ body.ov-open{overflow:hidden}
 @keyframes dc-twinkle{50%{opacity:.35;box-shadow:none}}
 #decor .icicles{height:16px}
 #decor .icicles i{position:absolute;top:0;width:5px;background:linear-gradient(#FFFFFF,#BFE3FF);clip-path:polygon(0 0,100% 0,50% 100%)}
+#decor .garland{height:26px}
+#decor .garland > svg{position:absolute;left:0;top:0;width:100%;height:12px}
+#decor .garland .gi svg{display:block}
+#decor .garland .gi{position:absolute;top:5px;transform-origin:top center;animation:dc-sway 3s ease-in-out infinite}
+@keyframes dc-sway{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+#decor .spider.love .thread{background:rgba(255,200,215,.8)}
+#decor .tilt{transform:rotate(-14deg)}
+#decor .hop{animation:dc-hop 1.8s steps(3,end) infinite}
+@keyframes dc-hop{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+#decor .wave{animation:dc-wave 1.4s steps(2,end) infinite;transform-origin:bottom left}
+@keyframes dc-wave{50%{transform:skewY(-4deg)}}
+#decor .float{animation:dc-float 4s ease-in-out infinite}
+#decor .float.slow{animation-duration:5.5s}
+@keyframes dc-float{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
+#decor .peek{animation:dc-peek 6s ease-in-out infinite}
+@keyframes dc-peek{0%,30%,100%{transform:translateY(16px);opacity:0}40%,85%{transform:translateY(0);opacity:1}}
+#decor .walk{animation:dc-walk 16s linear infinite}
+@keyframes dc-walk{0%{transform:translateX(0) scaleX(-1)}46%{transform:translateX(var(--dist)) scaleX(-1)}50%{transform:translateX(var(--dist)) scaleX(1)}96%{transform:translateX(0) scaleX(1)}100%{transform:translateX(0) scaleX(-1)}}
+#decor .cracks{opacity:.8}
+#decor .cracks svg{display:block;width:100%;height:100%}
+body.season-valentines header.top h1{color:#FFE3EC;text-shadow:3px 3px 0 #B3264F}
+body.season-stpatricks header.top h1{color:#E6FFE0;text-shadow:3px 3px 0 #1F6B2E}
+body.season-july4 header.top h1{color:#FFFFFF;text-shadow:3px 3px 0 #B3261E, 6px 6px 0 #2F4FBF}
+body.season-thanksgiving header.top h1{color:#FFF1D6;text-shadow:3px 3px 0 #8A3A10}
+body.season-newyear header.top h1{color:#FFF3C0;text-shadow:3px 3px 0 #8A6A10}
+body.season-easter header.top h1{color:#FFFFFF;text-shadow:3px 3px 0 #B06A9A}
+body.season-fri13 header.top h1{animation:f13flicker 7s steps(1,end) infinite}
+@keyframes f13flicker{0%,100%{opacity:1}90%{opacity:.35}91%{opacity:1}93%{opacity:.55}94%{opacity:1}}
+body.season-aprilfools .wrap .panel{animation:afWobble 5s ease-in-out infinite}
+body.season-aprilfools .wrap .panel:nth-child(2n){animation-delay:-2.5s}
+@keyframes afWobble{0%,100%{transform:rotate(-.5deg)}50%{transform:rotate(.5deg)}}
+.nybar .tag{color:#FFE680}
+.nybar .text{font-size:20px;font-weight:700}
+.nybar .text b{color:var(--accent);font-size:26px}
+.nybar.soon .text b{animation:nyPulse .5s steps(2,end) infinite}
+@keyframes nyPulse{50%{opacity:.4}}
+@media (prefers-reduced-motion: reduce){#decor .garland .gi,#decor .hop,#decor .wave,#decor .float,#decor .peek,#decor .walk{animation:none}#decor .peek{opacity:1;transform:none}body.season-aprilfools .wrap .panel,body.season-fri13 header.top h1,.nybar.soon .text b{animation:none}}
 @media (prefers-reduced-motion: reduce){#decor .menorah .flame,#decor .spin,#decor .dc,#decor .spider,#decor .lights i{animation:none}}
 .agechip{display:inline-flex;align-items:center;gap:7px;font-weight:600;white-space:nowrap}
 .agechip::before{content:"";width:10px;height:10px;background:var(--c);box-shadow:0 0 0 2px var(--outline);flex:none}
@@ -719,6 +756,23 @@ function buildLayer(seed, o){
     } else if (o.eggs && r() < o.eggs){
       const ec = pick(["#FF8FB8", "#8FD3FF", "#FFE36B", "#B79BFF", "#9BEFA0"]);
       px(sx + 2, sy - 4, 3, 4, ec); px(sx + 2, sy - 3, 3, 1, "#FFFFFF");
+    } else if (o.bunnies && r() < o.bunnies){
+      const bc = pick(["#F4F4F4", "#C9A27A", "#9A9AA2"]);
+      px(sx + 1, sy - 3, 4, 3, bc); px(sx + 4, sy - 5, 2, 2, bc); px(sx + 4, sy - 7, 1, 2, bc); px(sx + 5, sy - 8, 1, 3, bc);
+      px(sx + 5, sy - 4, 1, 1, "#222222"); px(sx, sy - 3, 1, 1, "#FFFFFF");
+    } else if (o.flags && r() < o.flags){
+      px(sx + 1, sy - 11, 1, 11, "#CFCFCF");
+      px(sx + 2, sy - 11, 6, 4, "#F4F4F4"); px(sx + 2, sy - 11, 6, 1, "#D02B2B"); px(sx + 2, sy - 9, 6, 1, "#D02B2B"); px(sx + 2, sy - 7, 6, 1, "#D02B2B");
+      px(sx + 2, sy - 11, 3, 2, "#2F4FBF"); px(sx + 3, sy - 10, 1, 1, "#FFFFFF");
+    } else if (o.turkeys && r() < o.turkeys){
+      px(sx - 1, sy - 8, 1, 3, "#C2361E"); px(sx, sy - 9, 1, 4, "#E8A41F"); px(sx + 1, sy - 9, 1, 4, "#D9621E"); px(sx + 2, sy - 8, 1, 3, "#C2361E");
+      px(sx, sy - 5, 5, 4, "#6B4226"); px(sx + 4, sy - 7, 2, 2, "#C9A27A"); px(sx + 6, sy - 6, 1, 1, "#E8A41F"); px(sx + 5, sy - 5, 1, 1, "#E03030");
+      px(sx + 1, sy - 1, 1, 1, "#E8A41F"); px(sx + 3, sy - 1, 1, 1, "#E8A41F");
+    } else if (o.hay && r() < o.hay){
+      px(sx, sy - PB, PB, PB, "#D9B23A"); px(sx, sy - PB + 2, PB, 1, "#A8781E"); px(sx, sy - PB + 4, PB, 1, "#A8781E");
+    } else if (o.cats && r() < o.cats){
+      px(sx + 1, sy - 4, 4, 4, "#151018"); px(sx + 1, sy - 7, 3, 3, "#151018"); px(sx + 1, sy - 8, 1, 1, "#151018"); px(sx + 3, sy - 8, 1, 1, "#151018");
+      px(sx + 1, sy - 6, 1, 1, "#E8E030"); px(sx + 3, sy - 6, 1, 1, "#E8E030"); px(sx + 5, sy - 3, 1, 3, "#151018"); px(sx + 6, sy - 4, 1, 1, "#151018");
     } else if (o.flowers && r() < o.flowers){
       px(sx + 2, sy - 3, 1, 3, "#3F7D2B"); px(sx + 1, sy - 4, 3, 2, pick(o.flowerColors));
     }
@@ -783,9 +837,14 @@ function palette(key, night){
   const leaves = season === "spring" ? [["#4E9A33","#4E9A33","#F2A7C3"],["#45902E","#F0B3CD","#45902E"]]
               : season === "fall" ? [["#D9621E","#C2361E","#E8A41F","#9B2B1A","#6E8A2A"],["#C8501A","#A8301C","#E09A20","#7E2216"]]
               : season === "winter" ? [["#2F5A32"],["#274E2B"]] : [["#3F7D2B"],["#346B24"]];
-  const flowers = holiday === "easter" ? .3 : season === "spring" ? .25 : season === "summer" ? .06 : 0;
+  const flowers = holiday === "easter" || holiday === "valentines" ? .32 : season === "spring" ? .25 : season === "summer" ? .06 : 0;
   const deco = {
-    flowers, flowerColors:["#FF6B9A","#FFE14D","#FFFFFF","#B38BFF","#FF9A3B"],
+    flowers, flowerColors: holiday === "valentines" ? ["#E8233F","#FF4D6D","#FF8FB8","#C2185B","#FFFFFF"] : ["#FF6B9A","#FFE14D","#FFFFFF","#B38BFF","#FF9A3B"],
+    bunnies: holiday === "easter" ? .05 : 0,
+    flags: holiday === "july4" ? .045 : 0,
+    turkeys: holiday === "thanksgiving" ? .045 : 0,
+    hay: holiday === "thanksgiving" ? .035 : 0,
+    cats: holiday === "fri13" ? .035 : 0,
     pumpkins: holiday === "halloween" ? .07 : season === "fall" ? .015 : 0,
     eggs: holiday === "easter" ? .08 : 0,
     lights: holiday === "christmas" || (season === "winter" && new Date().getMonth() === 11)
@@ -889,6 +948,17 @@ function drawMenorah(W, lit){
     pctx.fillStyle = "rgba(255,217,59,.35)"; pctx.fillRect(x - 1, top - 3, 3, 3);
   }
 }
+// Friday the 13th: eyes blinking in the dark hills
+function drawEyes(W, dark){
+  for (let i = 0; i < 7; i++){
+    if (Math.sin(panoT * 0.8 + i * 2.3) > 0.9) continue;
+    const x = Math.floor(W * (0.06 + i * 0.14) + (i * 37) % 23), y = PH - 9 - (i * 7) % 11;
+    pctx.globalAlpha = Math.min(1, dark * 1.3);
+    pctx.fillStyle = i % 3 === 0 ? "#FF3B3B" : "#F4F4C0";
+    pctx.fillRect(x, y, 1, 1); pctx.fillRect(x + 3, y, 1, 1);
+  }
+  pctx.globalAlpha = 1;
+}
 function drawRainbow(W){
   const cx = W * 0.7, cy = PH * 0.8, cols = ["#FF4B4B","#FF9A3B","#FFE14D","#55D255","#4B9BFF","#8B5BFF"];
   pctx.globalAlpha = 0.45; pctx.lineWidth = 3;
@@ -922,6 +992,8 @@ function drawPano(){
     const prog = sunUp ? (hr - 5.5) / 13 : ((hr >= 18.5 ? hr - 18.5 : hr + 5.5) / 11);
     const bx = Math.floor(W * (0.06 + 0.86 * prog)), by = Math.floor(PH * 0.62 - Math.sin(Math.PI * prog) * PH * 0.5);
     if (holiday === "halloween"){ pctx.fillStyle = "rgba(70,0,90," + (0.28 * dark) + ")"; pctx.fillRect(0, 0, W, PH); }
+    const tint = {valentines: "rgba(255,110,170,.16)", thanksgiving: "rgba(255,150,40,.12)", fri13: "rgba(30,0,40,.32)"}[holiday];
+    if (tint){ pctx.fillStyle = tint; pctx.fillRect(0, 0, W, PH); }
     if (!sunUp && holiday === "halloween"){
       pctx.fillStyle = "#FF9A2E"; pctx.fillRect(bx - 5, by - 5, 28, 28);
       pctx.fillStyle = "rgba(200,90,20,.6)"; pctx.fillRect(bx + 2, by + 3, 5, 5); pctx.fillRect(bx + 13, by + 12, 4, 4); pctx.fillRect(bx + 6, by + 15, 3, 3);
@@ -947,6 +1019,7 @@ function drawPano(){
     }
   });
   if (world === "overworld"){ const n = hanukkahCandles(); if (n) drawMenorah(W, n); }
+  if (world === "overworld" && holiday === "fri13") drawEyes(W, Math.max(0.35, dark));
   drawWeather(W);
   pctx.restore();
 }
@@ -1010,12 +1083,25 @@ function drawFigure(canvas, im){
   santaHat(ctx, 4, 0);
 }
 // Pixel Santa hat drawn over the top of the head on Christmas
+// Holiday hats drawn over the top of each player's head
 function santaHat(ctx, ox, oy){
   let hol = null; try { hol = holidayNow(); } catch(e){}
-  if (hol !== "christmas") return;
-  ctx.fillStyle = "#C8102E"; ctx.fillRect(ox + 1, oy, 5, 1); ctx.fillRect(ox, oy + 1, 8, 1);
-  ctx.fillStyle = "#9E0B22"; ctx.fillRect(ox + 5, oy, 1, 1);
-  ctx.fillStyle = "#F4F4F4"; ctx.fillRect(ox, oy + 2, 8, 1); ctx.fillRect(ox + 6, oy, 2, 1);
+  const f = (c, x, y, w, h) => { ctx.fillStyle = c; ctx.fillRect(ox + x, oy + y, w, h); };
+  if (hol === "christmas"){
+    f("#C8102E", 1, 0, 5, 1); f("#C8102E", 0, 1, 8, 1); f("#9E0B22", 5, 0, 1, 1); f("#F4F4F4", 0, 2, 8, 1); f("#F4F4F4", 6, 0, 2, 1);
+  } else if (hol === "stpatricks"){
+    f("#1F7A34", 2, 0, 4, 1); f("#111111", 2, 1, 4, 1); f("#E8B23A", 3, 1, 2, 1); f("#1F7A34", 0, 2, 8, 1);
+  } else if (hol === "thanksgiving"){
+    f("#1A1A1A", 2, 0, 4, 1); f("#1A1A1A", 2, 1, 4, 1); f("#E8B23A", 3, 1, 2, 1); f("#1A1A1A", 0, 2, 8, 1);
+  } else if (hol === "newyear"){
+    f("#FFFFFF", 3, 0, 1, 1); f("#FF3B8B", 4, 0, 1, 1); f("#3BA8FF", 2, 1, 4, 1); f("#FFD93B", 1, 2, 6, 1);
+  } else if (hol === "easter"){
+    f("#F4F4F4", 1, 0, 2, 2); f("#F4F4F4", 5, 0, 2, 2); f("#FFB3C8", 2, 0, 1, 2); f("#FFB3C8", 5, 0, 1, 2);
+  } else if (hol === "valentines"){
+    f("#FF2E4D", 5, 0, 1, 1); f("#FF2E4D", 7, 0, 1, 1); f("#FF2E4D", 5, 1, 3, 1); f("#FF2E4D", 6, 2, 1, 1);
+  } else if (hol === "july4"){
+    f("#2F4FBF", 2, 0, 4, 1); f("#FFFFFF", 3, 0, 1, 1); f("#D02B2B", 2, 1, 4, 1); f("#F4F4F4", 0, 2, 8, 1);
+  }
 }
 function drawHead(canvas, im){
   canvas.width = 8; canvas.height = 8;
@@ -2017,11 +2103,13 @@ function holidayNow(){
   if (m === 10 && day === nthWeekday(10, 4, 4)) return "thanksgiving";
   if (m === 11 && (day === 24 || day === 25)) return "christmas";
   if (hanukkahCandles() > 0) return "hanukkah";
+  if (d.getDay() === 5 && day === 13) return "fri13";
   return null;
 }
 function specialDayWeather(){
   const d = new Date(), m = d.getMonth(), day = d.getDate(), dow = d.getDay(), hol = holidayNow();
-  if (hol === "newyear" || hol === "july4" || hol === "easter" || hol === "aprilfools") return "clear";
+  if (hol === "newyear") return "confetti";
+  if (hol === "july4" || hol === "easter" || hol === "aprilfools") return "clear";
   if (hol === "valentines") return "hearts";
   if (hol === "stpatricks") return "clovers";
   if (hol === "christmas") return "snow";
@@ -2052,7 +2140,7 @@ function pickWeather(){
 }
 function setWeather(){
   weatherNow = pickWeather();
-  const n = weatherNow === "clear" ? 0 : weatherNow === "hearts" ? 24 : weatherNow === "clovers" ? 30 : weatherNow === "snow" ? 90 : weatherNow === "leaves" ? 26 : weatherNow === "ash" ? 70 : weatherNow === "end" ? 60 : 140;
+  const n = weatherNow === "clear" ? 0 : weatherNow === "hearts" ? 24 : weatherNow === "clovers" ? 30 : weatherNow === "confetti" ? 70 : weatherNow === "snow" ? 90 : weatherNow === "leaves" ? 26 : weatherNow === "ash" ? 70 : weatherNow === "end" ? 60 : 140;
   let s = 7; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
   flakes = Array.from({length: n}, () => ({x: rnd(), y: rnd(), v: 0.6 + rnd()*0.8, w: rnd()}));
 }
@@ -2078,6 +2166,14 @@ function drawWeather(W){
       const x = Math.floor(((f.x * W) + Math.sin(panoT * 0.9 + f.w * 8) * 5 + W) % W);
       pctx.fillStyle = i % 2 ? "#FF5C8A" : "#FF2E4D";
       pctx.fillRect(x, Math.floor(y), 1, 1); pctx.fillRect(x + 2, Math.floor(y), 1, 1); pctx.fillRect(x, Math.floor(y) + 1, 3, 1); pctx.fillRect(x + 1, Math.floor(y) + 2, 1, 1);
+    });
+  } else if (weatherNow === "confetti"){
+    const cc = ["#FF5555","#FFAA00","#FFFF55","#55FF55","#55FFFF","#FF55FF","#FFFFFF"];
+    flakes.forEach((f, i) => {
+      const y = ((f.y * PH) + panoT * 14 * f.v) % (PH + 4) - 2;
+      const x = Math.floor(((f.x * W) + Math.sin(panoT * 1.3 + f.w * 9) * 6 + W) % W);
+      const flat = Math.sin(panoT * 4 + f.w * 20) > 0;
+      pctx.fillStyle = cc[i % cc.length]; pctx.fillRect(x, Math.floor(y), flat ? 2 : 1, flat ? 1 : 2);
     });
   } else if (weatherNow === "clovers"){
     flakes.forEach((f, i) => {
@@ -2130,6 +2226,9 @@ function applySeason(){
   if (hol) document.body.classList.add("season-" + hol);
   document.body.classList.add("land-" + land);
   if (hol === "newyear") setTimeout(() => launchFireworks(9000), 1200);
+  const h1 = document.querySelector("header.top h1");
+  if (h1){ if (!h1.dataset.orig) h1.dataset.orig = h1.textContent; h1.textContent = hol === "aprilfools" ? "Hardcore Pointless Tracker" : h1.dataset.orig; }
+  newYearBar(hol === "newyear");
   if (hol === "aprilfools" && !skinsSwapped && players.length > 1){
     skinsSwapped = true;
     // Random shuffle on every page load, making sure nobody keeps their own skin
@@ -2147,6 +2246,31 @@ function applySeason(){
   document.querySelectorAll("canvas[data-kind]").forEach(cv => { const id = cv.dataset.skin; if (id) loadImg(id).then(im => { if (im) (cv.dataset.kind === "fig" ? drawFigure : drawHead)(cv, im); }); });
 }
 
+// New Year's Eve countdown (Dec 31), then "Happy New Year" on Jan 1. Uses the viewer's own clock.
+let nyTimer = null, nyFired = false, nyCounting = false;
+function newYearBar(on){
+  let bar = document.getElementById("nyBar");
+  clearInterval(nyTimer);
+  if (!on){ if (bar) bar.hidden = true; scheduleDecor(); return; }
+  if (!bar){
+    bar = document.createElement("section");
+    bar.className = "panel tipbar nybar"; bar.id = "nyBar"; bar.setAttribute("aria-label", "New Year countdown");
+    bar.innerHTML = '<span class="tag">NEW YEAR</span><span class="text" id="nyText"></span>';
+    document.querySelector("header.top").insertAdjacentElement("afterend", bar);
+  }
+  bar.hidden = false;
+  const tick = () => {
+    const now = new Date(), y = now.getFullYear();
+    if (now.getMonth() === 0){ if (nyCounting && !nyFired){ nyFired = true; launchFireworks(20000); } bar.classList.remove("soon"); document.getElementById("nyText").innerHTML = `Happy New Year! Welcome to <b>${y}</b>`; return; }
+    const ms = new Date(y + 1, 0, 1) - now;
+    nyCounting = true;
+    const t = Math.ceil(ms / 1000), hh = Math.floor(t / 3600), mm = Math.floor(t % 3600 / 60), ss = t % 60;
+    bar.classList.toggle("soon", t <= 60);
+    document.getElementById("nyText").innerHTML = `<b>${y + 1}</b> in <b>${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}</b>`;
+  };
+  tick(); nyTimer = setInterval(tick, 1000);
+  scheduleDecor();
+}
 // Fireworks drawn on their own layer above the page
 const fwCanvas = document.createElement("canvas");
 fwCanvas.className = "fw-canvas"; fwCanvas.setAttribute("aria-hidden", "true");
@@ -2231,17 +2355,110 @@ function menorahSvg(lit){
   }
   return `<svg width="105" height="72" viewBox="0 0 35 24" shape-rendering="crispEdges">${r}</svg>`;
 }
+const HEART_R = pixSvg([".rr.rr.","rwrrrrr","rrrrrrr",".rrrrr.","..rrr..","...r..."], {r:"#E8233F", w:"#FF9AAE"}, 3);
+const HEART_P = pixSvg([".rr.rr.","rwrrrrr","rrrrrrr",".rrrrr.","..rrr..","...r..."], {r:"#FF6FA0", w:"#FFD0DE"}, 3);
+const HEART_S = (c) => pixSvg([".r.r.","rrrrr",".rrr.","..r.."], {r:c}, 2);
+const SHAMROCK = pixSvg(["..ggg..","..gGg..","ggg.ggg","gGgggGg","ggg.ggg","...s...","...s..."], {g:"#2FA84F", G:"#5FD07A", s:"#1F7A34"}, 3);
+const POT_GOLD = pixSvg(["..y.yy.y..",".yyYyyYyy.","kkkkkkkkkk",".kKkkkkkk.",".kkkkkkkk.","..kkkkkk.."], {y:"#F4C430", Y:"#FFF08A", k:"#2A2A2A", K:"#5A5A5A"}, 3);
+const LEP_HAT = pixSvg(["..gggggg..","..gGgggg..","..kkkkkk..","..kkyykk..","..gggggg..","gggggggggg"], {g:"#1F7A34", G:"#3FA858", k:"#111111", y:"#E8B23A"}, 3);
+const BASKET = pixSvg(["..p...y..c.",".ppp.yyyccc","bbbbbbbbbbb",".bdbdbdbdb.",".dbdbdbdbd.","..bbbbbbb.."], {p:"#FF8FB8", y:"#FFE36B", c:"#8FD3FF", b:"#C68A4A", d:"#9A6A34"}, 3);
+const BUNNY = pixSvg([".w...w.",".wp.pw.",".wp.pw.","wwwwwww","wkwwwkw","wwwpwww",".wwwww."], {w:"#F4F4F4", p:"#FFB3C8", k:"#222222"}, 3);
+const EGG = (c) => pixSvg([".cc.","cwwc","cccc",".cc."], {c, w:"#FFFFFF"}, 3);
+const US_FLAG = pixSvg(["pbbbrrrr","pbwbwwww","pbbbrrrr","pwwwwwww","prrrrrrr","p.......","p......."], {p:"#CFCFCF", b:"#2F4FBF", w:"#F4F4F4", r:"#D02B2B"}, 3);
+const LEAF = (c) => pixSvg(["..c..",".ccc.","ccccc",".ccc.","..s.."], {c, s:"#6B4F2A"}, 2);
+const PIE = pixSvg(["..tttttt..",".tottottt.","tttttttttt","cccccccccc",".cccccccc."], {t:"#E0A050", o:"#C8501A", c:"#B07A3A"}, 3);
+const TURKEY = pixSvg(["o.y.o....","royor....","rbbbr.hh.",".bbbbbhx.",".bbbbbb..","..y..y..."], {o:"#E8A41F", y:"#F4C430", r:"#C2361E", b:"#6B4226", h:"#C9A27A", x:"#E03030"}, 3);
+const CORN = pixSvg(["..y..",".yyy.",".yYy.",".yyy.","gyyyg",".g.g."], {y:"#F4C430", Y:"#FFF08A", g:"#7A9A3A"}, 3);
+const BALLOON = (c) => pixSvg([".ccc.","cwccc","ccccc","ccccc",".ccc.","..c..","..s..","...s.","..s..","..s.."], {c, w:"#FFFFFF", s:"#DDDDDD"}, 3);
+const PARTY_HAT = pixSvg(["....w....","...ppp...","..yyyyy..","..ppppp..",".yyyyyyy.",".ppppppp.","bbbbbbbbb"], {w:"#FFFFFF", p:"#FF3B8B", y:"#FFD93B", b:"#3BA8FF"}, 3);
+const CREEPER = pixSvg(["gggggggg","gGgggGgg","gkkggkkg","gkkggkkg","gggkkggg","ggkkkkgg","ggkkkkgg","ggkggkgg"], {g:"#5BAF3C", G:"#7BD45A", k:"#1A1A1A"}, 3);
+const BLACK_CAT = pixSvg(["k.k......","kkk......","ykyk.....","kkkk....k",".kkkkkkk.",".kkkkkkk.",".k.k..k.k"], {k:"#151018", y:"#E8E030"}, 3);
+const PENNANT = (c) => `<svg width="14" height="16" viewBox="0 0 7 8" shape-rendering="crispEdges"><path d="M0 0H7V2H6V4H5V6H4V8H3V6H2V4H1V2H0Z" fill="${c}"/><path d="M0 0H7V1H0Z" fill="rgba(255,255,255,.35)"/></svg>`;
+const CRACKS = `<svg width="100%" height="100%" viewBox="0 0 100 60" preserveAspectRatio="none"><path d="M72 0L66 17L78 25L61 39L67 60M66 17L50 21L44 30M78 25L94 29M61 39L45 46L38 60M50 21L52 8" stroke="rgba(255,255,255,.6)" stroke-width="1" fill="none" vector-effect="non-scaling-stroke"/></svg>`;
 let decorLayer = null;
 function placeDecor(){
   let hol = null; try { hol = holidayNow(); } catch(e){}
   if (!decorLayer){ decorLayer = document.createElement("div"); decorLayer.id = "decor"; decorLayer.setAttribute("aria-hidden", "true"); document.body.appendChild(decorLayer); }
   decorLayer.innerHTML = "";
-  if (hol !== "halloween" && hol !== "christmas" && hol !== "hanukkah") return;
+  if (!["halloween","christmas","hanukkah","valentines","stpatricks","easter","july4","thanksgiving","newyear","aprilfools","fri13"].includes(hol)) return;
   const sy = scrollY, sx = scrollX;
   const box = el => { const r = el.getBoundingClientRect(); return {l: r.left + sx, t: r.top + sy, w: r.width, h: r.height}; };
   const add = (html, l, t, cls) => { const d = document.createElement("div"); d.className = "dc " + (cls || ""); d.style.left = l + "px"; d.style.top = t + "px"; d.innerHTML = html; decorLayer.appendChild(d); return d; };
   const targets = [...document.querySelectorAll(".lastdeath:not([hidden]), .tipbar:not([hidden]), .podium-panel, .spot, #questSec, .rules, #punSec .pun-panel")].filter(el => el.offsetParent);
-  if (hol === "halloween"){
+  // A string along the top of a panel with little things hanging from it
+  const garland = (b, i, item, itemW, strColor) => {
+    const n = Math.max(3, Math.floor(b.w / 30));
+    let items = "";
+    for (let k = 0; k < n; k++) items += `<span class="gi" style="left:${Math.round((k + 0.5) * (b.w / n) - itemW / 2)}px;animation-delay:-${((k * 37) % 23) / 10}s">${item(k)}</span>`;
+    add(`<svg width="${b.w}" height="12" preserveAspectRatio="none" viewBox="0 0 ${n*10} 12"><path d="${Array.from({length:n}, (_, k) => `M${k*10} 2Q${k*10+5} 7 ${k*10+10} 2`).join("")}" stroke="${strColor}" stroke-width="1.2" fill="none"/></svg>${items}`, b.l, b.t - 3, "garland").style.width = b.w + "px";
+  };
+  const title = document.querySelector("header.top h1"), tb = title ? box(title) : null;
+  if (hol === "valentines"){
+    targets.forEach((el, i) => {
+      const b = box(el);
+      garland(b, i, k => HEART_S(["#E8233F", "#FF6FA0", "#FFFFFF"][(k + i) % 3]), 10, "#B3264F");
+      add(i % 2 ? HEART_P : HEART_R, b.l + b.w * (i % 2 ? 0.82 : 0.08), b.t - 22, "bob");
+    });
+    if (tb){ const h = add(`<span class="thread"></span>${HEART_R}`, tb.l + Math.min(tb.w - 30, 300), 0, "spider love"); h.style.height = (tb.t + 10) + "px"; }
+  } else if (hol === "stpatricks"){
+    targets.forEach((el, i) => {
+      const b = box(el);
+      garland(b, i, k => PENNANT(["#1F9A44", "#FFFFFF", "#F4A21E"][(k + i) % 3]), 14, "#1F5A2E");
+      add(SHAMROCK, b.l - 6, b.t - 8, "bob"); add(SHAMROCK, b.l + b.w - 16, b.t - 8, "bob slow");
+    });
+    const pod = document.querySelector(".podium-panel");
+    if (pod){ const b = box(pod); add(POT_GOLD, b.l + 10, b.t + b.h - 26); add(GELT, b.l + 44, b.t + b.h - 18, "bob"); add(GELT, b.l + 58, b.t + b.h - 16, "bob slow"); }
+    if (tb) add(LEP_HAT, tb.l - 10, tb.t - 24, "tilt");
+  } else if (hol === "easter"){
+    const pastel = ["#FF8FB8", "#8FD3FF", "#FFE36B", "#B79BFF", "#9BEFA0"];
+    targets.forEach((el, i) => {
+      const b = box(el);
+      garland(b, i, k => PENNANT(pastel[(k + i) % pastel.length]), 14, "#B08A6A");
+      if (i % 2 === 0) add(EGG(pastel[i % pastel.length]), b.l + b.w * 0.88, b.t - 14, "bob");
+      if (i % 3 === 1) add(BUNNY, b.l + b.w * 0.1, b.t - 21, "hop");
+    });
+    const pod = document.querySelector(".podium-panel"), spot = document.querySelector(".spot");
+    if (pod){ const b = box(pod); add(BASKET, b.l + 10, b.t + b.h - 26); add(EGG("#B79BFF"), b.l + 48, b.t + b.h - 16); }
+    if (spot){ const b = box(spot); add(BASKET, b.l + b.w - 44, b.t + b.h - 26); }
+  } else if (hol === "july4"){
+    targets.forEach((el, i) => {
+      const b = box(el);
+      garland(b, i, k => PENNANT(["#D02B2B", "#F4F4F4", "#2F4FBF"][(k + i) % 3]), 14, "#3A3A4A");
+      add(US_FLAG, b.l + (i % 2 ? b.w - 30 : 4), b.t - 22, "wave");
+    });
+  } else if (hol === "thanksgiving"){
+    const fall = ["#D9621E", "#C2361E", "#E8A41F", "#9B2B1A", "#E07A20"];
+    targets.forEach((el, i) => {
+      const b = box(el);
+      garland(b, i, k => LEAF(fall[(k * 3 + i) % fall.length]), 10, "#6B4F2A");
+      if (i % 3 === 0) add(PUMPKIN, b.l + b.w * 0.85, b.t - 20, "bob");
+      if (i % 3 === 1) add(CORN, b.l + b.w * 0.86, b.t - 18);
+    });
+    const pod = document.querySelector(".podium-panel");
+    if (pod){ const b = box(pod); add(PIE, b.l + 10, b.t + b.h - 22); add(TURKEY, b.l + b.w - 40, b.t + b.h - 26, "bob"); }
+  } else if (hol === "newyear"){
+    const bal = ["#FFD93B", "#C9CED8", "#FF3B8B", "#3BA8FF", "#E8B23A"];
+    targets.forEach((el, i) => {
+      const b = box(el);
+      garland(b, i, k => PENNANT(["#E8B23A", "#C9CED8", "#1E1E1E"][(k + i) % 3]), 14, "#8A6A10");
+      if (i % 2 === 0) add(BALLOON(bal[i % bal.length]), b.l + b.w * 0.9, b.t - 34, "float");
+      if (i % 2 === 1) add(BALLOON(bal[(i + 2) % bal.length]), b.l + b.w * 0.04, b.t - 34, "float slow");
+    });
+    if (tb) add(PARTY_HAT, tb.l - 8, tb.t - 22, "tilt");
+  } else if (hol === "aprilfools"){
+    targets.forEach((el, i) => {
+      if (i % 2) return;
+      const b = box(el);
+      add(CREEPER, b.l + b.w * (i % 4 ? 0.2 : 0.75), b.t - 20, "peek");
+    });
+  } else if (hol === "fri13"){
+    targets.forEach((el, i) => {
+      const b = box(el);
+      if (i % 2 === 0 && b.w > 120){ const c = add(BLACK_CAT, b.l + 6, b.t - 21, "walk"); c.style.setProperty("--dist", Math.round(b.w - 40) + "px"); c.style.animationDelay = "-" + (i * 3) + "s"; }
+      if (i % 3 === 1){ add(WEB, b.l + 2, b.t + 2); }
+      if (i === 1 || i === 4){ const k = add(CRACKS, b.l, b.t, "cracks"); k.style.width = b.w + "px"; k.style.height = b.h + "px"; }
+    });
+  } else if (hol === "halloween"){
     targets.forEach((el, i) => {
       const b = box(el);
       add(PUMPKIN, b.l + b.w * (i % 2 ? 0.78 : 0.12), b.t - 20, "bob");
