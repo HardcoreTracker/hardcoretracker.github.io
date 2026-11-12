@@ -1,0 +1,57 @@
+name: Fetch player skin
+
+# Run from the Actions tab (or the API) with a Minecraft username.
+# Downloads the player's current skin from Mojang into skins/ and points data.json at it.
+on:
+  workflow_dispatch:
+    inputs:
+      username:
+        description: "Minecraft username"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    env:
+      MC_NAME: ${{ inputs.username }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download skin
+        run: |
+          set -euo pipefail
+          [[ "$MC_NAME" =~ ^[A-Za-z0-9_]{3,16}$ ]] || { echo "Not a valid Minecraft username"; exit 1; }
+          profile=$(curl -fsS "https://api.mojang.com/users/profiles/minecraft/$MC_NAME")
+          id=$(echo "$profile" | jq -r .id)
+          real=$(echo "$profile" | jq -r .name)
+          url=$(curl -fsS "https://sessionserver.mojang.com/session/minecraft/profile/$id" | jq -r '.properties[] | select(.name=="textures") | .value' | base64 -d | jq -r '.textures.SKIN.url')
+          curl -fsS "$url" -o "skins/$real.png"
+          echo "REAL_NAME=$real" >> "$GITHUB_ENV"
+
+      - name: Point data.json at the skin
+        run: |
+          python3 - <<'PY'
+          import json, os
+          name = os.environ["REAL_NAME"]
+          d = json.load(open("data.json"))
+          hit = False
+          for p in d["players"]:
+              if p.get("name", "").lower() == name.lower() or p.get("id", "").lower() == name.lower():
+                  p["skin"] = f"skins/{name}.png"; hit = True
+          if not hit:
+              raise SystemExit(f"{name} isn't in data.json yet")
+          open("data.json", "w").write(json.dumps(d, indent=2, ensure_ascii=False) + "\n")
+          PY
+
+      - name: Save
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898099+github-actions[bot]@users.noreply.github.com"
+          git add skins data.json
+          git diff --cached --quiet && { echo "Nothing changed"; exit 0; }
+          git commit -m "Skin for $REAL_NAME"
+          for i in 1 2 3; do git pull --rebase -q && git push -q && exit 0; sleep 5; done
+          exit 1
