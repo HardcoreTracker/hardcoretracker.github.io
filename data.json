@@ -503,6 +503,17 @@
       "date": "2026-11-11",
       "time": "2026-11-11T23:36:22Z",
       "source": "mod"
+    },
+    {
+      "id": "m1794536827000",
+      "player": "mysticdragbax",
+      "age": "iron",
+      "totem": false,
+      "cause": "Blown up by Creeper",
+      "reason": "",
+      "date": "2026-11-13",
+      "time": "2026-11-13T02:27:07Z",
+      "source": "mod"
     }
   ],
   "progress": {
@@ -514,9 +525,9 @@
     "text": "Active participation for 30 minutes in a Kick streamer with under 10 viewers"
   },
   "lastDeath": {
-    "player": "dark31911",
-    "cause": "Shot by Parched",
-    "time": "2026-11-11T23:36:22Z"
+    "player": "mysticdragbax",
+    "cause": "Blown up by Creeper",
+    "time": "2026-11-13T02:27:07Z"
   },
   "punishments": [
     {
