@@ -536,6 +536,17 @@
       "date": "2026-11-14",
       "time": "2026-11-14T18:31:46Z",
       "source": "mod"
+    },
+    {
+      "id": "m1794681172000",
+      "player": "mysticdragbax",
+      "age": "wood",
+      "totem": false,
+      "cause": "Hit the ground too hard",
+      "reason": "",
+      "date": "2026-11-14",
+      "time": "2026-11-14T18:32:52Z",
+      "source": "mod"
     }
   ],
   "progress": {
@@ -548,8 +559,8 @@
   },
   "lastDeath": {
     "player": "mysticdragbax",
-    "cause": "Went up in flames",
-    "time": "2026-11-14T18:31:46Z"
+    "cause": "Hit the ground too hard",
+    "time": "2026-11-14T18:32:52Z"
   },
   "punishments": [
     {
