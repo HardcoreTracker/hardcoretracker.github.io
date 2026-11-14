@@ -525,6 +525,17 @@
       "date": "2026-11-14",
       "time": "2026-11-14T09:42:51Z",
       "source": "mod"
+    },
+    {
+      "id": "m1794681106000",
+      "player": "mysticdragbax",
+      "age": "wood",
+      "totem": false,
+      "cause": "Went up in flames",
+      "reason": "",
+      "date": "2026-11-14",
+      "time": "2026-11-14T18:31:46Z",
+      "source": "mod"
     }
   ],
   "progress": {
@@ -536,9 +547,9 @@
     "text": "Active participation for 30 minutes in a Kick streamer with under 10 viewers"
   },
   "lastDeath": {
-    "player": "subkiwi",
-    "cause": "Blown up by Creeper",
-    "time": "2026-11-14T09:42:51Z"
+    "player": "mysticdragbax",
+    "cause": "Went up in flames",
+    "time": "2026-11-14T18:31:46Z"
   },
   "punishments": [
     {
