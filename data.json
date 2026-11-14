@@ -514,20 +514,31 @@
       "date": "2026-11-13",
       "time": "2026-11-13T02:27:07Z",
       "source": "mod"
+    },
+    {
+      "id": "m1794649371000",
+      "player": "subkiwi",
+      "age": "diamond",
+      "totem": false,
+      "cause": "Blown up by Creeper",
+      "reason": "",
+      "date": "2026-11-14",
+      "time": "2026-11-14T09:42:51Z",
+      "source": "mod"
     }
   ],
   "progress": {
-    "age": 5,
-    "quest": 34,
+    "age": 6,
+    "quest": 1,
     "totemFarm": false
   },
   "currentPunishment": {
     "text": "Active participation for 30 minutes in a Kick streamer with under 10 viewers"
   },
   "lastDeath": {
-    "player": "mysticdragbax",
+    "player": "subkiwi",
     "cause": "Blown up by Creeper",
-    "time": "2026-11-13T02:27:07Z"
+    "time": "2026-11-14T09:42:51Z"
   },
   "punishments": [
     {
