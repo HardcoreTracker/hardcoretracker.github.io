@@ -521,32 +521,11 @@
       "age": "diamond",
       "totem": false,
       "cause": "Blown up by Creeper",
-      "reason": "",
+      "reason": "Died to a bug, so it only counts 2 points",
       "date": "2026-11-14",
       "time": "2026-11-14T09:42:51Z",
-      "source": "mod"
-    },
-    {
-      "id": "m1794681106000",
-      "player": "mysticdragbax",
-      "age": "wood",
-      "totem": false,
-      "cause": "Went up in flames",
-      "reason": "",
-      "date": "2026-11-14",
-      "time": "2026-11-14T18:31:46Z",
-      "source": "mod"
-    },
-    {
-      "id": "m1794681172000",
-      "player": "mysticdragbax",
-      "age": "wood",
-      "totem": false,
-      "cause": "Hit the ground too hard",
-      "reason": "",
-      "date": "2026-11-14",
-      "time": "2026-11-14T18:32:52Z",
-      "source": "mod"
+      "source": "mod",
+      "points": 2
     }
   ],
   "progress": {
@@ -652,6 +631,12 @@
       "time": "2026-11-10T20:19:47-08:00",
       "player": "deim0s_v1",
       "text": "Apology video"
+    },
+    {
+      "id": "p16",
+      "time": "2026-11-14T01:42:51-08:00",
+      "player": "subkiwi",
+      "text": "Active participation for 30 minutes in a Kick streamer with under 10 viewers"
     }
   ],
   "weather": "auto",

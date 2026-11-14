@@ -655,7 +655,8 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const ageChip = k => { const a = AGE[k]; return a ? `<span class="agechip" style="--c:var(${a.c})">${esc(a.label)}</span>` : esc(k); };
 const nickHtml = p => p && p.nick ? ` <span class="nick">(${esc(p.nick)})</span>` : "";
-const deathPts = d => d.legacy ? 0 : (AGE[d.age]?.pts || 0) + (d.totem ? 1 : 0);
+// A death can have its points set by hand ("points": 2), e.g. when a bug caused it
+const deathPts = d => typeof d.points === "number" ? d.points : d.legacy ? 0 : (AGE[d.age]?.pts || 0) + (d.totem ? 1 : 0);
 
 let meta = {};
 let players = [], allPlayers = [], deaths = [], canEdit = false, db = null, assets = null;
@@ -1809,7 +1810,7 @@ function renderLastDeath(ld){
   if (!ld || !ld.player){ box.hidden = true; return; }
   const p = allPlayers.find(x => x.id === ld.player);
   const name = p ? p.name : ld.player;
-  $("ldText").innerHTML = `<b>${esc(name)}</b>${p && p.nick && p.nick !== p.name ? nickHtml(p) : ""} by ${esc(ld.cause || "unknown causes")}`;
+  $("ldText").innerHTML = `<b>${esc(name)}</b>${p && p.nick && p.nick !== p.name ? nickHtml(p) : ""} ${esc(/^[A-Z][a-z]+ [a-z]/.test(ld.cause || "") ? causeText(ld.cause) : "by " + (ld.cause || "unknown causes"))}`;
   $("ldTime").textContent = ld.time ? "(" + fmtWhen(ld.time) + ")" : "";
   const cv = $("ldHead"); drawHead(cv, null);
   if (p && p.skin) loadImg(p.skin).then(im => { if (im) drawHead(cv, im); });
