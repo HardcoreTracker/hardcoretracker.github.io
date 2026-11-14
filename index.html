@@ -1815,7 +1815,9 @@ function renderLastDeath(ld){
   const cv = $("ldHead"); drawHead(cv, null);
   if (p && p.skin) loadImg(p.skin).then(im => { if (im) drawHead(cv, im); });
   box.hidden = false;
-  startAliveTimer(ld.time);
+  // "worldStart" lets the timer count from a world reset caused by a death that was removed or doesn't count
+  const ws = meta.worldStart && (!ld.time || Date.parse(meta.worldStart) > Date.parse(ld.time)) ? meta.worldStart : ld.time;
+  startAliveTimer(ws);
 }
 let aliveTimer = null;
 function startAliveTimer(iso){
@@ -3099,6 +3101,7 @@ function applyData(d){
   // Players marked inactive keep their old deaths in the log but get no card, points or awards
   allPlayers = d.players || []; players = allPlayers.filter(p => !p.inactive); deaths = d.deaths || [];
   if (d.progress){ progress = d.progress; viewAge = progress.age; renderQuests(); }
+  meta.worldStart = d.worldStart || null;
   renderLastDeath(d.lastDeath);
   punData = d.punishments || [];
   renderShame();

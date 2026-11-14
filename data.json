@@ -537,9 +537,9 @@
     "text": "Active participation for 30 minutes in a Kick streamer with under 10 viewers"
   },
   "lastDeath": {
-    "player": "mysticdragbax",
-    "cause": "Hit the ground too hard",
-    "time": "2026-11-14T18:32:52Z"
+    "player": "subkiwi",
+    "cause": "Blown up by Creeper",
+    "time": "2026-11-14T09:42:51Z"
   },
   "punishments": [
     {
@@ -640,5 +640,6 @@
     }
   ],
   "weather": "auto",
-  "theme": "auto"
+  "theme": "auto",
+  "worldStart": "2026-11-14T18:32:52Z"
 }
