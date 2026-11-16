@@ -519,7 +519,7 @@
   "progress": {
     "age": 6,
     "quest": 21,
-    "totemFarm": false
+    "totemFarm": true
   },
   "currentPunishment": {
     "text": "Active participation for 30 minutes in a Kick streamer with under 10 viewers"
