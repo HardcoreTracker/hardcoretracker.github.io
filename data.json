@@ -1,5 +1,5 @@
 {
-  "updated": "Nov 15, 2026",
+  "updated": "Nov 16, 2026",
   "priorDeaths": 0,
   "players": [
     {
@@ -518,7 +518,7 @@
   ],
   "progress": {
     "age": 6,
-    "quest": 21,
+    "quest": 22,
     "totemFarm": true
   },
   "currentPunishment": {
