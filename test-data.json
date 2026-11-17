@@ -527,14 +527,14 @@
       "source": "mod"
     },
     {
-      "id": "test1794902053021",
+      "id": "test1794902179810",
       "player": "incendiaryblitz",
       "age": "end",
       "totem": false,
       "cause": "Test death",
       "reason": "Made by the test lab",
       "date": "2026-11-17",
-      "time": "2026-11-17T07:54:13.021Z",
+      "time": "2026-11-17T07:56:19.810Z",
       "source": "test"
     }
   ],
@@ -544,9 +544,7 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Double or Nothing (flip a coin)",
-    "used": true,
-    "givenTo": "incendiaryblitz"
+    "text": "Double or Nothing (flip a coin)"
   },
   "lastDeath": {
     "player": "monkey____",
@@ -655,13 +653,6 @@
       "time": "2026-11-16T19:35:36-08:00",
       "player": "monkey____",
       "text": "Play Hypixel Bedwars until victory"
-    },
-    {
-      "id": "p18",
-      "time": "2026-11-17T07:54:13.021Z",
-      "player": "incendiaryblitz",
-      "text": "Double or Nothing (flip a coin)",
-      "source": "auto"
     }
   ],
   "weather": "auto",
