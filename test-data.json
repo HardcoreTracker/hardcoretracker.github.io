@@ -544,9 +544,7 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Double or Nothing (flip a coin)",
-    "used": true,
-    "givenTo": "incendiaryblitz"
+    "text": "Minecraft knowledge exam"
   },
   "lastDeath": {
     "player": "monkey____",
@@ -695,10 +693,6 @@
     {
       "text": "Beat The Hardest Game",
       "short": "Hardest Game"
-    },
-    {
-      "text": "Minecraft knowledge exam",
-      "short": "MC knowledge exam"
     }
   ]
 }
