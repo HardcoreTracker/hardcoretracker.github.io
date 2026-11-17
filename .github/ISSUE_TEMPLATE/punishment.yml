@@ -1,0 +1,31 @@
+name: Suggest a punishment
+description: Suggest a new punishment for the Hearthigen punishment wheel.
+title: "Punishment: "
+labels: ["punishment suggestion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Got an idea for the wheel? Write it below. The admin approves suggestions before they go on the wheel.
+  - type: input
+    id: punishment
+    attributes:
+      label: Punishment
+      description: What the punished player has to do.
+      placeholder: "Build a statue of the person who died before you"
+    validations:
+      required: true
+  - type: input
+    id: short
+    attributes:
+      label: Short version for the wheel (optional)
+      description: 20 characters or fewer, so it fits on a slice.
+      placeholder: "Statue of shame"
+    validations:
+      required: false
+  - type: input
+    id: from
+    attributes:
+      label: Your name or nickname (optional)
+    validations:
+      required: false

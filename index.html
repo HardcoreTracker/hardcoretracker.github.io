@@ -546,6 +546,20 @@ body.has-ticker .lower-right{top:52px;max-height:calc(100vh - 68px)}
 .wheel-legend li{display:flex;gap:8px;align-items:baseline;line-height:1.35}
 .wheel-legend .sw{flex:none;width:12px;height:12px;box-shadow:inset 0 0 0 2px rgba(0,0,0,.35);transform:translateY(1px)}
 .wheel-legend li.hit{color:var(--accent);font-weight:700}
+
+/* ---------- admin: punishment suggestions ---------- */
+.wheel-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.adm-form{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.adm-form input{flex:1 1 260px;min-width:0;padding:8px;font:inherit;background:#1E1E1E;color:#FFFFFF;border:2px solid #555555}
+.adm-note{font-size:13px;line-height:1.5;opacity:.85}
+.adm-list{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
+.adm-list li{padding:12px;display:flex;flex-direction:column;gap:8px;color:#FFFFFF}
+.adm-list .adm-text{font-size:16px;font-weight:700;line-height:1.35}
+.adm-list .adm-meta{font-size:12px;opacity:.75}
+.adm-list .adm-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.adm-list .adm-row input{flex:1 1 180px;min-width:0;padding:6px;font:inherit;font-size:13px;background:#1E1E1E;color:#FFFFFF;border:2px solid #555555}
+.adm-list .adm-done{font-weight:700;color:#55FF55}
+.adm-list .adm-done.no{color:#FF5555}
 </style>
 </head>
 <body>
@@ -653,6 +667,10 @@ body.has-ticker .lower-right{top:52px;max-height:calc(100vh - 68px)}
       <div class="wheel-side">
         <div class="slot wheel-result" id="wheelResult" aria-live="polite"><span class="wr-note">Press <b>SPIN</b> to see what fate has in store.</span></div>
         <ol class="wheel-legend" id="wheelLegend"></ol>
+        <div class="wheel-links">
+          <a class="rules-btn" href="https://github.com/HardcoreTracker/hardcoretracker.github.io/issues/new?template=punishment.yml" target="_blank" rel="noopener noreferrer">+ Suggest a punishment</a>
+          <a class="rules-btn" href="#admin" id="admLink" hidden>Review suggestions</a>
+        </div>
       </div>
     </div>
   </section>
@@ -2127,6 +2145,7 @@ function rulesHtml(){
 function route(){
   const hsh = decodeURIComponent(location.hash.slice(1));
   if (hsh === "rules") openOverlay(rulesHtml());
+  else if (hsh === "admin"){ openOverlay(adminHtml()); adminWire(); }
   else if (hsh.startsWith("player-")){ const html = playerPageHtml(hsh.slice(7)); if (html) openOverlay(html); else closeOverlay(); }
   else if (!$("overlay").hidden){ $("overlay").hidden = true; document.body.classList.remove("ov-open"); }
 }
@@ -3221,6 +3240,93 @@ function spinWheel(){
 $("wheelSpin").addEventListener("click", spinWheel);
 window.addEventListener("resize", () => { if (!wheelSpinning) drawWheel(); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawWheel);
+// ---------- admin: approve punishment suggestions (token is saved only in the admin's own browser) ----------
+const REPO = "HardcoreTracker/hardcoretracker.github.io", ADM_KEY = "hct-admin-token", SUG_LABEL = "punishment suggestion";
+const admToken = () => { try { return localStorage.getItem(ADM_KEY) || ""; } catch(e){ return ""; } };
+function admSync(){ const l = $("admLink"); if (l) l.hidden = !admToken(); }
+admSync();
+function adminHtml(){
+  const t = admToken();
+  if (!t) return `<h2 class="mctitle">Admin</h2>
+    <p class="adm-note">Paste your GitHub token to review punishment suggestions on this device. It's saved only in this browser and only ever sent to GitHub.</p>
+    <form class="adm-form" id="admLogin"><input type="password" id="admTok" autocomplete="off" placeholder="github_pat_..." aria-label="GitHub token"><button type="submit" class="primary">Save on this device</button></form>
+    <p class="adm-note">Make one on GitHub under <b>Settings → Developer settings → Fine-grained tokens</b>: Resource owner <b>HardcoreTracker</b>, only the <b>hardcoretracker.github.io</b> repository, with <b>Contents</b> and <b>Issues</b> set to <b>Read and write</b>.</p>`;
+  return `<h2 class="mctitle">Punishment suggestions</h2>
+    <p class="adm-note">Approve adds it to the wheel right away and closes the suggestion. Reject closes it. <button type="button" class="small" id="admOut">Sign out on this device</button></p>
+    <div id="admList"><p class="adm-note">Loading suggestions…</p></div>`;
+}
+async function ghApi(path, opts = {}){
+  const r = await fetch("https://api.github.com/" + path, {...opts, headers: {"Authorization": "Bearer " + admToken(), "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", ...(opts.body ? {"Content-Type": "application/json"} : {})}});
+  if (!r.ok){ const err = new Error("GitHub said " + r.status); err.status = r.status; throw err; }
+  return r.status === 204 ? null : r.json();
+}
+// GitHub issue forms arrive as "### Heading\n\nanswer" sections
+function formFields(body){
+  const out = {}; String(body || "").split(/^### /m).slice(1).forEach(part => {
+    const nl = part.indexOf("\n"), key = part.slice(0, nl).trim().toLowerCase(), val = part.slice(nl).trim();
+    out[key] = val === "_No response_" ? "" : val;
+  });
+  return out;
+}
+const b64ToText = b => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\s/g, "")), c => c.charCodeAt(0)));
+const textToB64 = t => { const u = new TextEncoder().encode(t); let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
+async function addToWheel(text, short){
+  for (let attempt = 0; attempt < 3; attempt++){
+    const f = await ghApi(`repos/${REPO}/contents/data.json?ref=main`);
+    const d = JSON.parse(b64ToText(f.content));
+    d.wheel = d.wheel || [];
+    if (!d.wheel.some(w => w.text.toLowerCase() === text.toLowerCase())) d.wheel.push(short ? {text, short} : {text, short: text.length > 20 ? text.slice(0, 19) + "…" : text});
+    try {
+      await ghApi(`repos/${REPO}/contents/data.json`, {method: "PUT", body: JSON.stringify({message: "Wheel: add \"" + text + "\"", content: textToB64(JSON.stringify(d, null, 2) + "\n"), sha: f.sha, branch: "main"})});
+      return d;
+    } catch(e){ if (e.status !== 409 && e.status !== 422) throw e; }
+  }
+  throw new Error("The data file kept changing; try again in a moment");
+}
+async function closeSuggestion(num, approved){
+  await ghApi(`repos/${REPO}/issues/${num}/comments`, {method: "POST", body: JSON.stringify({body: approved ? "Approved and added to the punishment wheel." : "Thanks for the idea! This one isn't going on the wheel."})});
+  await ghApi(`repos/${REPO}/issues/${num}`, {method: "PATCH", body: JSON.stringify({state: "closed", state_reason: approved ? "completed" : "not_planned"})});
+}
+async function loadSuggestions(){
+  const box = $("admList"); if (!box) return;
+  try {
+    const list = (await ghApi(`repos/${REPO}/issues?state=open&per_page=50&labels=${encodeURIComponent(SUG_LABEL)}`)).filter(i => !i.pull_request);
+    if (!list.length){ box.innerHTML = '<p class="adm-note">No suggestions waiting right now.</p>'; return; }
+    box.innerHTML = `<ol class="adm-list">${list.map(i => {
+      const f = formFields(i.body), text = f["punishment"] || i.title.replace(/^Punishment:\s*/i, ""), short = f["short version for the wheel (optional)"] || "", from = f["your name or nickname (optional)"] || i.user.login;
+      return `<li class="slot" data-num="${i.number}"><span class="adm-text">${esc(text)}</span><span class="adm-meta">From ${esc(from)} · ${esc(new Date(i.created_at).toLocaleDateString())}</span>
+        <div class="adm-row"><input type="text" maxlength="24" value="${esc(short)}" placeholder="Short label for the wheel" aria-label="Short label"><button type="button" class="primary" data-act="ok">Approve</button><button type="button" data-act="no">Reject</button></div>
+        <input type="hidden" value="${esc(text)}" data-text></li>`;
+    }).join("")}</ol>`;
+  } catch(e){
+    box.innerHTML = `<p class="adm-note">Couldn't load suggestions (${esc(e.message)}). ${e.status === 401 || e.status === 403 || e.status === 404 ? "The token may be wrong, expired, or missing Issues access." : "Try again in a bit."}</p>`;
+  }
+}
+function adminWire(){
+  const login = $("admLogin");
+  if (login) login.addEventListener("submit", e => { e.preventDefault(); const v = $("admTok").value.trim(); if (!v) return; try { localStorage.setItem(ADM_KEY, v); } catch(err){} admSync(); openOverlay(adminHtml()); adminWire(); });
+  const out = $("admOut");
+  if (out) out.addEventListener("click", () => { try { localStorage.removeItem(ADM_KEY); } catch(err){} admSync(); openOverlay(adminHtml()); adminWire(); });
+  const list = $("admList");
+  if (list){
+    loadSuggestions();
+    list.addEventListener("click", async e => {
+      const btn = e.target.closest("button[data-act]"); if (!btn) return;
+      const li = btn.closest("li"), num = li.dataset.num, ok = btn.dataset.act === "ok";
+      const text = li.querySelector("[data-text]").value, short = li.querySelector(".adm-row input").value.trim();
+      li.querySelectorAll("button").forEach(b => b.disabled = true);
+      try {
+        if (ok){ const d = await addToWheel(text, short); renderWheel(d.wheel); }
+        await closeSuggestion(num, ok);
+        li.querySelector(".adm-row").innerHTML = ok ? '<span class="adm-done">Added to the wheel</span>' : '<span class="adm-done no">Rejected</span>';
+      } catch(err){
+        li.querySelectorAll("button").forEach(b => b.disabled = false);
+        alertInline(li, "Didn't work: " + err.message);
+      }
+    });
+  }
+}
+function alertInline(li, msg){ let m = li.querySelector(".adm-err"); if (!m){ m = document.createElement("span"); m.className = "adm-meta adm-err"; li.appendChild(m); } m.textContent = msg; }
 // ---------- data ----------
 function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
 function updatePreview(){}
