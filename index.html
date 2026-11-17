@@ -3251,7 +3251,10 @@ function adminHtml(){
     <p class="adm-note">Paste your GitHub token to review punishment suggestions on this device. It's saved only in this browser and only ever sent to GitHub.</p>
     <form class="adm-form" id="admLogin"><input type="password" id="admTok" autocomplete="off" placeholder="github_pat_..." aria-label="GitHub token"><button type="submit" class="primary">Save on this device</button></form>
     <p class="adm-note">Make one on GitHub under <b>Settings → Developer settings → Fine-grained tokens</b>: Resource owner <b>HardcoreTracker</b>, only the <b>hardcoretracker.github.io</b> repository, with <b>Contents</b> and <b>Issues</b> set to <b>Read and write</b>.</p>`;
-  return `<h2 class="mctitle">Punishment suggestions</h2>
+  return `<h2 class="mctitle">Totem farm</h2>
+    <p class="adm-note">While it's on, every death costs 1 extra point. It switches off by itself after each death, since the world resets.</p>
+    <div class="adm-form"><button type="button" class="${progress && progress.totemFarm ? "primary" : ""}" id="admTotem">${progress && progress.totemFarm ? "Totem farm: ON (tap to turn off)" : "Totem farm: OFF (tap to turn on)"}</button><span class="adm-note" id="admTotemMsg"></span></div>
+    <h2 class="mctitle">Punishment suggestions</h2>
     <p class="adm-note">Approve adds it to the wheel right away and closes the suggestion. Reject closes it. <button type="button" class="small" id="admOut">Sign out on this device</button></p>
     <div id="admList"><p class="adm-note">Loading suggestions…</p></div>`;
 }
@@ -3273,18 +3276,24 @@ function formFields(body){
 }
 const b64ToText = b => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\s/g, "")), c => c.charCodeAt(0)));
 const textToB64 = t => { const u = new TextEncoder().encode(t); let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
-async function addToWheel(text, short){
+// Change data.json on GitHub: load it, let fn edit it, save it (retrying if the mod saved at the same moment)
+async function editData(fn, message){
   for (let attempt = 0; attempt < 3; attempt++){
     const f = await ghApi(`repos/${REPO}/contents/data.json?ref=main`);
     const d = JSON.parse(b64ToText(f.content));
-    d.wheel = d.wheel || [];
-    if (!d.wheel.some(w => w.text.toLowerCase() === text.toLowerCase())) d.wheel.push(short ? {text, short} : {text, short: text.length > 20 ? text.slice(0, 19) + "…" : text});
+    fn(d);
     try {
-      await ghApi(`repos/${REPO}/contents/data.json`, {method: "PUT", body: JSON.stringify({message: "Wheel: add \"" + text + "\"", content: textToB64(JSON.stringify(d, null, 2) + "\n"), sha: f.sha, branch: "main"})});
+      await ghApi(`repos/${REPO}/contents/data.json`, {method: "PUT", body: JSON.stringify({message, content: textToB64(JSON.stringify(d, null, 2) + "\n"), sha: f.sha, branch: "main"})});
       return d;
     } catch(e){ if (e.status !== 409 && e.status !== 422) throw e; }
   }
   throw new Error("The data file kept changing; try again in a moment");
+}
+function addToWheel(text, short){
+  return editData(d => {
+    d.wheel = d.wheel || [];
+    if (!d.wheel.some(w => w.text.toLowerCase() === text.toLowerCase())) d.wheel.push(short ? {text, short} : {text, short: text.length > 20 ? text.slice(0, 19) + "…" : text});
+  }, "Wheel: add \"" + text + "\"");
 }
 async function closeSuggestion(num, approved){
   await ghApi(`repos/${REPO}/issues/${num}/comments`, {method: "POST", body: JSON.stringify({body: approved ? "Approved and added to the punishment wheel." : "Thanks for the idea! This one isn't going on the wheel."})});
@@ -3310,6 +3319,19 @@ function adminWire(){
   if (login) login.addEventListener("submit", e => { e.preventDefault(); const v = $("admTok").value.trim(); if (!v) return; try { localStorage.setItem(ADM_KEY, v); } catch(err){} admSync(); openOverlay(adminHtml()); adminWire(); });
   const out = $("admOut");
   if (out) out.addEventListener("click", () => { try { localStorage.removeItem(ADM_KEY); } catch(err){} admSync(); openOverlay(adminHtml()); adminWire(); });
+  const tb = $("admTotem");
+  if (tb) tb.addEventListener("click", async () => {
+    const turnOn = !(progress && progress.totemFarm), msg = $("admTotemMsg");
+    tb.disabled = true; msg.textContent = "Saving…";
+    try {
+      const d = await editData(x => { x.progress = x.progress || {}; x.progress.totemFarm = turnOn; }, turnOn ? "Totem farm built: every death now costs +1 more" : "Totem farm gone: deaths back to normal cost");
+      progress = d.progress; renderQuests(); render(); renderTicker();
+      tb.textContent = turnOn ? "Totem farm: ON (tap to turn off)" : "Totem farm: OFF (tap to turn on)";
+      tb.className = turnOn ? "primary" : "";
+      msg.textContent = "Saved. Everyone sees it within about a minute.";
+    } catch(err){ msg.textContent = "Didn't save: " + err.message; }
+    tb.disabled = false;
+  });
   const list = $("admList");
   if (list){
     loadSuggestions();

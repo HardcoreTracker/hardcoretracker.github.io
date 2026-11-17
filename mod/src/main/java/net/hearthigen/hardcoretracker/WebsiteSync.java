@@ -219,6 +219,10 @@ public final class WebsiteSync {
 		data.add("lastDeath", last);
 
 		if (job.completed >= 0) setProgress(data, job.completed);
+		// A death resets the shared world, so any totem farm is gone; it gets switched back on by hand when rebuilt
+		JsonObject prog = data.has("progress") ? data.getAsJsonObject("progress") : new JsonObject();
+		prog.addProperty("totemFarm", false);
+		data.add("progress", prog);
 		data.addProperty("updated", when.format(UPDATED));
 		return "Death: " + job.player + " - " + job.cause + " (+" + points + ")";
 	}

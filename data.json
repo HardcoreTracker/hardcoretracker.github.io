@@ -530,7 +530,7 @@
   "progress": {
     "age": 3,
     "quest": 18,
-    "totemFarm": true
+    "totemFarm": false
   },
   "currentPunishment": {
     "text": "Double or Nothing (flip a coin)"
