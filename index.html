@@ -1219,7 +1219,7 @@ const HEART = (on, extra="") => `<svg viewBox="0 0 9 8" aria-hidden="true"><path
 function totals(){
   const t = {};
   players.forEach(p => t[p.id] = Number(p.base) || 0);
-  deaths.forEach(d => { t[d.player] = (t[d.player] || 0) + deathPts(d); });
+  deaths.forEach(d => { if (!d.reverted) t[d.player] = (t[d.player] || 0) + deathPts(d); });
   return t;
 }
 function sortedDeaths(){
@@ -3215,38 +3215,31 @@ function wheelLockState(){
     ? '<span class="wr-tag">LOCKED</span><span class="wr-note">The wheel unlocks as soon as someone earns a new punishment.</span>'
     : `<span class="wr-tag">UNLOCKED</span><span class="wr-note"><b>${owed.map(x => esc(shortName(x.p)) + (x.owed > 1 ? " (" + x.owed + ")" : "")).join(", ")}</b> ${owed.length === 1 && owed[0].owed === 1 ? "has" : "have"} a punishment coming. Press <b>SPIN</b>!</span>`;
 }
-function renderWheel(list){
-  wheelItems = (list || []).map(w => typeof w === "string" ? {text: w, short: w} : {text: w.text, short: w.short || w.text});
-  $("wheelSec").hidden = !wheelItems.length;
-  if (!wheelItems.length) return;
+function renderWheelLegend(){
   $("wheelLegend").innerHTML = wheelItems.map((w, k) => `<li data-k="${k}"><span class="sw" style="background:${WHEEL_COLORS[k % WHEEL_COLORS.length]}"></span><span>${esc(w.text)}</span></li>`).join("");
   requestAnimationFrame(drawWheel);
+}
+function renderWheel(list){
+  if (wheelSpinning) return;
+  wheelItems = normWheel(list);
+  $("wheelSec").hidden = !wheelItems.length;
+  if (!wheelItems.length) return;
+  renderWheelLegend();
   wheelLockState();
 }
-function spinWheel(){
-  if (wheelSpinning || !wheelItems.length || !owedPunishments().length) return;
+// Spin server (Cloudflare Worker) that picks and saves the result for everyone. Empty = spins only show on this screen.
+const WHEEL_API = "";
+const normWheel = list => (list || []).map(w => typeof w === "string" ? {text: w, short: w} : {text: w.text, short: w.short || w.text});
+function landWheel(pick, done){
   const n = wheelItems.length, seg = Math.PI * 2 / n;
   const rnd = new Uint32Array(1); (window.crypto || window.msCrypto).getRandomValues(rnd);
-  const pick = rnd[0] % n;
-  // land somewhere inside the picked slice (not right on an edge)
-  const inSlice = (0.15 + 0.7 * ((rnd[0] >>> 8) % 1000) / 1000) * seg;
+  const inSlice = (0.15 + 0.7 * (rnd[0] % 1000) / 1000) * seg;
   const norm = a => ((a % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
   const target = norm(-(pick * seg + inSlice));
-  const start = wheelAngle, end = start + (Math.PI * 2) * (5 + (rnd[0] % 3)) + norm(target - norm(start));
-  const btn = $("wheelSpin"), res = $("wheelResult");
-  wheelSpinning = true; btn.disabled = true;
-  document.querySelectorAll(".wheel-legend li").forEach(li => li.classList.remove("hit"));
-  res.classList.remove("pop"); res.innerHTML = '<span class="wr-note">Spinning…</span>';
-  const finish = () => {
-    wheelAngle = norm(end); drawWheel(); wheelSpinning = false; wheelLockState();
-    const w = wheelItems[pick];
-    res.innerHTML = `<span class="wr-tag">THE WHEEL HAS SPOKEN</span><span class="wr-text">${esc(w.text)}</span><span class="wr-note">Not official until it shows up as the current punishment.</span>`;
-    void res.offsetWidth; res.classList.add("pop");
-    const li = document.querySelector(`.wheel-legend li[data-k="${pick}"]`); if (li) li.classList.add("hit");
-    if (!reduceMotion) launchFireworks(2500);
-  };
+  const start = wheelAngle, end = start + (Math.PI * 2) * (4 + (rnd[0] % 2)) + norm(target - norm(start));
+  const finish = () => { wheelAngle = norm(end); drawWheel(); wheelSpinning = false; done(); wheelLockState(); };
   if (reduceMotion){ wheelAngle = end; return finish(); }
-  const dur = 5200, t0 = performance.now(); let lastSeg = Math.floor(norm(start) / seg);
+  const dur = 4800, t0 = performance.now(); let lastSeg = Math.floor(norm(start) / seg);
   const step = now => {
     const t = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - t, 4);
     wheelAngle = start + (end - start) * e; drawWheel();
@@ -3254,6 +3247,54 @@ function spinWheel(){
     if (t < 1) requestAnimationFrame(step); else finish();
   };
   requestAnimationFrame(step);
+}
+function showWheelResult(pick, html){
+  const res = $("wheelResult");
+  res.innerHTML = html; void res.offsetWidth; res.classList.add("pop");
+  const li = document.querySelector(`.wheel-legend li[data-k="${pick}"]`); if (li) li.classList.add("hit");
+  if (!reduceMotion) launchFireworks(2500);
+}
+async function spinWheel(){
+  if (wheelSpinning || !wheelItems.length || !owedPunishments().length) return;
+  const btn = $("wheelSpin"), res = $("wheelResult");
+  wheelSpinning = true; btn.disabled = true;
+  document.querySelectorAll(".wheel-legend li").forEach(li => li.classList.remove("hit"));
+  res.classList.remove("pop"); res.innerHTML = '<span class="wr-note">Spinning…</span>';
+  if (!WHEEL_API){
+    const rnd = new Uint32Array(1); (window.crypto || window.msCrypto).getRandomValues(rnd);
+    const pick = rnd[0] % wheelItems.length;
+    return landWheel(pick, () => showWheelResult(pick, `<span class="wr-tag">THE WHEEL HAS SPOKEN</span><span class="wr-text">${esc(wheelItems[pick].text)}</span><span class="wr-note">Not official until it shows up as the current punishment.</span>`));
+  }
+  // Keep the wheel turning while the spin server picks the result
+  let waiting = true; const t0 = performance.now(), base = wheelAngle;
+  const idle = now => { if (!waiting) return; wheelAngle = base + (now - t0) / 1000 * 7; drawWheel(); requestAnimationFrame(idle); };
+  if (!reduceMotion) requestAnimationFrame(idle);
+  try {
+    const r = await fetch(WHEEL_API.replace(/\/$/, "") + "/spin", {method: "POST", cache: "no-store"});
+    const j = await r.json().catch(() => ({}));
+    waiting = false;
+    if (!r.ok){
+      wheelSpinning = false;
+      res.innerHTML = j.error === "locked"
+        ? '<span class="wr-tag">TOO LATE</span><span class="wr-note">Someone already spun for this punishment. Updating…</span>'
+        : '<span class="wr-tag">THE WHEEL JAMMED</span><span class="wr-note">Couldn\'t spin right now. Try again in a moment.</span>';
+      if (j.error === "locked") setTimeout(() => { res.innerHTML = ""; loadData(false).catch(() => {}); }, 2500);
+      wheelLockState(); return;
+    }
+    // Make sure we're showing the same slices the server spun
+    if (j.wheel){ wheelItems = normWheel(j.wheel); renderWheelLegend(); }
+    landWheel(j.index, () => {
+      showWheelResult(j.index, `<span class="wr-tag">THE WHEEL HAS SPOKEN</span><span class="wr-text">${esc(j.text)}</span><span class="wr-note"><b>${esc(j.playerName)}</b> gets it. It's now the current punishment.</span>`);
+      $("cpText").textContent = j.text;
+      punData.push({id: "pending", player: j.player, text: j.text, time: new Date().toISOString(), source: "wheel"});
+      renderPunishments(punData);
+      setTimeout(() => loadData(false).catch(() => {}), 70000);
+    });
+  } catch(e){
+    waiting = false; wheelSpinning = false;
+    res.innerHTML = '<span class="wr-tag">THE WHEEL JAMMED</span><span class="wr-note">Couldn\'t reach the wheel. Check your connection and try again.</span>';
+    wheelLockState();
+  }
 }
 $("wheelSpin").addEventListener("click", spinWheel);
 window.addEventListener("resize", () => { if (!wheelSpinning) drawWheel(); });
