@@ -618,7 +618,7 @@ if (new URLSearchParams(location.search).has("testlab")){
       <span class="label sub">Shared-life hardcore · Wilderness Bound</span>
       <h1 class="mctitle">Hardcore Point Tracker</h1>
     </div>
-    <div class="top-btns"><button type="button" class="rules-btn fx-btn" id="fxBtn" aria-pressed="true">Effects: On</button><a class="rules-btn" href="#rules">Rules</a><a class="rules-btn" href="#redstone-vault-b2945e" id="admTop" hidden>Admin</a></div>
+    <div class="top-btns"><button type="button" class="rules-btn fx-btn" id="fxBtn" aria-pressed="true">Effects: On</button><a class="rules-btn" href="#rules">Rules</a><button type="button" class="rules-btn" id="admTop" hidden>Admin</button></div>
     <div class="status" id="status">Loading the server's record…</div>
   </header>
 
@@ -711,7 +711,7 @@ if (new URLSearchParams(location.search).has("testlab")){
         <ol class="wheel-legend" id="wheelLegend"></ol>
         <div class="wheel-links">
           <a class="rules-btn" href="https://github.com/HardcoreTracker/hardcoretracker.github.io/issues/new?template=punishment.yml" target="_blank" rel="noopener noreferrer">+ Suggest a punishment</a>
-          <a class="rules-btn" href="#redstone-vault-b2945e" id="admLink" hidden>Review suggestions</a>
+          <button type="button" class="rules-btn" id="admLink" hidden>Review suggestions</button>
         </div>
       </div>
     </div>
@@ -774,6 +774,7 @@ const pctx = pano.getContext("2d");
 // Test lab: opening the site with ?testlab uses test-data.json instead of the real data, so nothing here touches the real site
 const TESTLAB = new URLSearchParams(location.search).has("testlab");
 const DATA_FILE = TESTLAB ? "test-data.json" : "data.json";
+let adminOpen = false;
 const prefersReduced = (() => { try { return matchMedia("(prefers-reduced-motion: reduce)").matches; } catch(e){ return false; } })();
 // "Effects off" (saved on this device only) freezes the background and stops the scrolling and wiggling
 let fxOff = false; try { fxOff = localStorage.getItem("hct-effects") === "off"; } catch(e){}
@@ -2131,6 +2132,7 @@ function openOverlay(html, focusSel){
   const c = $("overlay").querySelector(".ov-close"); if (c) c.focus();
 }
 function closeOverlay(){
+  adminOpen = false;
   $("overlay").hidden = true; document.body.classList.remove("ov-open");
   if (location.hash) history.replaceState(null, "", location.pathname + location.search);
 }
@@ -2189,10 +2191,11 @@ function rulesHtml(){
 }
 function route(){
   const hsh = decodeURIComponent(location.hash.slice(1));
+  if (hsh === "rules" || hsh.startsWith("player-")) adminOpen = false;
   if (hsh === "rules") openOverlay(rulesHtml());
-  else if (hsh === "redstone-vault-b2945e"){ openOverlay(adminHtml()); adminWire(); }
+  else if (hsh && hsh.length > 12) isAdminHash(hsh).then(ok => { if (ok){ openAdmin(); history.replaceState(null, "", location.pathname + location.search); } });
   else if (hsh.startsWith("player-")){ const html = playerPageHtml(hsh.slice(7)); if (html) openOverlay(html); else closeOverlay(); }
-  else if (!$("overlay").hidden){ $("overlay").hidden = true; document.body.classList.remove("ov-open"); }
+  else if (!$("overlay").hidden && !adminOpen){ $("overlay").hidden = true; document.body.classList.remove("ov-open"); }
 }
 addEventListener("hashchange", route);
 document.addEventListener("click", e => {
@@ -3355,8 +3358,15 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawWheel)
 // ---------- admin: approve punishment suggestions (token is saved only in the admin's own browser) ----------
 const REPO = "HardcoreTracker/hardcoretracker.github.io", ADM_KEY = "hct-admin-token", SUG_LABEL = "punishment suggestion";
 const admToken = () => { try { return localStorage.getItem(ADM_KEY) || ""; } catch(e){ return ""; } };
+// The admin page's address isn't in this code: only a one-way fingerprint (SHA-256) of it is.
+const ADMIN_HASH = "92ab6b41eb764f6431abedd83890594f587f1f7f173afecaae91f7e24cd11dab";
+async function isAdminHash(h){
+  try { const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(h)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join("") === ADMIN_HASH; } catch(e){ return false; }
+}
+function openAdmin(){ openOverlay(adminHtml()); adminOpen = true; adminWire(); }
 function admSync(){ const on = !!admToken(); ["admLink", "admTop"].forEach(id => { const l = $(id); if (l) l.hidden = !on; }); }
 admSync();
+["admLink", "admTop"].forEach(id => { const b = $(id); if (b) b.addEventListener("click", openAdmin); });
 function adminHtml(){
   const t = admToken();
   if (!t) return `<h2 class="mctitle">Admin</h2>
