@@ -53,7 +53,7 @@
     },
     {
       "id": "monkey____",
-      "name": "monkey____",
+      "name": "monkey______",
       "nick": "Sage",
       "base": 7,
       "skin": "skins/monkey____.png"
@@ -86,13 +86,6 @@
       "nick": "Alex",
       "base": 0,
       "skin": "skins/Dark31911.png"
-    },
-    {
-      "id": "monkey______",
-      "name": "monkey______",
-      "nick": "monkey______",
-      "base": 0,
-      "skin": ""
     }
   ],
   "deaths": [
@@ -524,7 +517,7 @@
     },
     {
       "id": "m1794886536000",
-      "player": "monkey______",
+      "player": "monkey____",
       "age": "diamond",
       "totem": true,
       "cause": "Blown up by Creeper",
@@ -540,10 +533,10 @@
     "totemFarm": true
   },
   "currentPunishment": {
-    "text": "Play Hypixel Bedwars until victory"
+    "text": "Double or Nothing (flip a coin)"
   },
   "lastDeath": {
-    "player": "monkey______",
+    "player": "monkey____",
     "cause": "Blown up by Creeper",
     "time": "2026-11-17T03:35:36Z"
   },
@@ -643,6 +636,12 @@
       "time": "2026-11-14T01:42:51-08:00",
       "player": "subkiwi",
       "text": "Active participation for 30 minutes in a Kick streamer with under 10 viewers"
+    },
+    {
+      "id": "p17",
+      "time": "2026-11-16T19:35:36-08:00",
+      "player": "monkey____",
+      "text": "Play Hypixel Bedwars until victory"
     }
   ],
   "weather": "auto",
@@ -656,10 +655,6 @@
     {
       "text": "Make it through Wood without joining a party",
       "short": "Solo through Wood"
-    },
-    {
-      "text": "Double or Nothing (flip a coin)",
-      "short": "Double or Nothing"
     },
     {
       "text": "10 minutes MC slave each",
