@@ -526,6 +526,26 @@ body.has-ticker .lower-right{top:52px;max-height:calc(100vh - 68px)}
   .lower-right .quests{overflow:visible}
   .lower-right .q-list{min-height:0;max-height:460px}
 }
+
+/* ---------- punishment wheel ---------- */
+.wheel-panel{display:flex;flex-wrap:wrap;gap:20px;align-items:center;padding:18px}
+.wheel-box{position:relative;width:min(400px,100%);aspect-ratio:1;flex:none;margin:0 auto}
+.wheel-box canvas{width:100%;height:100%;display:block}
+.wheel-pointer{position:absolute;left:50%;top:-6px;width:28px;height:30px;transform:translateX(-50%);background:#1E1E1E;clip-path:polygon(0 0,100% 0,100% 30%,75% 30%,75% 60%,50% 100%,25% 60%,25% 30%,0 30%);z-index:2}
+.wheel-pointer::after{content:"";position:absolute;inset:3px 5px 6px;background:#FF5555;clip-path:polygon(0 0,100% 0,100% 30%,72% 30%,72% 60%,50% 100%,28% 60%,28% 30%,0 30%)}
+.wheel-spin{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:23%;aspect-ratio:1;border-radius:0;font-size:clamp(14px,3.6vw,20px);padding:0;z-index:2}
+.wheel-spin:disabled{opacity:.8;cursor:wait}
+.wheel-side{flex:1 1 280px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.wheel-result{padding:14px;min-height:96px;display:flex;flex-direction:column;justify-content:center;gap:6px;color:#FFFFFF}
+.wheel-result .wr-tag{font-size:12px;color:#FFFF55;letter-spacing:.05em}
+.wheel-result .wr-text{font-size:20px;font-weight:700;line-height:1.3;text-shadow:2px 2px 0 #3F3F3F}
+.wheel-result .wr-note{font-size:13px;opacity:.85;line-height:1.4}
+.wheel-result.pop{animation:wrPop .5s steps(4,end) 1}
+@keyframes wrPop{0%{transform:scale(.92)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
+.wheel-legend{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;font-size:13px}
+.wheel-legend li{display:flex;gap:8px;align-items:baseline;line-height:1.35}
+.wheel-legend .sw{flex:none;width:12px;height:12px;box-shadow:inset 0 0 0 2px rgba(0,0,0,.35);transform:translateY(1px)}
+.wheel-legend li.hit{color:var(--accent);font-weight:700}
 </style>
 </head>
 <body>
@@ -620,6 +640,21 @@ body.has-ticker .lower-right{top:52px;max-height:calc(100vh - 68px)}
     <span class="tag" id="shameTag">HALL OF SHAME</span>
     <span class="text" id="shame"></span>
     <button type="button" id="shameNext">Next award</button>
+  </section>
+
+  <section id="wheelSec" hidden aria-label="Punishment wheel">
+    <div class="sect-head"><h2 class="mctitle">Punishment wheel</h2><span class="hint">Anyone can spin. It's official once it shows up as the current punishment.</span></div>
+    <div class="panel wheel-panel">
+      <div class="wheel-box">
+        <canvas id="wheelCv" aria-hidden="true"></canvas>
+        <div class="wheel-pointer" aria-hidden="true"></div>
+        <button type="button" class="primary wheel-spin" id="wheelSpin">SPIN</button>
+      </div>
+      <div class="wheel-side">
+        <div class="slot wheel-result" id="wheelResult" aria-live="polite"><span class="wr-note">Press <b>SPIN</b> to see what fate has in store.</span></div>
+        <ol class="wheel-legend" id="wheelLegend"></ol>
+      </div>
+    </div>
   </section>
 
   <section id="punSec" hidden>
@@ -3098,6 +3133,94 @@ document.addEventListener("keydown", e => { const c = e.target.closest && e.targ
 })();
 document.getElementById("fxBtn").addEventListener("click", () => setEffects(reduceMotion));
 syncFxBtn();
+// ---------- punishment wheel ----------
+// Slices come from "wheel" in data.json. Spinning only shows a result on this screen;
+// it becomes official when the admin sets it as the current punishment.
+const WHEEL_COLORS = ["#B02E26","#F9801D","#FED83D","#80C71F","#169C9C","#3AB3DA","#3C44AA","#8932B8","#C74EBD","#F38BAA","#5E7C16","#835432"];
+const DARK_TEXT = new Set(["#FED83D","#80C71F","#F38BAA","#3AB3DA"]);
+let wheelItems = [], wheelAngle = 0, wheelSpinning = false, wheelAudio = null;
+function wheelTick(){
+  try {
+    wheelAudio = wheelAudio || new (window.AudioContext || window.webkitAudioContext)();
+    const o = wheelAudio.createOscillator(), g = wheelAudio.createGain(), t = wheelAudio.currentTime;
+    o.type = "square"; o.frequency.value = 1200; g.gain.setValueAtTime(0.04, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
+    o.connect(g).connect(wheelAudio.destination); o.start(t); o.stop(t + 0.035);
+  } catch(e){}
+}
+function drawWheel(){
+  const cv = $("wheelCv"); if (!cv || !wheelItems.length) return;
+  const size = cv.clientWidth || 400, dpr = Math.min(2, window.devicePixelRatio || 1);
+  if (cv.width !== Math.round(size * dpr)){ cv.width = Math.round(size * dpr); cv.height = Math.round(size * dpr); }
+  const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, size, size);
+  const c = size / 2, r = c - 10, n = wheelItems.length, seg = Math.PI * 2 / n;
+  ctx.fillStyle = "#1E1E1E"; ctx.beginPath(); ctx.arc(c, c, r + 8, 0, Math.PI * 2); ctx.fill();
+  for (let k = 0; k < n; k++){
+    const a0 = wheelAngle + k * seg - Math.PI / 2, col = WHEEL_COLORS[k % WHEEL_COLORS.length];
+    ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(c, c); ctx.arc(c, c, r, a0, a0 + seg); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = "rgba(0,0,0,.45)"; ctx.lineWidth = 3; ctx.stroke();
+    const mid = a0 + seg / 2, cosM = Math.cos(mid);
+    const room = r - 14 - (size * 0.13 + 8);         // space between the edge and the SPIN button
+    let fs = Math.max(9, Math.round(size / 31));
+    ctx.font = `700 ${fs}px Monocraft, "Courier New", monospace`;
+    while (fs > 7 && ctx.measureText(wheelItems[k].short).width > room){ fs--; ctx.font = `700 ${fs}px Monocraft, "Courier New", monospace`; }
+    ctx.save(); ctx.translate(c, c);
+    const flip = cosM < -0.001;                        // left half: turn the text around so it isn't upside down
+    ctx.rotate(flip ? mid + Math.PI : mid);
+    ctx.textAlign = flip ? "left" : "right"; ctx.textBaseline = "middle";
+    const x = flip ? -(r - 14) : (r - 14);
+    const dark = DARK_TEXT.has(col);
+    ctx.fillStyle = dark ? "rgba(255,255,255,.35)" : "rgba(0,0,0,.55)"; ctx.fillText(wheelItems[k].short, x + 1, 2);
+    ctx.fillStyle = dark ? "#222222" : "#FFFFFF"; ctx.fillText(wheelItems[k].short, x, 1);
+    ctx.restore();
+  }
+  // pegs around the edge
+  for (let k = 0; k < n; k++){
+    const a = wheelAngle + k * seg - Math.PI / 2;
+    ctx.fillStyle = "#E0E0E0"; ctx.fillRect(Math.round(c + Math.cos(a) * (r + 2)) - 3, Math.round(c + Math.sin(a) * (r + 2)) - 3, 6, 6);
+  }
+}
+function renderWheel(list){
+  wheelItems = (list || []).map(w => typeof w === "string" ? {text: w, short: w} : {text: w.text, short: w.short || w.text});
+  $("wheelSec").hidden = !wheelItems.length;
+  if (!wheelItems.length) return;
+  $("wheelLegend").innerHTML = wheelItems.map((w, k) => `<li data-k="${k}"><span class="sw" style="background:${WHEEL_COLORS[k % WHEEL_COLORS.length]}"></span><span>${esc(w.text)}</span></li>`).join("");
+  requestAnimationFrame(drawWheel);
+}
+function spinWheel(){
+  if (wheelSpinning || !wheelItems.length) return;
+  const n = wheelItems.length, seg = Math.PI * 2 / n;
+  const rnd = new Uint32Array(1); (window.crypto || window.msCrypto).getRandomValues(rnd);
+  const pick = rnd[0] % n;
+  // land somewhere inside the picked slice (not right on an edge)
+  const inSlice = (0.15 + 0.7 * ((rnd[0] >>> 8) % 1000) / 1000) * seg;
+  const norm = a => ((a % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+  const target = norm(-(pick * seg + inSlice));
+  const start = wheelAngle, end = start + (Math.PI * 2) * (5 + (rnd[0] % 3)) + norm(target - norm(start));
+  const btn = $("wheelSpin"), res = $("wheelResult");
+  wheelSpinning = true; btn.disabled = true;
+  document.querySelectorAll(".wheel-legend li").forEach(li => li.classList.remove("hit"));
+  res.classList.remove("pop"); res.innerHTML = '<span class="wr-note">Spinning…</span>';
+  const finish = () => {
+    wheelAngle = norm(end); drawWheel(); wheelSpinning = false; btn.disabled = false;
+    const w = wheelItems[pick];
+    res.innerHTML = `<span class="wr-tag">THE WHEEL HAS SPOKEN</span><span class="wr-text">${esc(w.text)}</span><span class="wr-note">Not official until it shows up as the current punishment.</span>`;
+    void res.offsetWidth; res.classList.add("pop");
+    const li = document.querySelector(`.wheel-legend li[data-k="${pick}"]`); if (li) li.classList.add("hit");
+    if (!reduceMotion) launchFireworks(2500);
+  };
+  if (reduceMotion){ wheelAngle = end; return finish(); }
+  const dur = 5200, t0 = performance.now(); let lastSeg = Math.floor(norm(start) / seg);
+  const step = now => {
+    const t = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - t, 4);
+    wheelAngle = start + (end - start) * e; drawWheel();
+    const sg = Math.floor(norm(wheelAngle) / seg); if (sg !== lastSeg){ lastSeg = sg; wheelTick(); }
+    if (t < 1) requestAnimationFrame(step); else finish();
+  };
+  requestAnimationFrame(step);
+}
+$("wheelSpin").addEventListener("click", spinWheel);
+window.addEventListener("resize", () => { if (!wheelSpinning) drawWheel(); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawWheel);
 // ---------- data ----------
 function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
 function updatePreview(){}
@@ -3116,6 +3239,7 @@ function applyData(d){
   renderShame();
   punData = d.punishments || [];
   renderPunishments(d.punishments);
+  renderWheel(d.wheel);
   weatherMode = d.weather || "auto"; themeMode = d.theme || "auto"; setWeather(); applySeason(); drawPano();
   checkMilestones(d);
   render();
