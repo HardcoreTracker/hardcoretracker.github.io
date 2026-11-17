@@ -568,9 +568,40 @@ body.has-ticker .lower-right{top:52px;max-height:calc(100vh - 68px)}
 .testlab-bar b{letter-spacing:.06em}
 html.testlab .ticker{top:auto;position:relative}
 html.testlab body.has-ticker{padding-top:0}
+
+.demo-bar{position:fixed;left:50%;bottom:max(10px, env(safe-area-inset-bottom, 0px));transform:translateX(-50%);z-index:70;width:min(1060px, calc(100% - 20px));display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 12px}
+.demo-bar[hidden],.demo-show[hidden]{display:none}
+.demo-bar .tag{font-family:var(--f-label);font-weight:700;font-size:12px;color:#FFFFFF;background:#8932B8;padding:4px 8px}
+.demo-btns{display:flex;flex-wrap:wrap;gap:6px;flex:1 1 520px}
+.demo-btns button{font-size:13px;padding:3px 9px}
+.demo-btns button[aria-pressed="true"]{border-color:#FFFFFF;background:#3F7A2E;box-shadow:inset 2px 2px 0 #6FB24E, inset -2px -3px 0 #1F3F15}
+.demo-time{display:flex;align-items:center;gap:6px;font-size:13px}
+.demo-time input{width:140px;accent-color:#3F7A2E}
+.demo-now{font-size:12px;opacity:.8;flex-basis:100%}
+.demo-show{position:fixed;right:12px;bottom:max(12px, env(safe-area-inset-bottom, 0px));z-index:70;font-size:13px}
+html.testlab.lab-open .wrap{padding-bottom:170px}
 </style>
 </head>
 <body>
+<script>
+// Test lab only: a pretend clock so the test panel can show other days and times. The real site never runs this.
+if (new URLSearchParams(location.search).has("testlab")){
+  const RealDate = Date; window.__RealDate = RealDate; window.__labOffset = 0;
+  class LabDate extends RealDate {
+    constructor(...a){ if (a.length) super(...a); else super(RealDate.now() + window.__labOffset); }
+    static now(){ return RealDate.now() + window.__labOffset; }
+  }
+  window.Date = LabDate;
+}
+</script>
+<div class="demo-bar panel" id="labPanel" hidden aria-label="Test lab controls">
+  <span class="tag">Test lab</span>
+  <div class="demo-btns" id="labBtns"></div>
+  <label class="demo-time">Time <input type="range" id="labHour" min="0" max="23.5" step="0.5" value="13"> <span id="labHourTxt">1:00 pm</span></label>
+  <button type="button" class="small" id="labHide">Hide</button>
+  <span class="demo-now" id="labNow"></span>
+</div>
+<button type="button" class="demo-show" id="labShow" hidden>Test lab panel</button>
 <div class="testlab-bar" id="testlabBar" hidden><b>TEST LAB</b><span>Changes here only affect test data. The real site isn't touched.</span><button type="button" id="testlabReset">Reset test data</button><span id="testlabMsg"></span></div>
 <div class="ticker" id="ticker" hidden aria-label="Hearthigen news">
   <span class="tk-lab"><span class="long">HEARTHIGEN NEWS</span><span class="short">NEWS</span></span>
@@ -3439,6 +3470,75 @@ if (TESTLAB){
     } catch(e){ msg.textContent = "Couldn't reset: " + e.message + (String(e.message).includes("not_found") ? " (paste the updated spin server code into Cloudflare)" : ""); b.disabled = false; }
   });
 }
+// ---------- test lab panel: pretend days, holidays, ages and times (test lab only) ----------
+if (TESTLAB) (() => {
+  const EVENTS = [
+    {id:"today", label:"Today", date:null},
+    {id:"spring", label:"Spring", date:[2027,3,25]},
+    {id:"summer", label:"Summer", date:[2027,6,15]},
+    {id:"fall", label:"Fall", date:[2026,9,28]},
+    {id:"winter", label:"Winter", date:[2027,0,15]},
+    {id:"valentines", label:"Valentine's", date:[2027,1,14]},
+    {id:"stpatricks", label:"St. Patrick's", date:[2027,2,17]},
+    {id:"aprilfools", label:"April Fools'", date:[2027,3,1]},
+    {id:"easter", label:"Easter", date:[2027,2,28]},
+    {id:"july4", label:"4th of July", date:[2027,6,4], hour:21.5},
+    {id:"halloween", label:"Halloween night", date:[2026,9,31], hour:21},
+    {id:"thanksgiving", label:"Thanksgiving", date:[2026,10,26]},
+    {id:"firstsnow", label:"First snow", date:[2026,11,1]},
+    {id:"hanukkah", label:"Hanukkah (night 5)", date:[2026,11,8], hour:20},
+    {id:"christmas", label:"Christmas Eve", date:[2026,11,24], hour:21},
+    {id:"newyear", label:"New Year's Eve", date:[2026,11,31], hour:23.5, fireworks:true},
+    {id:"fri13", label:"Friday the 13th", date:[2027,7,13]},
+    {id:"nether", label:"Nether Age", date:null, age:7},
+    {id:"end", label:"End Age", date:null, age:8},
+    {id:"milestone", label:"Milestone", date:null, milestone:true}
+  ];
+  const R = window.__RealDate, real = new R();
+  let current = EVENTS[0], hour = Math.round((real.getHours() + real.getMinutes() / 60) * 2) / 2 % 24, realProgress = null;
+  const fmtHour = x => { const h = Math.floor(x), m = x % 1 ? "30" : "00"; return ((h % 12) || 12) + ":" + m + (h < 12 ? " am" : " pm"); };
+  function apply(){
+    const now = new R();
+    const [y, mo, d] = current.date || [now.getFullYear(), now.getMonth(), now.getDate()];
+    window.__labOffset = new R(y, mo, d, Math.floor(hour), (hour % 1) * 60).getTime() - R.now();
+    if (!realProgress) realProgress = {...progress};
+    progress.age = current.age || realProgress.age; progress.quest = current.age ? 1 : realProgress.quest; viewAge = progress.age;
+    try { holCache.key = ""; } catch(e){}
+    setWeather(); applySeason(); renderQuests(); render(); renderTicker(); drawPano();
+    document.querySelectorAll("#labBtns button").forEach(b => b.setAttribute("aria-pressed", b.dataset.id === current.id));
+    $("labHour").value = hour; $("labHourTxt").textContent = fmtHour(hour);
+    $("labNow").textContent = "Pretending it's " + new Date().toLocaleDateString(undefined, {weekday:"long", month:"long", day:"numeric", year:"numeric"}) + " at " + fmtHour(hour) + " · weather: " + weatherNow + " · holiday: " + (holidayNow() || "none") + " · age " + progress.age + ". Only on this screen.";
+    if (current.fireworks) launchFireworks(8000);
+    if (current.milestone){
+      document.querySelectorAll(".milestone").forEach(x => x.remove());
+      const box = document.createElement("div");
+      box.className = "milestone panel"; box.setAttribute("role", "status");
+      box.innerHTML = '<span class="tag">Milestone</span><strong class="mctitle">50 deaths!</strong><span>The server just hit 50 total deaths. Impressive, in a bad way.</span><button type="button">Nice</button>';
+      box.querySelector("button").addEventListener("click", () => box.remove());
+      document.body.appendChild(box); setTimeout(() => box.remove(), 9000);
+      launchFireworks(6000);
+    }
+  }
+  const show = open => {
+    $("labPanel").hidden = !open; $("labShow").hidden = open;
+    document.documentElement.classList.toggle("lab-open", open);
+    try { localStorage.setItem("hct-lab-panel", open ? "1" : "0"); } catch(e){}
+  };
+  let open = true; try { open = localStorage.getItem("hct-lab-panel") !== "0"; } catch(e){}
+  show(open);
+  $("labHide").addEventListener("click", () => show(false));
+  $("labShow").addEventListener("click", () => show(true));
+  $("labBtns").innerHTML = EVENTS.map(e => '<button type="button" data-id="' + e.id + '">' + e.label + '</button>').join("");
+  $("labBtns").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    current = EVENTS.find(x => x.id === b.dataset.id);
+    if (current.hour != null) hour = current.hour;
+    else if (current.id === "today"){ const n = new R(); hour = Math.round((n.getHours() + n.getMinutes() / 60) * 2) / 2 % 24; }
+    apply();
+  });
+  $("labHour").addEventListener("input", e => { hour = Number(e.target.value); apply(); });
+  const wait = setInterval(() => { if (players.length){ clearInterval(wait); realProgress = {...progress}; apply(); } }, 200);
+})();
 // ---------- data ----------
 function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
 function updatePreview(){}
