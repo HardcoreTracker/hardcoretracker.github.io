@@ -24,11 +24,11 @@ jobs:
         run: |
           set -euo pipefail
           [[ "$MC_NAME" =~ ^[A-Za-z0-9_]{3,16}$ ]] || { echo "Not a valid Minecraft username"; exit 1; }
-          profile=$(curl -fsS "https://api.mojang.com/users/profiles/minecraft/$MC_NAME")
+          profile=$(curl -fsS --retry 6 --retry-all-errors --retry-delay 15 "https://api.mojang.com/users/profiles/minecraft/$MC_NAME")
           id=$(echo "$profile" | jq -r .id)
           real=$(echo "$profile" | jq -r .name)
-          url=$(curl -fsS "https://sessionserver.mojang.com/session/minecraft/profile/$id" | jq -r '.properties[] | select(.name=="textures") | .value' | base64 -d | jq -r '.textures.SKIN.url')
-          curl -fsS "$url" -o "skins/$real.png"
+          url=$(curl -fsS --retry 6 --retry-all-errors --retry-delay 15 "https://sessionserver.mojang.com/session/minecraft/profile/$id" | jq -r '.properties[] | select(.name=="textures") | .value' | base64 -d | jq -r '.textures.SKIN.url')
+          curl -fsS --retry 6 --retry-all-errors --retry-delay 15 "$url" -o "skins/$real.png"
           echo "REAL_NAME=$real" >> "$GITHUB_ENV"
 
       - name: Point data.json at the skin
