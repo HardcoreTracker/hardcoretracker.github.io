@@ -2193,8 +2193,8 @@ function route(){
   const hsh = decodeURIComponent(location.hash.slice(1));
   if (hsh === "rules" || hsh.startsWith("player-")) adminOpen = false;
   if (hsh === "rules") openOverlay(rulesHtml());
-  else if (hsh && hsh.length > 12) isAdminHash(hsh).then(ok => { if (ok){ openAdmin(); history.replaceState(null, "", location.pathname + location.search); } });
   else if (hsh.startsWith("player-")){ const html = playerPageHtml(hsh.slice(7)); if (html) openOverlay(html); else closeOverlay(); }
+  else if (hsh && hsh.length > 12) isAdminHash(hsh).then(ok => { if (ok){ openAdmin(); history.replaceState(null, "", location.pathname + location.search); } });
   else if (!$("overlay").hidden && !adminOpen){ $("overlay").hidden = true; document.body.classList.remove("ov-open"); }
 }
 addEventListener("hashchange", route);
