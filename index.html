@@ -3228,7 +3228,7 @@ function renderWheel(list){
   wheelLockState();
 }
 // Spin server (Cloudflare Worker) that picks and saves the result for everyone. Empty = spins only show on this screen.
-const WHEEL_API = "";
+const WHEEL_API = "https://hearthigen-wheel.rylanromesburg.workers.dev";
 const normWheel = list => (list || []).map(w => typeof w === "string" ? {text: w, short: w} : {text: w.text, short: w.short || w.text});
 function landWheel(pick, done){
   const n = wheelItems.length, seg = Math.PI * 2 / n;
