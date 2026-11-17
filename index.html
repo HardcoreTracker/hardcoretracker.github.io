@@ -534,6 +534,7 @@ body.has-ticker .lower-right{top:52px;max-height:calc(100vh - 68px)}
 .wheel-pointer{position:absolute;left:50%;top:-6px;width:28px;height:30px;transform:translateX(-50%);background:#1E1E1E;clip-path:polygon(0 0,100% 0,100% 30%,75% 30%,75% 60%,50% 100%,25% 60%,25% 30%,0 30%);z-index:2}
 .wheel-pointer::after{content:"";position:absolute;inset:3px 5px 6px;background:#FF5555;clip-path:polygon(0 0,100% 0,100% 30%,72% 30%,72% 60%,50% 100%,28% 60%,28% 30%,0 30%)}
 .wheel-spin{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:23%;aspect-ratio:1;border-radius:0;font-size:clamp(14px,3.6vw,20px);padding:0;z-index:2}
+.cp-note{display:block;margin-top:4px;font-size:13px;color:#FFFF55}
 .wheel-spin:disabled{opacity:.85;cursor:not-allowed}
 .wheel-box.locked canvas{filter:grayscale(.75) brightness(.75)}
 .wheel-side{flex:1 1 280px;min-width:0;display:flex;flex-direction:column;gap:12px}
@@ -643,6 +644,7 @@ if (new URLSearchParams(location.search).has("testlab")){
       <div class="slot cur-pun" id="curPun">
         <span class="label">Current punishment</span>
         <span class="cp-text shadowed" id="cpText">None right now</span>
+        <span class="cp-note" id="cpNote" hidden></span>
       </div>
       <span class="label">On the chopping block</span>
       <div id="spotBody"></div>
@@ -2955,7 +2957,9 @@ function renderTicker(){
     news.push(`<span class="tk-it"><span class="tk-k">QUEST</span>Age ${progress.age}${a ? " · " + esc(a.name) : ""} · quest ${progress.quest}${a ? " of " + a.quests.length : ""}</span>`);
   }
   const cp = $("cpText").textContent;
-  if (cp && cp !== "None right now") news.push(`<span class="tk-it"><span class="tk-k">PUNISHMENT</span>Now serving: ${esc(cp)}</span>`);
+  if (cp && cp !== "None right now") news.push(curPunData.used
+    ? `<span class="tk-it"><span class="tk-k">PUNISHMENT</span>${esc(givenToName())} got: ${esc(cp)}. The wheel is open!</span>`
+    : `<span class="tk-it"><span class="tk-k">PUNISHMENT</span>Next up: ${esc(cp)}</span>`);
   news.push(`<span class="tk-it"><span class="tk-k">TOTALS</span>${esc($("sDeaths").textContent)} deaths · ${esc($("sPun").textContent)} punishments</span>`);
   const stocks = [...players].sort((a, b) => (t[b.id] || 0) - (t[a.id] || 0) || a.name.localeCompare(b.name)).map(p => {
     const s = stockFor(p.id), up = s.change >= 0;
@@ -3247,15 +3251,23 @@ function owedPunishments(){
   (punData || []).forEach(x => given[x.player] = (given[x.player] || 0) + 1);
   return players.map(p => ({p, owed: Math.floor((t[p.id] || 0) / PER_PUNISH) - (given[p.id] || 0)})).filter(x => x.owed > 0);
 }
+// The wheel unlocks once the current punishment has been given to someone; a spin picks the next one
+let curPunData = {};
+const givenToName = () => { const p = curPunData.givenTo && allPlayers.find(x => x.id === curPunData.givenTo); return p ? shortName(p) : "Someone"; };
+function renderCurPunNote(){
+  const n = $("cpNote"); if (!n) return;
+  n.hidden = !curPunData.used;
+  if (curPunData.used) n.textContent = `Given to ${givenToName()}. Spin the wheel for the next one.`;
+}
 function wheelLockState(){
-  const owed = owedPunishments(), btn = $("wheelSpin"), box = document.querySelector(".wheel-box"), res = $("wheelResult");
-  const locked = !owed.length;
+  const btn = $("wheelSpin"), box = document.querySelector(".wheel-box"), res = $("wheelResult");
+  const locked = !curPunData.used;
   box.classList.toggle("locked", locked);
-  if (!wheelSpinning){ btn.disabled = locked; btn.textContent = locked ? "🔒" : "SPIN"; btn.title = locked ? "Locked until someone earns a new punishment" : ""; }
+  if (!wheelSpinning){ btn.disabled = locked; btn.textContent = locked ? "🔒" : "SPIN"; btn.title = locked ? "Locked until someone gets the current punishment" : ""; }
   if (wheelSpinning || res.querySelector(".wr-text")) return;
   res.innerHTML = locked
-    ? '<span class="wr-tag">LOCKED</span><span class="wr-note">The wheel unlocks as soon as someone earns a new punishment.</span>'
-    : `<span class="wr-tag">UNLOCKED</span><span class="wr-note"><b>${owed.map(x => esc(shortName(x.p)) + (x.owed > 1 ? " (" + x.owed + ")" : "")).join(", ")}</b> ${owed.length === 1 && owed[0].owed === 1 ? "has" : "have"} a punishment coming. Press <b>SPIN</b>!</span>`;
+    ? '<span class="wr-tag">LOCKED</span><span class="wr-note">Whoever is punished next gets the current punishment. Then the wheel unlocks to pick the one after.</span>'
+    : `<span class="wr-tag">UNLOCKED</span><span class="wr-note"><b>${esc(givenToName())}</b> got <b>${esc(curPunData.text || "the punishment")}</b>. Press <b>SPIN</b> to pick the next punishment!</span>`;
 }
 function renderWheelLegend(){
   $("wheelLegend").innerHTML = wheelItems.map((w, k) => `<li data-k="${k}"><span class="sw" style="background:${WHEEL_COLORS[k % WHEEL_COLORS.length]}"></span><span>${esc(w.text)}</span></li>`).join("");
@@ -3297,7 +3309,7 @@ function showWheelResult(pick, html){
   if (!reduceMotion) launchFireworks(2500);
 }
 async function spinWheel(){
-  if (wheelSpinning || !wheelItems.length || !owedPunishments().length) return;
+  if (wheelSpinning || !wheelItems.length || !curPunData.used) return;
   const btn = $("wheelSpin"), res = $("wheelResult");
   wheelSpinning = true; btn.disabled = true;
   document.querySelectorAll(".wheel-legend li").forEach(li => li.classList.remove("hit"));
@@ -3318,7 +3330,7 @@ async function spinWheel(){
     if (!r.ok){
       wheelSpinning = false;
       res.innerHTML = j.error === "locked"
-        ? '<span class="wr-tag">TOO LATE</span><span class="wr-note">Someone already spun for this punishment. Updating…</span>'
+        ? '<span class="wr-tag">TOO LATE</span><span class="wr-note">Someone already spun for the next punishment. Updating…</span>'
         : '<span class="wr-tag">THE WHEEL JAMMED</span><span class="wr-note">Couldn\'t spin right now. Try again in a moment.</span>';
       if (j.error === "locked") setTimeout(() => { res.innerHTML = ""; loadData(false).catch(() => {}); }, 2500);
       wheelLockState(); return;
@@ -3326,10 +3338,9 @@ async function spinWheel(){
     // Make sure we're showing the same slices the server spun
     if (j.wheel){ wheelItems = normWheel(j.wheel); renderWheelLegend(); }
     landWheel(j.index, () => {
-      showWheelResult(j.index, `<span class="wr-tag">THE WHEEL HAS SPOKEN</span><span class="wr-text">${esc(j.text)}</span><span class="wr-note"><b>${esc(j.playerName)}</b> gets it. It's now the current punishment.</span>`);
-      $("cpText").textContent = j.text;
-      punData.push({id: "pending", player: j.player, text: j.text, time: new Date().toISOString(), source: "wheel"});
-      renderPunishments(punData);
+      showWheelResult(j.index, `<span class="wr-tag">NEXT PUNISHMENT</span><span class="wr-text">${esc(j.text)}</span><span class="wr-note">Whoever is punished next gets this one.</span>`);
+      curPunData = {text: j.text};
+      $("cpText").textContent = j.text; renderCurPunNote();
       setTimeout(() => loadData(false).catch(() => {}), 70000);
     });
   } catch(e){
@@ -3547,11 +3558,13 @@ let lastDataText = "";
 function applyData(d){
   meta = {priorDeaths: d.priorDeaths || 0};
   const cp = d.currentPunishment || {};
+  curPunData = cp;
   $("cpText").textContent = cp.text || "None right now";
   // Players marked inactive keep their old deaths in the log but get no card, points or awards
   allPlayers = d.players || []; players = allPlayers.filter(p => !p.inactive); deaths = d.deaths || [];
   if (d.progress){ progress = d.progress; viewAge = progress.age; renderQuests(); }
   meta.worldStart = d.worldStart || null;
+  renderCurPunNote();
   renderLastDeath(d.lastDeath);
   punData = d.punishments || [];
   renderShame();

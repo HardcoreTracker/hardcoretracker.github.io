@@ -1,10 +1,13 @@
 // Hearthigen punishment wheel: spin server (Cloudflare Worker)
 //
+// How punishments work: when someone earns one, they get the CURRENT punishment (a GitHub
+// automation logs it and marks the current punishment "used"). The wheel then picks the NEXT one.
+//
 // The website calls POST /spin. This Worker:
 //   1. reads data.json from GitHub,
-//   2. checks someone has earned a punishment that isn't logged yet (otherwise the wheel is locked),
+//   2. checks the current punishment has been given out (otherwise the wheel is locked),
 //   3. picks a random slice itself (so nobody can fake a result),
-//   4. saves it: current punishment, punishment history, and takes the slice off the wheel.
+//   4. saves it as the new current punishment and takes that slice off the wheel.
 // The GitHub token lives in the Worker's secret GITHUB_TOKEN and is never sent to visitors.
 
 const REPO = "HardcoreTracker/hardcoretracker.github.io";
@@ -37,31 +40,26 @@ export default {
       const meta = await got.json();
       const data = JSON.parse(fromBase64(meta.content));
 
-      const owed = owedPunishments(data);
-      if (!owed.length) return reply({error: "locked"}, 409, cors);
+      const cur = data.currentPunishment || {};
+      if (!cur.used) return reply({error: "locked"}, 409, cors);
       const wheel = Array.isArray(data.wheel) ? data.wheel : [];
       if (!wheel.length) return reply({error: "empty"}, 409, cors);
 
       const index = randomInt(wheel.length);
       const item = wheel[index];
-      const who = owed[0];
-
-      data.currentPunishment = {...(data.currentPunishment || {}), text: item.text};
-      data.punishments = Array.isArray(data.punishments) ? data.punishments : [];
-      const nextId = Math.max(0, ...data.punishments.map(p => parseInt(String(p.id).replace(/\D/g, ""), 10) || 0)) + 1;
-      data.punishments.push({id: "p" + nextId, time: who.time, player: who.id, text: item.text, source: "wheel"});
+      data.currentPunishment = {text: item.text};
       data.wheel = wheel.filter((_, i) => i !== index);
 
       const save = await github(env, `repos/${REPO}/contents/${file}`, {
         method: "PUT",
         body: JSON.stringify({
-          message: (file === "data.json" ? "" : "Test lab: ") + `Wheel: ${who.name} gets "${item.text}"`,
+          message: (file === "data.json" ? "" : "Test lab: ") + `Wheel: next punishment is "${item.text}"`,
           content: toBase64(JSON.stringify(data, null, 2) + "\n"),
           sha: meta.sha,
           branch: "main",
         }),
       });
-      if (save.ok) return reply({ok: true, index, text: item.text, player: who.id, playerName: who.name, wheel}, 200, cors);
+      if (save.ok) return reply({ok: true, index, text: item.text, wheel}, 200, cors);
       if (save.status !== 409 && save.status !== 422) return reply({error: "github_" + save.status}, 502, cors);
       // someone (or the mod) saved at the same moment: read again and re-check
     }

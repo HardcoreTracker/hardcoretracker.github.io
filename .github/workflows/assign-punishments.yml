@@ -1,0 +1,46 @@
+name: Give out punishments
+
+# When the data changes (a death from the mod, a wheel spin, an edit), give the current
+# punishment to anyone who just earned one, then the wheel unlocks to pick the next one.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data.json"
+      - "test-data.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: assign-punishments
+  cancel-in-progress: false
+
+jobs:
+  assign:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Give out the current punishment
+        run: python3 .github/scripts/assign_punishments.py data.json test-data.json
+
+      - name: Save
+        run: |
+          [ -f commit-message.txt ] || { echo "Nothing to save"; exit 0; }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898099+github-actions[bot]@users.noreply.github.com"
+          git add data.json test-data.json
+          git diff --cached --quiet && exit 0
+          git commit -q -F commit-message.txt
+          for i in 1 2 3 4 5; do
+            if git push -q; then exit 0; fi
+            # someone saved at the same moment: start over from their version
+            git reset -q --hard HEAD~1 && git pull -q --rebase
+            rm -f commit-message.txt
+            python3 .github/scripts/assign_punishments.py data.json test-data.json
+            [ -f commit-message.txt ] || exit 0
+            git add data.json test-data.json && git commit -q -F commit-message.txt
+          done
+          exit 1
