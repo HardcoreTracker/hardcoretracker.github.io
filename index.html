@@ -561,9 +561,17 @@ body.has-ticker .lower-right{top:52px;max-height:calc(100vh - 68px)}
 .adm-list .adm-row input{flex:1 1 180px;min-width:0;padding:6px;font:inherit;font-size:13px;background:#1E1E1E;color:#FFFFFF;border:2px solid #555555}
 .adm-list .adm-done{font-weight:700;color:#55FF55}
 .adm-list .adm-done.no{color:#FF5555}
+
+/* ---------- test lab ---------- */
+.testlab-bar{position:sticky;top:0;z-index:60;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:8px 16px;background:#8932B8;color:#FFFFFF;font-size:13px;box-shadow:0 2px 0 rgba(0,0,0,.35)}
+.testlab-bar[hidden]{display:none}
+.testlab-bar b{letter-spacing:.06em}
+html.testlab .ticker{top:auto;position:relative}
+html.testlab body.has-ticker{padding-top:0}
 </style>
 </head>
 <body>
+<div class="testlab-bar" id="testlabBar" hidden><b>TEST LAB</b><span>Changes here only affect test data. The real site isn't touched.</span><button type="button" id="testlabReset">Reset test data</button><span id="testlabMsg"></span></div>
 <div class="ticker" id="ticker" hidden aria-label="Hearthigen news">
   <span class="tk-lab"><span class="long">HEARTHIGEN NEWS</span><span class="short">NEWS</span></span>
   <div class="tk-run"><div class="tk-track" id="tkTrack"></div><div class="tk-brk" id="tkBrk" hidden role="status"></div></div>
@@ -730,6 +738,9 @@ $("ruleTable").innerHTML = AGES.map(a => `<tr><td>${ageChip(a.key)}</td><td>+${a
 // ---------- panorama background ----------
 const pano = document.getElementById("pano");
 const pctx = pano.getContext("2d");
+// Test lab: opening the site with ?testlab uses test-data.json instead of the real data, so nothing here touches the real site
+const TESTLAB = new URLSearchParams(location.search).has("testlab");
+const DATA_FILE = TESTLAB ? "test-data.json" : "data.json";
 const prefersReduced = (() => { try { return matchMedia("(prefers-reduced-motion: reduce)").matches; } catch(e){ return false; } })();
 // "Effects off" (saved on this device only) freezes the background and stops the scrolling and wiggling
 let fxOff = false; try { fxOff = localStorage.getItem("hct-effects") === "off"; } catch(e){}
@@ -3270,7 +3281,7 @@ async function spinWheel(){
   const idle = now => { if (!waiting) return; wheelAngle = base + (now - t0) / 1000 * 7; drawWheel(); requestAnimationFrame(idle); };
   if (!reduceMotion) requestAnimationFrame(idle);
   try {
-    const r = await fetch(WHEEL_API.replace(/\/$/, "") + "/spin", {method: "POST", cache: "no-store"});
+    const r = await fetch(WHEEL_API.replace(/\/$/, "") + "/spin" + (TESTLAB ? "?file=test" : ""), {method: "POST", cache: "no-store"});
     const j = await r.json().catch(() => ({}));
     waiting = false;
     if (!r.ok){
@@ -3338,11 +3349,11 @@ const textToB64 = t => { const u = new TextEncoder().encode(t); let s = ""; for 
 // Change data.json on GitHub: load it, let fn edit it, save it (retrying if the mod saved at the same moment)
 async function editData(fn, message){
   for (let attempt = 0; attempt < 3; attempt++){
-    const f = await ghApi(`repos/${REPO}/contents/data.json?ref=main`);
+    const f = await ghApi(`repos/${REPO}/contents/${DATA_FILE}?ref=main`);
     const d = JSON.parse(b64ToText(f.content));
     fn(d);
     try {
-      await ghApi(`repos/${REPO}/contents/data.json`, {method: "PUT", body: JSON.stringify({message, content: textToB64(JSON.stringify(d, null, 2) + "\n"), sha: f.sha, branch: "main"})});
+      await ghApi(`repos/${REPO}/contents/${DATA_FILE}`, {method: "PUT", body: JSON.stringify({message, content: textToB64(JSON.stringify(d, null, 2) + "\n"), sha: f.sha, branch: "main"})});
       return d;
     } catch(e){ if (e.status !== 409 && e.status !== 422) throw e; }
   }
@@ -3411,6 +3422,23 @@ function adminWire(){
   }
 }
 function alertInline(li, msg){ let m = li.querySelector(".adm-err"); if (!m){ m = document.createElement("span"); m.className = "adm-meta adm-err"; li.appendChild(m); } m.textContent = msg; }
+// ---------- test lab controls ----------
+if (TESTLAB){
+  document.documentElement.classList.add("testlab");
+  document.title = "TEST LAB · " + document.title;
+  $("testlabBar").hidden = false;
+  $("testlabReset").addEventListener("click", async () => {
+    const msg = $("testlabMsg"), b = $("testlabReset");
+    b.disabled = true; msg.textContent = "Resetting…";
+    try {
+      const r = await fetch(WHEEL_API.replace(/\/$/, "") + "/test/reset", {method: "POST", cache: "no-store"});
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.error || r.status);
+      msg.textContent = `Done: a copy of the real data, plus a test death so ${j.owed || "someone"} owes a punishment. Reloading in a moment…`;
+      setTimeout(() => location.reload(), 4000);
+    } catch(e){ msg.textContent = "Couldn't reset: " + e.message + (String(e.message).includes("not_found") ? " (paste the updated spin server code into Cloudflare)" : ""); b.disabled = false; }
+  });
+}
 // ---------- data ----------
 function setStatus(t, kind){ const s=$("status"); s.textContent=t; s.className="status " + (kind||""); }
 function updatePreview(){}
@@ -3439,7 +3467,7 @@ function applyData(d){
 }
 // Load the data, then check for updates every minute so new deaths show up without refreshing.
 function loadData(first){
-  return fetch("data.json?t=" + Date.now(), {cache:"no-store"}).then(r => { if (!r.ok) throw 0; return r.text(); }).then(text => {
+  return fetch(DATA_FILE + "?t=" + Date.now(), {cache:"no-store"}).then(r => { if (!r.ok) throw 0; return r.text(); }).then(text => {
     if (text === lastDataText) return;
     lastDataText = text;
     applyData(JSON.parse(text));

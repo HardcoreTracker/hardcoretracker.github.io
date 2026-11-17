@@ -1,0 +1,695 @@
+{
+  "updated": "Nov 17, 2026",
+  "priorDeaths": 0,
+  "players": [
+    {
+      "id": "kanalumaddela",
+      "name": "kanalumaddela",
+      "nick": "Kana",
+      "base": 22,
+      "skin": "skins/kanalumaddela.png"
+    },
+    {
+      "id": "silver3gaming",
+      "name": "Silver3Gaming",
+      "nick": "SilverE",
+      "base": 12,
+      "skin": "skins/Silver3Gaming.png"
+    },
+    {
+      "id": "mysticdragbax",
+      "name": "Mysticdragbax",
+      "nick": "Mystic",
+      "base": 10,
+      "skin": "skins/Mysticdragbax.png"
+    },
+    {
+      "id": "subkiwi",
+      "name": "SubKiwi",
+      "nick": "SubKiwi",
+      "base": 10,
+      "skin": "skins/SubKiwi.png"
+    },
+    {
+      "id": "deim0s_v1",
+      "name": "Deim0s_v1",
+      "nick": "Deimos",
+      "base": 9,
+      "skin": "skins/Deim0s_v1.png"
+    },
+    {
+      "id": "incendiaryblitz",
+      "name": "IncendiaryBlitz",
+      "nick": "Incend",
+      "base": 9,
+      "skin": "skins/IncendiaryBlitz.png"
+    },
+    {
+      "id": "nagalooge",
+      "name": "Nagalooge",
+      "nick": "DevMod",
+      "base": 7,
+      "skin": "skins/Nagalooge.png"
+    },
+    {
+      "id": "monkey____",
+      "name": "monkey______",
+      "nick": "Sage",
+      "base": 7,
+      "skin": "skins/monkey______.png"
+    },
+    {
+      "id": "soulgiver039",
+      "name": "Soulgiver039",
+      "nick": "Soulgiver",
+      "base": 4,
+      "skin": "skins/Soulgiver039.png"
+    },
+    {
+      "id": "feniul",
+      "name": "Feniul",
+      "nick": "Feniul",
+      "base": 3,
+      "skin": "skins/Feniul.png"
+    },
+    {
+      "id": "shrinppy",
+      "name": "shrinppy",
+      "nick": "Proper",
+      "base": 3,
+      "skin": "skins/shrinppy.png",
+      "inactive": true
+    },
+    {
+      "id": "dark31911",
+      "name": "Dark31911",
+      "nick": "Alex",
+      "base": 0,
+      "skin": "skins/Dark31911.png"
+    }
+  ],
+  "deaths": [
+    {
+      "id": "d1",
+      "player": "kanalumaddela",
+      "age": "copper",
+      "cause": "Not tracked (Copper Age)",
+      "legacy": true,
+      "date": "",
+      "time": ""
+    },
+    {
+      "id": "d2",
+      "player": "kanalumaddela",
+      "age": "wood",
+      "cause": "Not tracked (Wood Age)",
+      "legacy": true,
+      "date": "",
+      "time": ""
+    },
+    {
+      "id": "d3",
+      "player": "nagalooge",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-10-10",
+      "time": "2026-10-10T21:18:00-07:00"
+    },
+    {
+      "id": "d4",
+      "player": "feniul",
+      "age": "",
+      "cause": "Impaled by Drowned",
+      "legacy": true,
+      "date": "2026-10-10",
+      "time": "2026-10-10T21:47:00-07:00"
+    },
+    {
+      "id": "d5",
+      "player": "mysticdragbax",
+      "age": "",
+      "cause": "Blown up by Creeper",
+      "legacy": true,
+      "date": "2026-10-11",
+      "time": "2026-10-11T00:41:00-07:00"
+    },
+    {
+      "id": "d6",
+      "player": "shrinppy",
+      "age": "",
+      "cause": "Fell off some vines",
+      "legacy": true,
+      "date": "2026-10-12",
+      "time": "2026-10-12T14:09:00-07:00"
+    },
+    {
+      "id": "d7",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Fell from a high place",
+      "legacy": true,
+      "date": "2026-10-12",
+      "time": "2026-10-12T15:02:00-07:00"
+    },
+    {
+      "id": "d8",
+      "player": "deim0s_v1",
+      "age": "",
+      "cause": "Slain by Wolf",
+      "legacy": true,
+      "date": "2026-10-12",
+      "time": "2026-10-12T15:52:00-07:00"
+    },
+    {
+      "id": "d9",
+      "player": "incendiaryblitz",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-10-12",
+      "time": "2026-10-12T16:10:00-07:00"
+    },
+    {
+      "id": "d10",
+      "player": "soulgiver039",
+      "age": "",
+      "cause": "Tried to swim in lava",
+      "legacy": true,
+      "date": "2026-10-12",
+      "time": "2026-10-12T18:41:00-07:00"
+    },
+    {
+      "id": "d12",
+      "player": "mysticdragbax",
+      "age": "",
+      "cause": "Doomed to fall by Skeleton",
+      "legacy": true,
+      "date": "2026-10-12",
+      "time": "2026-10-12T20:58:00-07:00"
+    },
+    {
+      "id": "d13",
+      "player": "soulgiver039",
+      "age": "",
+      "cause": "Slain by Enderman",
+      "legacy": true,
+      "date": "2026-10-12",
+      "time": "2026-10-12T21:11:00-07:00"
+    },
+    {
+      "id": "d14",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Impaled by Drowned",
+      "legacy": true,
+      "date": "2026-10-13",
+      "time": "2026-10-13T17:20:00-07:00"
+    },
+    {
+      "id": "d15",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-10-13",
+      "time": "2026-10-13T17:39:00-07:00"
+    },
+    {
+      "id": "d16",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-10-13",
+      "time": "2026-10-13T18:10:00-07:00"
+    },
+    {
+      "id": "d17",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-10-13",
+      "time": "2026-10-13T19:21:00-07:00"
+    },
+    {
+      "id": "d18",
+      "player": "subkiwi",
+      "age": "",
+      "cause": "Blown up by Creeper",
+      "legacy": true,
+      "date": "2026-10-13",
+      "time": "2026-10-13T22:02:00-07:00"
+    },
+    {
+      "id": "d19",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Slain by Zombie",
+      "legacy": true,
+      "date": "2026-10-14",
+      "time": "2026-10-14T01:56:00-07:00"
+    },
+    {
+      "id": "d20",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Tried to swim in lava",
+      "legacy": true,
+      "date": "2026-10-14",
+      "time": "2026-10-14T13:32:00-07:00"
+    },
+    {
+      "id": "d21",
+      "player": "deim0s_v1",
+      "age": "",
+      "cause": "Slain by Zombie",
+      "legacy": true,
+      "date": "2026-10-14",
+      "time": "2026-10-14T14:27:00-07:00"
+    },
+    {
+      "id": "d22",
+      "player": "mysticdragbax",
+      "age": "",
+      "cause": "Burned to death",
+      "legacy": true,
+      "date": "2026-10-14",
+      "time": "2026-10-14T19:18:00-07:00"
+    },
+    {
+      "id": "d23",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-10-14",
+      "time": "2026-10-14T22:20:00-07:00"
+    },
+    {
+      "id": "d24",
+      "player": "deim0s_v1",
+      "age": "",
+      "cause": "Slain by Zombie",
+      "legacy": true,
+      "date": "2026-10-15",
+      "time": "2026-10-15T20:25:00-07:00"
+    },
+    {
+      "id": "d25",
+      "player": "subkiwi",
+      "age": "",
+      "cause": "Impaled by Drowned",
+      "legacy": true,
+      "date": "2026-10-16",
+      "time": "2026-10-16T18:55:00-07:00"
+    },
+    {
+      "id": "d26",
+      "player": "deim0s_v1",
+      "age": "",
+      "cause": "Blown up by Creeper",
+      "legacy": true,
+      "date": "2026-10-17",
+      "time": "2026-10-17T23:03:00-07:00"
+    },
+    {
+      "id": "d27",
+      "player": "mysticdragbax",
+      "age": "",
+      "cause": "Slain by Vindicator",
+      "legacy": true,
+      "date": "2026-10-22",
+      "time": "2026-10-22T19:48:00-07:00"
+    },
+    {
+      "id": "d28",
+      "player": "nagalooge",
+      "age": "",
+      "cause": "Slain by Enderman",
+      "legacy": true,
+      "date": "2026-10-22",
+      "time": "2026-10-22T23:50:00-07:00"
+    },
+    {
+      "id": "d29",
+      "player": "feniul",
+      "age": "",
+      "cause": "Blown up by Creeper",
+      "legacy": true,
+      "date": "2026-10-23",
+      "time": "2026-10-23T19:41:00-07:00"
+    },
+    {
+      "id": "d30",
+      "player": "monkey____",
+      "age": "",
+      "cause": "Impaled by Drowned",
+      "legacy": true,
+      "date": "2026-10-23",
+      "time": "2026-10-23T21:40:00-07:00"
+    },
+    {
+      "id": "d31",
+      "player": "incendiaryblitz",
+      "age": "",
+      "cause": "Speared by Zombie",
+      "legacy": true,
+      "date": "2026-10-24",
+      "time": "2026-10-24T13:48:00-07:00"
+    },
+    {
+      "id": "d32",
+      "player": "incendiaryblitz",
+      "age": "",
+      "cause": "Slain by Zombie",
+      "legacy": true,
+      "date": "2026-10-24",
+      "time": "2026-10-24T14:31:00-07:00"
+    },
+    {
+      "id": "d33",
+      "player": "monkey____",
+      "age": "",
+      "cause": "Tried to swim in lava",
+      "legacy": true,
+      "date": "2026-10-30",
+      "time": "2026-10-30T20:25:00-07:00",
+      "reverted": true
+    },
+    {
+      "id": "d34",
+      "player": "silver3gaming",
+      "age": "",
+      "cause": "Fell from a high place",
+      "legacy": true,
+      "date": "2026-11-02",
+      "time": "2026-11-02T12:16:00-08:00"
+    },
+    {
+      "id": "d35",
+      "player": "deim0s_v1",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-11-02",
+      "time": "2026-11-02T17:03:00-08:00"
+    },
+    {
+      "id": "d36",
+      "player": "subkiwi",
+      "age": "",
+      "cause": "Fell from a high place",
+      "legacy": true,
+      "date": "2026-11-02",
+      "time": "2026-11-02T19:11:00-08:00"
+    },
+    {
+      "id": "d37",
+      "player": "silver3gaming",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-11-03",
+      "time": "2026-11-03T17:18:00-08:00"
+    },
+    {
+      "id": "d38",
+      "player": "silver3gaming",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-11-03",
+      "time": "2026-11-03T19:39:00-08:00"
+    },
+    {
+      "id": "d39",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Burned to a crisp while fighting Skeleton",
+      "legacy": true,
+      "date": "2026-11-05",
+      "time": "2026-11-05T19:49:00-08:00"
+    },
+    {
+      "id": "d40",
+      "player": "kanalumaddela",
+      "age": "",
+      "cause": "Slain by Iron Golem",
+      "legacy": true,
+      "date": "2026-11-06",
+      "time": "2026-11-06T23:06:00-08:00"
+    },
+    {
+      "id": "d41",
+      "player": "incendiaryblitz",
+      "age": "",
+      "cause": "Blown up by Creeper",
+      "legacy": true,
+      "date": "2026-11-08",
+      "time": "2026-11-08T09:54:00-08:00"
+    },
+    {
+      "id": "d42",
+      "player": "subkiwi",
+      "age": "",
+      "cause": "Shot by Skeleton",
+      "legacy": true,
+      "date": "2026-11-09",
+      "time": "2026-11-09T18:00:00-08:00"
+    },
+    {
+      "id": "m1794370787000",
+      "player": "subkiwi",
+      "age": "iron",
+      "totem": false,
+      "cause": "Blown up by Creeper",
+      "reason": "",
+      "date": "2026-11-11",
+      "time": "2026-11-11T04:19:47Z",
+      "source": "mod"
+    },
+    {
+      "id": "m1794371802000",
+      "player": "deim0s_v1",
+      "age": "wood",
+      "totem": false,
+      "cause": "Blown up by Creeper",
+      "reason": "",
+      "date": "2026-11-11",
+      "time": "2026-11-11T04:36:42Z",
+      "source": "mod"
+    },
+    {
+      "id": "m1794440182000",
+      "player": "dark31911",
+      "age": "copper",
+      "totem": false,
+      "cause": "Shot by Parched",
+      "reason": "",
+      "date": "2026-11-11",
+      "time": "2026-11-11T23:36:22Z",
+      "source": "mod"
+    },
+    {
+      "id": "m1794536827000",
+      "player": "mysticdragbax",
+      "age": "iron",
+      "totem": false,
+      "cause": "Blown up by Creeper",
+      "reason": "",
+      "date": "2026-11-13",
+      "time": "2026-11-13T02:27:07Z",
+      "source": "mod"
+    },
+    {
+      "id": "m1794649371000",
+      "player": "subkiwi",
+      "age": "diamond",
+      "totem": false,
+      "cause": "Blown up by Creeper",
+      "reason": "Died to a bug, so it only counts 2 points",
+      "date": "2026-11-14",
+      "time": "2026-11-14T09:42:51Z",
+      "source": "mod",
+      "points": 2
+    },
+    {
+      "id": "m1794886536000",
+      "player": "monkey____",
+      "age": "diamond",
+      "totem": true,
+      "cause": "Blown up by Creeper",
+      "reason": "",
+      "date": "2026-11-17",
+      "time": "2026-11-17T03:35:36Z",
+      "source": "mod"
+    },
+    {
+      "id": "test1794898681989",
+      "player": "incendiaryblitz",
+      "age": "end",
+      "totem": false,
+      "cause": "Test death",
+      "reason": "Made by the test lab",
+      "date": "2026-11-17",
+      "time": "2026-11-17T06:58:01.989Z",
+      "source": "test"
+    }
+  ],
+  "progress": {
+    "age": 3,
+    "quest": 18,
+    "totemFarm": false
+  },
+  "currentPunishment": {
+    "text": "Double or Nothing (flip a coin)"
+  },
+  "lastDeath": {
+    "player": "monkey____",
+    "cause": "Blown up by Creeper",
+    "time": "2026-11-17T03:35:36Z"
+  },
+  "punishments": [
+    {
+      "id": "p1",
+      "time": "2026-10-10T20:07:00-07:00",
+      "player": "kanalumaddela",
+      "text": "AI dance video"
+    },
+    {
+      "id": "p2",
+      "time": "2026-10-12T15:40:00-07:00",
+      "player": "mysticdragbax",
+      "text": "Teach a class over a given topic"
+    },
+    {
+      "id": "p3",
+      "time": "2026-10-12T21:02:00-07:00",
+      "player": "kanalumaddela",
+      "text": "Farm a stack of wheat with no bonemeal"
+    },
+    {
+      "id": "p4",
+      "time": "2026-10-13T19:28:00-07:00",
+      "player": "kanalumaddela",
+      "text": "Watch a video on how to get better at survival Minecraft and take handwritten notes"
+    },
+    {
+      "id": "p5",
+      "time": "2026-10-14T22:28:00-07:00",
+      "player": "deim0s_v1",
+      "text": "30 minutes on a Minecraft training server or tutorial map"
+    },
+    {
+      "id": "p6",
+      "time": "2026-10-15T20:40:00-07:00",
+      "player": "subkiwi",
+      "text": "Write a handwritten apology letter"
+    },
+    {
+      "id": "p7",
+      "time": "2026-10-16T19:06:00-07:00",
+      "player": "mysticdragbax",
+      "text": "Karaoke chosen by others"
+    },
+    {
+      "id": "p8",
+      "time": "2026-10-22T20:31:00-07:00",
+      "player": "incendiaryblitz",
+      "text": "Make a cringe TikTok"
+    },
+    {
+      "id": "p9",
+      "time": "2026-10-24T18:44:00-07:00",
+      "player": "monkey____",
+      "text": "Discord name for a week, chosen by others"
+    },
+    {
+      "id": "p10",
+      "time": "2026-11-02T17:17:00-08:00",
+      "player": "silver3gaming",
+      "text": "500 piece jigsaw puzzle"
+    },
+    {
+      "id": "p11",
+      "time": "2026-11-02T17:18:00-08:00",
+      "player": "silver3gaming",
+      "text": "Gather dirt, build a tower from sea level to build limit, and mine it all back. No VeinMiner, no shovels."
+    },
+    {
+      "id": "p12",
+      "time": "2026-11-02T17:16:00-08:00",
+      "player": "nagalooge",
+      "text": "Mine 5 obsidian by hand, no scrolling reels"
+    },
+    {
+      "id": "p13",
+      "time": "2026-11-03T20:13:00-08:00",
+      "player": "kanalumaddela",
+      "text": "PowerPoint presentation on why you suck at Minecraft, detailing each of your deaths and how to prevent them"
+    },
+    {
+      "id": "p14",
+      "time": "2026-11-06T23:13:00-08:00",
+      "player": "subkiwi",
+      "text": "Drink a glass of milk"
+    },
+    {
+      "id": "p15",
+      "time": "2026-11-10T20:19:47-08:00",
+      "player": "deim0s_v1",
+      "text": "Apology video"
+    },
+    {
+      "id": "p16",
+      "time": "2026-11-14T01:42:51-08:00",
+      "player": "subkiwi",
+      "text": "Active participation for 30 minutes in a Kick streamer with under 10 viewers"
+    },
+    {
+      "id": "p17",
+      "time": "2026-11-16T19:35:36-08:00",
+      "player": "monkey____",
+      "text": "Play Hypixel Bedwars until victory"
+    }
+  ],
+  "weather": "auto",
+  "theme": "auto",
+  "worldStart": "2026-11-14T18:32:52Z",
+  "wheel": [
+    {
+      "text": "Build a NICE house from a house tutorial",
+      "short": "NICE tutorial house"
+    },
+    {
+      "text": "Make it through Wood without joining a party",
+      "short": "Solo through Wood"
+    },
+    {
+      "text": "10 minutes MC slave each",
+      "short": "10 min MC slave"
+    },
+    {
+      "text": "Set up a villager trading hall with Mending, Unbreaking 3, Prot 4 and Sharpness 5",
+      "short": "Trading hall"
+    },
+    {
+      "text": "Profile picture voted on by us for one week",
+      "short": "Voted PFP (1 wk)"
+    },
+    {
+      "text": "\"I suck at Minecraft\" written 100 times",
+      "short": "\"I suck\" x100"
+    },
+    {
+      "text": "Beat The Hardest Game",
+      "short": "Hardest Game"
+    },
+    {
+      "text": "Minecraft knowledge exam",
+      "short": "MC knowledge exam"
+    }
+  ]
+}

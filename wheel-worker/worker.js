@@ -22,16 +22,19 @@ export default {
       "Vary": "Origin",
     };
     if (request.method === "OPTIONS") return new Response(null, {status: 204, headers: cors});
-    const path = new URL(request.url).pathname;
+    const url = new URL(request.url), path = url.pathname;
+    // The site's test lab uses test-data.json so it never touches the real data
+    const file = url.searchParams.get("file") === "test" ? "test-data.json" : "data.json";
     if (request.method === "GET" && path === "/") return reply({ok: true, service: "hearthigen-wheel"}, 200, cors);
-    if (request.method !== "POST" || path !== "/spin") return reply({error: "not_found"}, 404, cors);
+    if (request.method !== "POST" || (path !== "/spin" && path !== "/test/reset")) return reply({error: "not_found"}, 404, cors);
     if (!ALLOWED_ORIGINS.includes(origin)) return reply({error: "forbidden"}, 403, cors);
     if (!env.GITHUB_TOKEN) return reply({error: "not_configured"}, 500, cors);
+    if (path === "/test/reset") return resetTest(env, cors);
 
     for (let attempt = 0; attempt < 3; attempt++) {
-      const file = await github(env, `repos/${REPO}/contents/data.json?ref=main`);
-      if (!file.ok) return reply({error: "github_" + file.status}, 502, cors);
-      const meta = await file.json();
+      const got = await github(env, `repos/${REPO}/contents/${file}?ref=main`);
+      if (!got.ok) return reply({error: "github_" + got.status}, 502, cors);
+      const meta = await got.json();
       const data = JSON.parse(fromBase64(meta.content));
 
       const owed = owedPunishments(data);
@@ -49,10 +52,10 @@ export default {
       data.punishments.push({id: "p" + nextId, time: who.time, player: who.id, text: item.text, source: "wheel"});
       data.wheel = wheel.filter((_, i) => i !== index);
 
-      const save = await github(env, `repos/${REPO}/contents/data.json`, {
+      const save = await github(env, `repos/${REPO}/contents/${file}`, {
         method: "PUT",
         body: JSON.stringify({
-          message: `Wheel: ${who.name} gets "${item.text}"`,
+          message: (file === "data.json" ? "" : "Test lab: ") + `Wheel: ${who.name} gets "${item.text}"`,
           content: toBase64(JSON.stringify(data, null, 2) + "\n"),
           sha: meta.sha,
           branch: "main",
@@ -65,6 +68,27 @@ export default {
     return reply({error: "busy"}, 503, cors);
   },
 };
+
+// Test lab reset: copy the real data into test-data.json and add one test death so someone owes a punishment
+async function resetTest(env, cors) {
+  const real = await github(env, `repos/${REPO}/contents/data.json?ref=main`);
+  if (!real.ok) return reply({error: "github_" + real.status}, 502, cors);
+  const data = JSON.parse(fromBase64((await real.json()).content));
+  const t = {};
+  const players = (data.players || []).filter(p => !p.inactive);
+  players.forEach(p => t[p.id] = Number(p.base) || 0);
+  (data.deaths || []).filter(d => !d.reverted).forEach(d => { if (d.player in t) t[d.player] += deathPoints(d); });
+  // whoever is closest to their next punishment gets a +5 test death
+  const pick = players.map(p => ({p, away: PER_PUNISH - (t[p.id] % PER_PUNISH)})).sort((a, b) => a.away - b.away)[0];
+  if (!pick) return reply({error: "no_players"}, 409, cors);
+  data.deaths.push({id: "test" + Date.now(), player: pick.p.id, age: "end", totem: false, cause: "Test death", reason: "Made by the test lab", date: new Date().toISOString().slice(0, 10), time: new Date().toISOString(), source: "test"});
+  let sha;
+  const cur = await github(env, `repos/${REPO}/contents/test-data.json?ref=main`);
+  if (cur.ok) sha = (await cur.json()).sha;
+  const save = await github(env, `repos/${REPO}/contents/test-data.json`, {method: "PUT", body: JSON.stringify({message: "Test lab: reset test data", content: toBase64(JSON.stringify(data, null, 2) + "\n"), branch: "main", ...(sha ? {sha} : {})})});
+  if (!save.ok) return reply({error: "github_" + save.status}, 502, cors);
+  return reply({ok: true, owed: pick.p.nick || pick.p.name}, 200, cors);
+}
 
 // Same rules as the website: base points + points for each death; every 5 points is a punishment.
 function deathPoints(d) {
