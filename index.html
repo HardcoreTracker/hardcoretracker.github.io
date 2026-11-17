@@ -534,7 +534,8 @@ body.has-ticker .lower-right{top:52px;max-height:calc(100vh - 68px)}
 .wheel-pointer{position:absolute;left:50%;top:-6px;width:28px;height:30px;transform:translateX(-50%);background:#1E1E1E;clip-path:polygon(0 0,100% 0,100% 30%,75% 30%,75% 60%,50% 100%,25% 60%,25% 30%,0 30%);z-index:2}
 .wheel-pointer::after{content:"";position:absolute;inset:3px 5px 6px;background:#FF5555;clip-path:polygon(0 0,100% 0,100% 30%,72% 30%,72% 60%,50% 100%,28% 60%,28% 30%,0 30%)}
 .wheel-spin{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:23%;aspect-ratio:1;border-radius:0;font-size:clamp(14px,3.6vw,20px);padding:0;z-index:2}
-.wheel-spin:disabled{opacity:.8;cursor:wait}
+.wheel-spin:disabled{opacity:.85;cursor:not-allowed}
+.wheel-box.locked canvas{filter:grayscale(.75) brightness(.75)}
 .wheel-side{flex:1 1 280px;min-width:0;display:flex;flex-direction:column;gap:12px}
 .wheel-result{padding:14px;min-height:96px;display:flex;flex-direction:column;justify-content:center;gap:6px;color:#FFFFFF}
 .wheel-result .wr-tag{font-size:12px;color:#FFFF55;letter-spacing:.05em}
@@ -3198,15 +3199,32 @@ function drawWheel(){
     ctx.fillStyle = "#E0E0E0"; ctx.fillRect(Math.round(c + Math.cos(a) * (r + 2)) - 3, Math.round(c + Math.sin(a) * (r + 2)) - 3, 6, 6);
   }
 }
+// The wheel unlocks only while someone has earned more punishments than the history shows they've been given
+function owedPunishments(){
+  const t = totals(), given = {};
+  (punData || []).forEach(x => given[x.player] = (given[x.player] || 0) + 1);
+  return players.map(p => ({p, owed: Math.floor((t[p.id] || 0) / PER_PUNISH) - (given[p.id] || 0)})).filter(x => x.owed > 0);
+}
+function wheelLockState(){
+  const owed = owedPunishments(), btn = $("wheelSpin"), box = document.querySelector(".wheel-box"), res = $("wheelResult");
+  const locked = !owed.length;
+  box.classList.toggle("locked", locked);
+  if (!wheelSpinning){ btn.disabled = locked; btn.textContent = locked ? "🔒" : "SPIN"; btn.title = locked ? "Locked until someone earns a new punishment" : ""; }
+  if (wheelSpinning || res.querySelector(".wr-text")) return;
+  res.innerHTML = locked
+    ? '<span class="wr-tag">LOCKED</span><span class="wr-note">The wheel unlocks as soon as someone earns a new punishment.</span>'
+    : `<span class="wr-tag">UNLOCKED</span><span class="wr-note"><b>${owed.map(x => esc(shortName(x.p)) + (x.owed > 1 ? " (" + x.owed + ")" : "")).join(", ")}</b> ${owed.length === 1 && owed[0].owed === 1 ? "has" : "have"} a punishment coming. Press <b>SPIN</b>!</span>`;
+}
 function renderWheel(list){
   wheelItems = (list || []).map(w => typeof w === "string" ? {text: w, short: w} : {text: w.text, short: w.short || w.text});
   $("wheelSec").hidden = !wheelItems.length;
   if (!wheelItems.length) return;
   $("wheelLegend").innerHTML = wheelItems.map((w, k) => `<li data-k="${k}"><span class="sw" style="background:${WHEEL_COLORS[k % WHEEL_COLORS.length]}"></span><span>${esc(w.text)}</span></li>`).join("");
   requestAnimationFrame(drawWheel);
+  wheelLockState();
 }
 function spinWheel(){
-  if (wheelSpinning || !wheelItems.length) return;
+  if (wheelSpinning || !wheelItems.length || !owedPunishments().length) return;
   const n = wheelItems.length, seg = Math.PI * 2 / n;
   const rnd = new Uint32Array(1); (window.crypto || window.msCrypto).getRandomValues(rnd);
   const pick = rnd[0] % n;
@@ -3220,7 +3238,7 @@ function spinWheel(){
   document.querySelectorAll(".wheel-legend li").forEach(li => li.classList.remove("hit"));
   res.classList.remove("pop"); res.innerHTML = '<span class="wr-note">Spinning…</span>';
   const finish = () => {
-    wheelAngle = norm(end); drawWheel(); wheelSpinning = false; btn.disabled = false;
+    wheelAngle = norm(end); drawWheel(); wheelSpinning = false; wheelLockState();
     const w = wheelItems[pick];
     res.innerHTML = `<span class="wr-tag">THE WHEEL HAS SPOKEN</span><span class="wr-text">${esc(w.text)}</span><span class="wr-note">Not official until it shows up as the current punishment.</span>`;
     void res.offsetWidth; res.classList.add("pop");
