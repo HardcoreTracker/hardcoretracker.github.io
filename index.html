@@ -3335,7 +3335,11 @@ async function spinWheel(){
       res.innerHTML = j.error === "locked"
         ? '<span class="wr-tag">TOO LATE</span><span class="wr-note">Someone already spun for the next punishment. Updating…</span>'
         : '<span class="wr-tag">THE WHEEL JAMMED</span><span class="wr-note">Couldn\'t spin right now. Try again in a moment.</span>';
-      if (j.error === "locked") setTimeout(() => { res.innerHTML = ""; loadData(false).catch(() => {}); }, 2500);
+      if (j.error === "locked") freshFromGitHub().then(d => {
+        const c = d.currentPunishment || {};
+        res.innerHTML = c.used ? "" : `<span class="wr-tag">ALREADY SPUN</span><span class="wr-text">${esc(c.text || "")}</span><span class="wr-note">Someone already picked the next punishment.</span>`;
+        wheelLockState();
+      }).catch(() => setTimeout(() => { res.innerHTML = ""; loadData(false).catch(() => {}); }, 2500));
       wheelLockState(); return;
     }
     // Make sure we're showing the same slices the server spun
@@ -3344,7 +3348,7 @@ async function spinWheel(){
       showWheelResult(j.index, `<span class="wr-tag">NEXT PUNISHMENT</span><span class="wr-text">${esc(j.text)}</span><span class="wr-note">Whoever is punished next gets this one.</span>`);
       curPunData = {text: j.text};
       $("cpText").textContent = j.text; renderCurPunNote();
-      setTimeout(() => loadData(false).catch(() => {}), 70000);
+      holdPagesUntil = Date.now() + 3 * 60000;
     });
   } catch(e){
     waiting = false; wheelSpinning = false;
@@ -3486,8 +3490,16 @@ if (TESTLAB){
       const r = await fetch(WHEEL_API.replace(/\/$/, "") + "/test/reset", {method: "POST", cache: "no-store"});
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.error || r.status);
-      msg.textContent = `Done: a copy of the real data, plus a test death so ${j.owed || "someone"} owes a punishment. Reloading in a moment…`;
-      setTimeout(() => location.reload(), 4000);
+      msg.textContent = `Reset! ${j.owed || "Someone"} got a test death. Handing out the test punishment (about a minute)…`;
+      curPunData = {}; $("wheelResult").innerHTML = ""; wheelLockState();
+      const t0 = Date.now();
+      const check = async () => {
+        try { const d = await freshFromGitHub(); if ((d.currentPunishment || {}).used){ msg.textContent = "Ready! The wheel is unlocked."; $("wheelResult").innerHTML = ""; wheelLockState(); b.disabled = false; return; } } catch(e){}
+        if (Date.now() - t0 > 150000){ msg.textContent = "Still waiting on GitHub. Reload the page in a minute."; b.disabled = false; return; }
+        setTimeout(check, 8000);
+      };
+      setTimeout(check, 6000);
+      return;
     } catch(e){ msg.textContent = "Couldn't reset: " + e.message + (String(e.message).includes("not_found") ? " (paste the updated spin server code into Cloudflare)" : ""); b.disabled = false; }
   });
 }
@@ -3588,8 +3600,20 @@ function applyData(d){
   if (!$("overlay").hidden && location.hash.startsWith("#player-") && $("ovBody").querySelector(".cookie.open")) { /* keep an opened cookie open */ } else route();
   setStatus("Updated " + (d.updated || "recently"), "live");
 }
+// GitHub's website copy lags about a minute behind changes. Right after a spin or reset, read the
+// file straight from GitHub instead, and ignore the lagging copy for a few minutes.
+let holdPagesUntil = 0;
+async function freshFromGitHub(){
+  const r = await fetch(`https://api.github.com/repos/HardcoreTracker/hardcoretracker.github.io/contents/${DATA_FILE}?ref=main`, {cache: "no-store", headers: {"Accept": "application/vnd.github+json"}});
+  if (!r.ok) throw new Error("GitHub said " + r.status);
+  const text = b64ToText((await r.json()).content);
+  holdPagesUntil = Date.now() + 3 * 60000;
+  if (text !== lastDataText){ lastDataText = text; applyData(JSON.parse(text)); }
+  return JSON.parse(text);
+}
 // Load the data, then check for updates every minute so new deaths show up without refreshing.
 function loadData(first){
+  if (!first && Date.now() < holdPagesUntil) return Promise.resolve();
   return fetch(DATA_FILE + "?t=" + Date.now(), {cache:"no-store"}).then(r => { if (!r.ok) throw 0; return r.text(); }).then(text => {
     if (text === lastDataText) return;
     lastDataText = text;
