@@ -577,7 +577,7 @@ body.has-ticker .lower-right{top:52px;max-height:calc(100vh - 68px)}
       <span class="label sub">Shared-life hardcore · Wilderness Bound</span>
       <h1 class="mctitle">Hardcore Point Tracker</h1>
     </div>
-    <div class="top-btns"><button type="button" class="rules-btn fx-btn" id="fxBtn" aria-pressed="true">Effects: On</button><a class="rules-btn" href="#rules">Rules</a><a class="rules-btn" href="#admin" id="admTop" hidden>Admin</a></div>
+    <div class="top-btns"><button type="button" class="rules-btn fx-btn" id="fxBtn" aria-pressed="true">Effects: On</button><a class="rules-btn" href="#rules">Rules</a><a class="rules-btn" href="#redstone-vault-b2945e" id="admTop" hidden>Admin</a></div>
     <div class="status" id="status">Loading the server's record…</div>
   </header>
 
@@ -669,7 +669,7 @@ body.has-ticker .lower-right{top:52px;max-height:calc(100vh - 68px)}
         <ol class="wheel-legend" id="wheelLegend"></ol>
         <div class="wheel-links">
           <a class="rules-btn" href="https://github.com/HardcoreTracker/hardcoretracker.github.io/issues/new?template=punishment.yml" target="_blank" rel="noopener noreferrer">+ Suggest a punishment</a>
-          <a class="rules-btn" href="#admin" id="admLink" hidden>Review suggestions</a>
+          <a class="rules-btn" href="#redstone-vault-b2945e" id="admLink" hidden>Review suggestions</a>
         </div>
       </div>
     </div>
@@ -2145,7 +2145,7 @@ function rulesHtml(){
 function route(){
   const hsh = decodeURIComponent(location.hash.slice(1));
   if (hsh === "rules") openOverlay(rulesHtml());
-  else if (hsh === "admin"){ openOverlay(adminHtml()); adminWire(); }
+  else if (hsh === "redstone-vault-b2945e"){ openOverlay(adminHtml()); adminWire(); }
   else if (hsh.startsWith("player-")){ const html = playerPageHtml(hsh.slice(7)); if (html) openOverlay(html); else closeOverlay(); }
   else if (!$("overlay").hidden){ $("overlay").hidden = true; document.body.classList.remove("ov-open"); }
 }
