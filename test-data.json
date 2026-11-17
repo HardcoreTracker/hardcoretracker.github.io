@@ -544,7 +544,7 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Double or Nothing (flip a coin)"
+    "text": "\"I suck at Minecraft\" written 100 times"
   },
   "lastDeath": {
     "player": "monkey____",
@@ -653,6 +653,13 @@
       "time": "2026-11-16T19:35:36-08:00",
       "player": "monkey____",
       "text": "Play Hypixel Bedwars until victory"
+    },
+    {
+      "id": "p18",
+      "time": "2026-11-17T07:00:35.123Z",
+      "player": "incendiaryblitz",
+      "text": "\"I suck at Minecraft\" written 100 times",
+      "source": "wheel"
     }
   ],
   "weather": "auto",
@@ -678,10 +685,6 @@
     {
       "text": "Profile picture voted on by us for one week",
       "short": "Voted PFP (1 wk)"
-    },
-    {
-      "text": "\"I suck at Minecraft\" written 100 times",
-      "short": "\"I suck\" x100"
     },
     {
       "text": "Beat The Hardest Game",
