@@ -86,6 +86,13 @@
       "nick": "Alex",
       "base": 0,
       "skin": "skins/Dark31911.png"
+    },
+    {
+      "id": "monkey______",
+      "name": "monkey______",
+      "nick": "monkey______",
+      "base": 0,
+      "skin": ""
     }
   ],
   "deaths": [
@@ -514,6 +521,17 @@
       "time": "2026-11-14T09:42:51Z",
       "source": "mod",
       "points": 2
+    },
+    {
+      "id": "m1794886536000",
+      "player": "monkey______",
+      "age": "diamond",
+      "totem": true,
+      "cause": "Blown up by Creeper",
+      "reason": "",
+      "date": "2026-11-17",
+      "time": "2026-11-17T03:35:36Z",
+      "source": "mod"
     }
   ],
   "progress": {
@@ -525,9 +543,9 @@
     "text": "Play Hypixel Bedwars until victory"
   },
   "lastDeath": {
-    "player": "subkiwi",
+    "player": "monkey______",
     "cause": "Blown up by Creeper",
-    "time": "2026-11-14T09:42:51Z"
+    "time": "2026-11-17T03:35:36Z"
   },
   "punishments": [
     {
