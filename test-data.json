@@ -527,14 +527,14 @@
       "source": "mod"
     },
     {
-      "id": "test1794958915898",
+      "id": "test1794958949777",
       "player": "incendiaryblitz",
       "age": "end",
       "totem": false,
       "cause": "Test death",
       "reason": "Made by the test lab",
       "date": "2026-11-17",
-      "time": "2026-11-17T23:41:55.898Z",
+      "time": "2026-11-17T23:42:29.777Z",
       "source": "test"
     }
   ],
@@ -544,7 +544,7 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Beat The Hardest Game"
+    "text": "Double or Nothing (flip a coin)"
   },
   "lastDeath": {
     "player": "monkey____",
@@ -653,13 +653,6 @@
       "time": "2026-11-16T19:35:36-08:00",
       "player": "monkey____",
       "text": "Play Hypixel Bedwars until victory"
-    },
-    {
-      "id": "p18",
-      "time": "2026-11-17T23:41:55.898Z",
-      "player": "incendiaryblitz",
-      "text": "Double or Nothing (flip a coin)",
-      "source": "auto"
     }
   ],
   "weather": "auto",
@@ -689,6 +682,10 @@
     {
       "text": "\"I suck at Minecraft\" written 100 times",
       "short": "\"I suck\" x100"
+    },
+    {
+      "text": "Beat The Hardest Game",
+      "short": "Hardest Game"
     },
     {
       "text": "Minecraft knowledge exam",
