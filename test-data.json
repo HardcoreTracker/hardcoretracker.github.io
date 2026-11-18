@@ -538,24 +538,24 @@
       "source": "mod"
     },
     {
-      "id": "test1794975998101",
+      "id": "test1794976032027",
       "player": "incendiaryblitz",
       "age": "end",
       "totem": false,
       "cause": "Test death",
       "reason": "Made by the test lab",
       "date": "2026-11-18",
-      "time": "2026-11-18T04:26:38.101Z",
+      "time": "2026-11-18T04:27:12.027Z",
       "source": "test"
     }
   ],
   "progress": {
     "age": 2,
-    "quest": 24,
+    "quest": 26,
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Set up a villager trading hall with Mending, Unbreaking 3, Prot 4 and Sharpness 5"
+    "text": "Profile picture voted on by us for one week"
   },
   "lastDeath": {
     "player": "dark31911",
@@ -671,13 +671,6 @@
       "player": "dark31911",
       "text": "Double or Nothing (flip a coin)",
       "source": "auto"
-    },
-    {
-      "id": "p19",
-      "time": "2026-11-18T04:26:38.101Z",
-      "player": "incendiaryblitz",
-      "text": "Profile picture voted on by us for one week",
-      "source": "auto"
     }
   ],
   "weather": "auto",
@@ -695,6 +688,10 @@
     {
       "text": "10 minutes MC slave each",
       "short": "10 min MC slave"
+    },
+    {
+      "text": "Set up a villager trading hall with Mending, Unbreaking 3, Prot 4 and Sharpness 5",
+      "short": "Trading hall"
     },
     {
       "text": "\"I suck at Minecraft\" written 100 times",
