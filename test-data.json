@@ -527,31 +527,40 @@
       "source": "mod"
     },
     {
-      "id": "test1794964579929",
+      "id": "m1794967183000",
+      "player": "dark31911",
+      "age": "iron",
+      "totem": false,
+      "cause": "Blown up by Creeper",
+      "reason": "",
+      "date": "2026-11-18",
+      "time": "2026-11-18T01:59:43Z",
+      "source": "mod"
+    },
+    {
+      "id": "test1794968864220",
       "player": "incendiaryblitz",
       "age": "end",
       "totem": false,
       "cause": "Test death",
       "reason": "Made by the test lab",
       "date": "2026-11-18",
-      "time": "2026-11-18T01:16:19.929Z",
+      "time": "2026-11-18T02:27:44.220Z",
       "source": "test"
     }
   ],
   "progress": {
-    "age": 3,
-    "quest": 20,
+    "age": 1,
+    "quest": 12,
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Double or Nothing (flip a coin)",
-    "used": true,
-    "givenTo": "incendiaryblitz"
+    "text": "Profile picture voted on by us for one week"
   },
   "lastDeath": {
-    "player": "monkey____",
+    "player": "dark31911",
     "cause": "Blown up by Creeper",
-    "time": "2026-11-17T03:35:36Z"
+    "time": "2026-11-18T01:59:43Z"
   },
   "punishments": [
     {
@@ -658,8 +667,8 @@
     },
     {
       "id": "p18",
-      "time": "2026-11-18T01:16:19.929Z",
-      "player": "incendiaryblitz",
+      "time": "2026-11-18T01:59:43Z",
+      "player": "dark31911",
       "text": "Double or Nothing (flip a coin)",
       "source": "auto"
     }
@@ -683,10 +692,6 @@
     {
       "text": "Set up a villager trading hall with Mending, Unbreaking 3, Prot 4 and Sharpness 5",
       "short": "Trading hall"
-    },
-    {
-      "text": "Profile picture voted on by us for one week",
-      "short": "Voted PFP (1 wk)"
     },
     {
       "text": "\"I suck at Minecraft\" written 100 times",
