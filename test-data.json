@@ -555,9 +555,7 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Profile picture voted on by us for one week",
-    "used": true,
-    "givenTo": "incendiaryblitz"
+    "text": "Build a NICE house from a house tutorial"
   },
   "lastDeath": {
     "player": "dark31911",
@@ -686,10 +684,6 @@
   "theme": "auto",
   "worldStart": "2026-11-14T18:32:52Z",
   "wheel": [
-    {
-      "text": "Build a NICE house from a house tutorial",
-      "short": "NICE tutorial house"
-    },
     {
       "text": "Make it through Wood without joining a party",
       "short": "Solo through Wood"
