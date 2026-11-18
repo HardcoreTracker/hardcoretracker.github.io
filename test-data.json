@@ -544,7 +544,9 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Double or Nothing (flip a coin)"
+    "text": "Double or Nothing (flip a coin)",
+    "used": true,
+    "givenTo": "incendiaryblitz"
   },
   "lastDeath": {
     "player": "monkey____",
@@ -653,6 +655,13 @@
       "time": "2026-11-16T19:35:36-08:00",
       "player": "monkey____",
       "text": "Play Hypixel Bedwars until victory"
+    },
+    {
+      "id": "p18",
+      "time": "2026-11-18T00:25:03.803Z",
+      "player": "incendiaryblitz",
+      "text": "Double or Nothing (flip a coin)",
+      "source": "auto"
     }
   ],
   "weather": "auto",
