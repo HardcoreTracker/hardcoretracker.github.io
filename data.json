@@ -525,20 +525,31 @@
       "date": "2026-11-17",
       "time": "2026-11-17T03:35:36Z",
       "source": "mod"
+    },
+    {
+      "id": "m1794967183000",
+      "player": "dark31911",
+      "age": "iron",
+      "totem": false,
+      "cause": "Blown up by Creeper",
+      "reason": "",
+      "date": "2026-11-18",
+      "time": "2026-11-18T01:59:43Z",
+      "source": "mod"
     }
   ],
   "progress": {
     "age": 4,
-    "quest": 15,
+    "quest": 16,
     "totemFarm": false
   },
   "currentPunishment": {
     "text": "Double or Nothing (flip a coin)"
   },
   "lastDeath": {
-    "player": "monkey____",
+    "player": "dark31911",
     "cause": "Blown up by Creeper",
-    "time": "2026-11-17T03:35:36Z"
+    "time": "2026-11-18T01:59:43Z"
   },
   "punishments": [
     {
