@@ -544,9 +544,7 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Double or Nothing (flip a coin)",
-    "used": true,
-    "givenTo": "incendiaryblitz"
+    "text": "\"I suck at Minecraft\" written 100 times"
   },
   "lastDeath": {
     "player": "monkey____",
@@ -687,10 +685,6 @@
     {
       "text": "Profile picture voted on by us for one week",
       "short": "Voted PFP (1 wk)"
-    },
-    {
-      "text": "\"I suck at Minecraft\" written 100 times",
-      "short": "\"I suck\" x100"
     },
     {
       "text": "Beat The Hardest Game",
