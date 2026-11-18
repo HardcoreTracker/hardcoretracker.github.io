@@ -555,7 +555,9 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Profile picture voted on by us for one week"
+    "text": "Profile picture voted on by us for one week",
+    "used": true,
+    "givenTo": "incendiaryblitz"
   },
   "lastDeath": {
     "player": "dark31911",
@@ -670,6 +672,13 @@
       "time": "2026-11-18T01:59:43Z",
       "player": "dark31911",
       "text": "Double or Nothing (flip a coin)",
+      "source": "auto"
+    },
+    {
+      "id": "p19",
+      "time": "2026-11-18T05:17:29.054Z",
+      "player": "incendiaryblitz",
+      "text": "Profile picture voted on by us for one week",
       "source": "auto"
     }
   ],
