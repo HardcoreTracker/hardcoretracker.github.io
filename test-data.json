@@ -555,9 +555,7 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Profile picture voted on by us for one week",
-    "used": true,
-    "givenTo": "incendiaryblitz"
+    "text": "Beat The Hardest Game"
   },
   "lastDeath": {
     "player": "dark31911",
@@ -705,10 +703,6 @@
     {
       "text": "\"I suck at Minecraft\" written 100 times",
       "short": "\"I suck\" x100"
-    },
-    {
-      "text": "Beat The Hardest Game",
-      "short": "Hardest Game"
     },
     {
       "text": "Minecraft knowledge exam",
