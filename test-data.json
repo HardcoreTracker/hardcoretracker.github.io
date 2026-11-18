@@ -544,9 +544,7 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Double or Nothing (flip a coin)",
-    "used": true,
-    "givenTo": "incendiaryblitz"
+    "text": "Set up a villager trading hall with Mending, Unbreaking 3, Prot 4 and Sharpness 5"
   },
   "lastDeath": {
     "player": "monkey____",
@@ -679,10 +677,6 @@
     {
       "text": "10 minutes MC slave each",
       "short": "10 min MC slave"
-    },
-    {
-      "text": "Set up a villager trading hall with Mending, Unbreaking 3, Prot 4 and Sharpness 5",
-      "short": "Trading hall"
     },
     {
       "text": "Profile picture voted on by us for one week",
