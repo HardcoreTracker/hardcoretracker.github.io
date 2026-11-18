@@ -544,9 +544,7 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Double or Nothing (flip a coin)",
-    "used": true,
-    "givenTo": "dark31911"
+    "text": "Profile picture voted on by us for one week"
   },
   "lastDeath": {
     "player": "dark31911",
@@ -683,10 +681,6 @@
     {
       "text": "Set up a villager trading hall with Mending, Unbreaking 3, Prot 4 and Sharpness 5",
       "short": "Trading hall"
-    },
-    {
-      "text": "Profile picture voted on by us for one week",
-      "short": "Voted PFP (1 wk)"
     },
     {
       "text": "\"I suck at Minecraft\" written 100 times",
