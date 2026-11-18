@@ -538,14 +538,14 @@
       "source": "mod"
     },
     {
-      "id": "test1794980273043",
+      "id": "test1794980307087",
       "player": "incendiaryblitz",
       "age": "end",
       "totem": false,
       "cause": "Test death",
       "reason": "Made by the test lab",
       "date": "2026-11-18",
-      "time": "2026-11-18T05:37:53.043Z",
+      "time": "2026-11-18T05:38:27.087Z",
       "source": "test"
     }
   ],
@@ -555,7 +555,7 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Beat The Hardest Game"
+    "text": "Profile picture voted on by us for one week"
   },
   "lastDeath": {
     "player": "dark31911",
@@ -671,13 +671,6 @@
       "player": "dark31911",
       "text": "Double or Nothing (flip a coin)",
       "source": "auto"
-    },
-    {
-      "id": "p19",
-      "time": "2026-11-18T05:37:53.043Z",
-      "player": "incendiaryblitz",
-      "text": "Profile picture voted on by us for one week",
-      "source": "auto"
     }
   ],
   "weather": "auto",
@@ -703,6 +696,10 @@
     {
       "text": "\"I suck at Minecraft\" written 100 times",
       "short": "\"I suck\" x100"
+    },
+    {
+      "text": "Beat The Hardest Game",
+      "short": "Hardest Game"
     },
     {
       "text": "Minecraft knowledge exam",
