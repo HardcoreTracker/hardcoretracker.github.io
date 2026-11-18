@@ -544,9 +544,7 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Double or Nothing (flip a coin)",
-    "used": true,
-    "givenTo": "incendiaryblitz"
+    "text": "Beat The Hardest Game"
   },
   "lastDeath": {
     "player": "monkey____",
@@ -691,10 +689,6 @@
     {
       "text": "\"I suck at Minecraft\" written 100 times",
       "short": "\"I suck\" x100"
-    },
-    {
-      "text": "Beat The Hardest Game",
-      "short": "Hardest Game"
     },
     {
       "text": "Minecraft knowledge exam",
