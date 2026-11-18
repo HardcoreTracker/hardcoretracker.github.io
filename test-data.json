@@ -538,14 +538,14 @@
       "source": "mod"
     },
     {
-      "id": "test1794977984280",
+      "id": "test1794978018359",
       "player": "incendiaryblitz",
       "age": "end",
       "totem": false,
       "cause": "Test death",
       "reason": "Made by the test lab",
       "date": "2026-11-18",
-      "time": "2026-11-18T04:59:44.280Z",
+      "time": "2026-11-18T05:00:18.359Z",
       "source": "test"
     }
   ],
@@ -555,7 +555,7 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Build a NICE house from a house tutorial"
+    "text": "Profile picture voted on by us for one week"
   },
   "lastDeath": {
     "player": "dark31911",
@@ -671,19 +671,16 @@
       "player": "dark31911",
       "text": "Double or Nothing (flip a coin)",
       "source": "auto"
-    },
-    {
-      "id": "p19",
-      "time": "2026-11-18T04:59:44.280Z",
-      "player": "incendiaryblitz",
-      "text": "Profile picture voted on by us for one week",
-      "source": "auto"
     }
   ],
   "weather": "auto",
   "theme": "auto",
   "worldStart": "2026-11-14T18:32:52Z",
   "wheel": [
+    {
+      "text": "Build a NICE house from a house tutorial",
+      "short": "NICE tutorial house"
+    },
     {
       "text": "Make it through Wood without joining a party",
       "short": "Solo through Wood"
