@@ -544,9 +544,7 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Double or Nothing (flip a coin)",
-    "used": true,
-    "givenTo": "incendiaryblitz"
+    "text": "Build a NICE house from a house tutorial"
   },
   "lastDeath": {
     "player": "monkey____",
@@ -668,10 +666,6 @@
   "theme": "auto",
   "worldStart": "2026-11-14T18:32:52Z",
   "wheel": [
-    {
-      "text": "Build a NICE house from a house tutorial",
-      "short": "NICE tutorial house"
-    },
     {
       "text": "Make it through Wood without joining a party",
       "short": "Solo through Wood"
