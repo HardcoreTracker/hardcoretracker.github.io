@@ -555,9 +555,7 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Profile picture voted on by us for one week",
-    "used": true,
-    "givenTo": "incendiaryblitz"
+    "text": "Set up a villager trading hall with Mending, Unbreaking 3, Prot 4 and Sharpness 5"
   },
   "lastDeath": {
     "player": "dark31911",
@@ -697,10 +695,6 @@
     {
       "text": "10 minutes MC slave each",
       "short": "10 min MC slave"
-    },
-    {
-      "text": "Set up a villager trading hall with Mending, Unbreaking 3, Prot 4 and Sharpness 5",
-      "short": "Trading hall"
     },
     {
       "text": "\"I suck at Minecraft\" written 100 times",
