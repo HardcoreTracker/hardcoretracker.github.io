@@ -538,14 +538,14 @@
       "source": "mod"
     },
     {
-      "id": "test1794979729031",
+      "id": "test1794979763317",
       "player": "incendiaryblitz",
       "age": "end",
       "totem": false,
       "cause": "Test death",
       "reason": "Made by the test lab",
       "date": "2026-11-18",
-      "time": "2026-11-18T05:28:49.031Z",
+      "time": "2026-11-18T05:29:23.317Z",
       "source": "test"
     }
   ],
@@ -555,7 +555,7 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Minecraft knowledge exam"
+    "text": "Profile picture voted on by us for one week"
   },
   "lastDeath": {
     "player": "dark31911",
@@ -671,13 +671,6 @@
       "player": "dark31911",
       "text": "Double or Nothing (flip a coin)",
       "source": "auto"
-    },
-    {
-      "id": "p19",
-      "time": "2026-11-18T05:28:49.031Z",
-      "player": "incendiaryblitz",
-      "text": "Profile picture voted on by us for one week",
-      "source": "auto"
     }
   ],
   "weather": "auto",
@@ -707,6 +700,10 @@
     {
       "text": "Beat The Hardest Game",
       "short": "Hardest Game"
+    },
+    {
+      "text": "Minecraft knowledge exam",
+      "short": "MC knowledge exam"
     }
   ]
 }
