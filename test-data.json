@@ -538,14 +538,14 @@
       "source": "mod"
     },
     {
-      "id": "test1794977361063",
+      "id": "test1794977395142",
       "player": "incendiaryblitz",
       "age": "end",
       "totem": false,
       "cause": "Test death",
       "reason": "Made by the test lab",
       "date": "2026-11-18",
-      "time": "2026-11-18T04:49:21.063Z",
+      "time": "2026-11-18T04:49:55.142Z",
       "source": "test"
     }
   ],
@@ -555,7 +555,7 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "\"I suck at Minecraft\" written 100 times"
+    "text": "Profile picture voted on by us for one week"
   },
   "lastDeath": {
     "player": "dark31911",
@@ -671,13 +671,6 @@
       "player": "dark31911",
       "text": "Double or Nothing (flip a coin)",
       "source": "auto"
-    },
-    {
-      "id": "p19",
-      "time": "2026-11-18T04:49:21.063Z",
-      "player": "incendiaryblitz",
-      "text": "Profile picture voted on by us for one week",
-      "source": "auto"
     }
   ],
   "weather": "auto",
@@ -699,6 +692,10 @@
     {
       "text": "Set up a villager trading hall with Mending, Unbreaking 3, Prot 4 and Sharpness 5",
       "short": "Trading hall"
+    },
+    {
+      "text": "\"I suck at Minecraft\" written 100 times",
+      "short": "\"I suck\" x100"
     },
     {
       "text": "Beat The Hardest Game",
