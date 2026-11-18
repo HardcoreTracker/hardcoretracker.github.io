@@ -555,9 +555,7 @@
     "totemFarm": false
   },
   "currentPunishment": {
-    "text": "Profile picture voted on by us for one week",
-    "used": true,
-    "givenTo": "incendiaryblitz"
+    "text": "Minecraft knowledge exam"
   },
   "lastDeath": {
     "player": "dark31911",
@@ -709,10 +707,6 @@
     {
       "text": "Beat The Hardest Game",
       "short": "Hardest Game"
-    },
-    {
-      "text": "Minecraft knowledge exam",
-      "short": "MC knowledge exam"
     }
   ]
 }
