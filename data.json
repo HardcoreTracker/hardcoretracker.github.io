@@ -547,20 +547,31 @@
       "date": "2026-11-19",
       "time": "2026-11-19T02:26:44Z",
       "source": "mod"
+    },
+    {
+      "id": "m1795055320000",
+      "player": "mysticdragbax",
+      "age": "wood",
+      "totem": false,
+      "cause": "Drowned",
+      "reason": "",
+      "date": "2026-11-19",
+      "time": "2026-11-19T02:28:40Z",
+      "source": "mod"
     }
   ],
   "progress": {
-    "age": 3,
-    "quest": 17,
+    "age": 1,
+    "quest": 1,
     "totemFarm": false
   },
   "currentPunishment": {
     "text": "Profile picture voted on by us for one week"
   },
   "lastDeath": {
-    "player": "monkey____",
-    "cause": "Hit the ground too hard",
-    "time": "2026-11-19T02:26:44Z"
+    "player": "mysticdragbax",
+    "cause": "Drowned",
+    "time": "2026-11-19T02:28:40Z"
   },
   "punishments": [
     {
