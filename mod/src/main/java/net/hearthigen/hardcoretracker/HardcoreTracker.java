@@ -62,8 +62,11 @@ public final class HardcoreTracker implements ModInitializer {
 		try {
 			long now = System.currentTimeMillis();
 			String name = player.getName().getString();
-			if (now - lastDeathAt < Math.max(0, config.ignoreDeathsWithinSeconds) * 1000L) {
-				LOG.info("[HardcoreTracker] Not logging {}'s death; it came right after another one (shared life).", name);
+			// Deaths in the first 5 minutes after a logged death are the shared-life chain or the new world's
+			// seed refresh, so they don't count. Never less than 5 minutes, even if an older config says 30 seconds.
+			long windowMs = Math.max(300, config.ignoreDeathsWithinSeconds) * 1000L;
+			if (now - lastDeathAt < windowMs) {
+				LOG.info("[HardcoreTracker] Not logging {}'s death; it came within 5 minutes of the last one (shared life / new world).", name);
 				return;
 			}
 			lastDeathAt = now;

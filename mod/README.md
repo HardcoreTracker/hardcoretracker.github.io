@@ -6,7 +6,7 @@ A small **server-side** Fabric mod for Minecraft **26.3**. It sends deaths and W
 ## What it does
 
 - **Deaths:** when a player dies, it logs who died, the cause ("Shot by Skeleton") and the time, works out the points for the current age (plus 1 if the totem farm is on), and updates the site. The death log, points, punishments, chopping block, Hall of Shame and "Survived" timer all update about a minute later.
-- **Shared life:** after a death is logged, any other deaths in the next 30 seconds are ignored, so the shared-life chain only counts once.
+- **Shared life and new worlds:** after a death is logged, any other deaths in the next 5 minutes are ignored, so the shared-life chain and the new world's seed refresh only count once.
 - **Quest progress:** every 5 minutes it checks how many Wilderness Bound quests are done and updates the age and current quest on the site.
 - **Never loses a death:** updates wait in a queue saved on the server (`config/hardcoretracker-queue.json`). If GitHub is down or the server stops, they're sent later.
 
@@ -48,7 +48,7 @@ If the token ever leaks, delete it on GitHub and make a new one.
 | `enabled` | `true` | Set to `false` to pause all updates. |
 | `githubToken` | `""` | The token from above. |
 | `repository` | `HardcoreTracker/hardcoretracker.github.io` | The website repository. |
-| `ignoreDeathsWithinSeconds` | `30` | Deaths this soon after a logged one are ignored (shared life). |
+| `ignoreDeathsWithinSeconds` | `300` | Deaths this soon after a logged one are ignored (shared life / new world). Never less than 300. |
 | `syncQuestProgress` | `true` | Keep the site's age and quest in sync with Wilderness Bound. |
 | `questSyncMinutes` | `5` | How often to check quest progress. |
 

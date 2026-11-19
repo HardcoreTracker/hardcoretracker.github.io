@@ -25,7 +25,7 @@ public final class TrackerConfig {
 	 * After a death is logged, deaths in the next this-many seconds are ignored.
 	 * Shared life kills everyone at once, and only the first death should count.
 	 */
-	public int ignoreDeathsWithinSeconds = 30;
+	public int ignoreDeathsWithinSeconds = 300;
 	/** Also keep the website's current age and quest in sync with Wilderness Bound. */
 	public boolean syncQuestProgress = true;
 	/** How often to check quest progress, in minutes. */
