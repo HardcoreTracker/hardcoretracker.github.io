@@ -536,20 +536,31 @@
       "date": "2026-11-18",
       "time": "2026-11-18T01:59:43Z",
       "source": "mod"
+    },
+    {
+      "id": "m1795055204000",
+      "player": "monkey____",
+      "age": "copper",
+      "totem": false,
+      "cause": "Hit the ground too hard",
+      "reason": "",
+      "date": "2026-11-19",
+      "time": "2026-11-19T02:26:44Z",
+      "source": "mod"
     }
   ],
   "progress": {
     "age": 3,
-    "quest": 16,
+    "quest": 17,
     "totemFarm": false
   },
   "currentPunishment": {
     "text": "Profile picture voted on by us for one week"
   },
   "lastDeath": {
-    "player": "dark31911",
-    "cause": "Blown up by Creeper",
-    "time": "2026-11-18T01:59:43Z"
+    "player": "monkey____",
+    "cause": "Hit the ground too hard",
+    "time": "2026-11-19T02:26:44Z"
   },
   "punishments": [
     {
